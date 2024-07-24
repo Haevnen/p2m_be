@@ -1,0 +1,27 @@
+version: '3.8'
+
+x-env: &appenv
+  environment:
+    - DB_HOST=${MYSQL_HOST}
+    - DB_PORT=3306
+    - DB_USER=${MYSQL_USER}
+    - DB_PASS=${MYSQL_PASSWORD}
+    - DB_NAME=${MYSQL_DATABASE}
+services:
+  db:
+    image: mysql:8.0.33
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d/
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    logging:
+      driver: "none"
+    restart: always
+    container_name: ${PROJECT_NAME}-db

@@ -1,0 +1,81 @@
+openapi: 3.0.2
+info:
+  title: P2M API
+  description: P2M API document
+  version: 1.0.0
+  termsOfService: ''
+  contact:
+    name: COM
+servers:
+  - url: '{host}/api/v1'
+    variables:
+      host:
+        default: 'http://localhost:38081'
+        enum:
+          - 'http://localhost:38081'
+
+paths:
+  /logins:
+    post:
+      summary: User login
+      description: Logs in a user and returns an authentication token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "password123"
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid username or password"
+tags:
+  - name: Users
+    description: Users API
+  - name: Tasks
+    description: Tasks API
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Specify Acess Token (tentative)
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Basic Authentication
+  parameters:
+    user_id:
+      name: X-User-Id
+      in: header
+      schema:
+        x-go-type: uint64
+        type: integer
+      required: true
