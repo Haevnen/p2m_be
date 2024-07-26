@@ -4,7 +4,7 @@ services:
 
   # migrate
   flyway:
-    image: flyway/flyway:9.20.0-alpine
+    image: flyway/flyway:10-alpine
     command: info
     volumes:
       - ./database:/flyway/sql
@@ -13,6 +13,6 @@ services:
       - FLYWAY_SCHEMAS=${MYSQL_DATABASE}
       - FLYWAY_USER=${MYSQL_USER}
       - FLYWAY_PASSWORD=${MYSQL_PASSWORD}
-      - FLYWAY_LOCATIONS=filesystem:sql/common/migrations
+      - FLYWAY_LOCATIONS=filesystem:sql/migrations
       - FLYWAY_ENCODING=UTF-8
       - FLYWAY_CLEAN_DISABLED=false

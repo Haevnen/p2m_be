@@ -1,4 +1,4 @@
-FROM flyway/flyway:9.20.0-alpine
+FROM flyway/flyway/flyway:10-alpine
 
 ADD database/migrations /flyway/sql/common-migrations
 CMD ["migrate"]
