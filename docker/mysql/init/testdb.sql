@@ -1,4 +1,4 @@
 CREATE DATABASE IF NOT EXISTS `p2m_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 CREATE USER 'test' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON `dpm_test`.* TO 'test'@'%';
+GRANT ALL PRIVILEGES ON `p2m_test`.* TO 'test'@'%';

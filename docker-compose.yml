@@ -9,7 +9,8 @@ x-env: &appenv
     - DB_NAME=${MYSQL_DATABASE}
 services:
   db:
-    image: mysql:8.0.33
+    image: mysql:8.4.2
+    command: ["mysqld", "--mysql-native-password=ON"]
     ports:
       - ${DB_PORT}:3306
     volumes:
@@ -21,7 +22,11 @@ services:
       - MYSQL_DATABASE
       - MYSQL_USER
       - MYSQL_PASSWORD
-    logging:
-      driver: "none"
     restart: always
     container_name: ${PROJECT_NAME}-db
+
+volumes:
+  db-data:
+    driver: local
+  redis-data:
+    driver: local
