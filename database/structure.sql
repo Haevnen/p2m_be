@@ -21,7 +21,29 @@ SET @@SESSION.SQL_LOG_BIN= 0;
 -- GTID state at the beginning of the backup 
 --
 
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '1afc95f3-4b4e-11ef-9392-0242ac160002:1-16';
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '6802be75-4bc7-11ef-94c7-0242ac120002:1-244';
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `session_id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `refresh_token` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT (now()),
+  `expired_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `session_id` (`session_id`),
+  UNIQUE KEY `refresh_token` (`refresh_token`),
+  KEY `fk_sessions_users` (`user_id`),
+  CONSTRAINT `fk_sessions_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `users`
@@ -31,14 +53,20 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `nick_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `type` enum('FULLTIME','FREELANCER') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_active` bit(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `nick_name` varchar(20) COLLATE utf8mb4_bin NOT NULL,
+  `email` varchar(200) COLLATE utf8mb4_bin NOT NULL,
+  `password_hashed` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `contract_type` enum('FULLTIME','FREELANCE') COLLATE utf8mb4_bin NOT NULL DEFAULT 'FULLTIME',
+  `is_active` bit(1) NOT NULL DEFAULT b'1',
+  `is_admin` bit(1) NOT NULL DEFAULT b'0',
+  `created_at` timestamp NOT NULL DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nick_name` (`nick_name`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

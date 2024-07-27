@@ -9,7 +9,7 @@ services:
     volumes:
       - ./database:/flyway/sql
     environment:
-      - FLYWAY_URL=jdbc:mysql://${MYSQL_HOST}:3306/${MYSQL_DATABASE}?charset=utf8mb4&collation=utf8_unicode_ci&parseTime=true&allowPublicKeyRetrieval=true
+      - FLYWAY_URL=jdbc:mysql://${MYSQL_HOST}:3306/${MYSQL_DATABASE}?charset=utf8mb4&collation=utf8mb4_bin&parseTime=true&allowPublicKeyRetrieval=true
       - FLYWAY_SCHEMAS=${MYSQL_DATABASE}
       - FLYWAY_USER=${MYSQL_USER}
       - FLYWAY_PASSWORD=${MYSQL_PASSWORD}
