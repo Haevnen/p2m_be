@@ -216,6 +216,18 @@ paths:
                     example: "Invalid access token"
                 required:
                   - message
+        '403':
+          description: Access forbidden (only admin)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access forbidden"
+                required:
+                  - message
   /users/register:
     post:
       tags:
@@ -267,6 +279,18 @@ paths:
                   message:
                     type: string
                     example: "Invalid user input"
+                required:
+                  - message
+        '403':
+          description: Access forbidden (only admin)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access forbidden"
                 required:
                   - message
   /users/{name}:
@@ -332,6 +356,18 @@ paths:
                   message:
                     type: string
                     example: "User not found"
+                required:
+                  - message
+        '403':
+          description: Access forbidden (only admin)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access forbidden"
                 required:
                   - message
 tags:
