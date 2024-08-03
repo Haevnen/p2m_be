@@ -5,3 +5,9 @@ Starting the environment
 ```
 make run
 ```
+
+### Migrate
+Migrate the database
+```
+make migrate
+```

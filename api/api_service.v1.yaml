@@ -14,6 +14,15 @@ servers:
           - 'http://localhost:38081'
 
 paths:
+  /ping:
+    get:
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
   /login:
     post:
       tags:
@@ -27,57 +36,13 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                nickname:
-                  type: string
-                  example: "nickname"
-                password:
-                  type: string
-                  format: password
-                  example: "password123"
+              $ref: "#/components/schemas/UserLoginBody"
       responses:
         '200':
-          description: Successful login
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  session_id:
-                    description: uuid string
-                    type: string
-                    example: "123e4567-e89b-12d3-a456-426655440000"
-                  access_token:
-                    description: jwt string
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                  refresh_token:
-                    description: jwt string
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                  refresh_token_expired_at:
-                    description: timestamp
-                    type: string
-                    example: "2022-01-01T00:00:00Z"
-                  user:
-                    $ref: "#/components/schemas/User"
-                required:
-                  - session_id
-                  - refresh_token
-                  - access_token
-                  - user
-                  
+          $ref: "#/components/responses/UserLoginResponse"
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid nickname or password"
+          $ref: "#/components/responses/Unauthorized"
+      operationId: internal_userLogin
   /logout:
     post:
       tags:
@@ -91,29 +56,10 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: Successful logout
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Logout successfully"
-                required:
-                  - message
+          description: Successful operation
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid access token"
-                required:
-                  - message
+          $ref: "#/components/responses/Unauthorized"
+      operationId: internal_userLogout
   /refresh-token:
     post:
       tags:
@@ -127,64 +73,15 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                refresh_token:
-                  type: string
-                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              $ref: "#/components/schemas/RefreshTokenRequestBody"
       responses:
         '200':
-          description: Successful refresh
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  session_id:
-                    description: uuid string
-                    type: string
-                    example: "123e4567-e89b-12d3-a456-426655440000"
-                  access_token:
-                    description: jwt string
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                  refresh_token:
-                    description: jwt string
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                  refresh_token_expired_at:
-                    description: timestamp
-                    type: string
-                    example: "2022-01-01T00:00:00Z"
-                required:
-                  - session_id
-                  - access_token
-                  - refresh_token
-                  - refresh_token_expired_at
+          $ref: "#/components/responses/RefreshTokenResponse"
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "refresh token expired"
-                required:
-                  - message
+          $ref: "#/components/responses/Unauthorized"
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "refresh token not found"
-                required:
-                  - message
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_refreshToken
   /users:
     get:
       tags:
@@ -205,29 +102,10 @@ paths:
                 items:
                   $ref: "#/components/schemas/User"
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid access token"
-                required:
-                  - message
+          $ref: "#/components/responses/Unauthorized"
         '403':
-          description: Access forbidden (only admin)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Access forbidden"
-                required:
-                  - message
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_getAllUsers
   /users/register:
     post:
       tags:
@@ -247,52 +125,15 @@ paths:
       responses:
         '200':
           description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Register successfully"
-                required:
-                  - message
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid access token"
-                required:
-                  - message
+          $ref: "#/components/responses/Unauthorized"
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid user input"
-                required:
-                  - message
+          $ref: "#/components/responses/BadRequest"
         '403':
-          description: Access forbidden (only admin)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Access forbidden"
-                required:
-                  - message
+          $ref: "#/components/responses/Forbidden"
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+      operationId: internal_registerUser
   /users/{name}:
     delete:
       tags:
@@ -312,64 +153,15 @@ paths:
       responses:
         '200':
           description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Delete successfully"
-                required:
-                  - message
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid access token"
-                required:
-                  - message
+          $ref: "#/components/responses/Unauthorized"
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid user input"
-                required:
-                  - message
+          $ref: "#/components/responses/BadRequest"
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "User not found"
-                required:
-                  - message
+          $ref: "#/components/responses/NotFound"
         '403':
-          description: Access forbidden (only admin)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Access forbidden"
-                required:
-                  - message
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_removeUser
 tags:
   - name: Users
     description: Users API
@@ -411,14 +203,134 @@ components:
       in: query
       schema:
         type: boolean
+  responses:
+    Unauthorized:
+      description: Error if API token key is not set or invalid or has already expired
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Access forbidden (only admin)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    UnexpectedError:
+      description: Unexpected errors
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: internal_error
+            title: internal error
+    UserLoginResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            title: UserLoginResponse
+            type: object
+            properties:
+              session_id:
+                description: uuid string
+                type: string
+                example: "123e4567-e89b-12d3-a456-426655440000"
+              access_token:
+                description: jwt string
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              refresh_token:
+                description: jwt string
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              refresh_token_expired_at:
+                description: timestamp
+                type: string
+                example: "2022-01-01T00:00:00Z"
+              user:
+                $ref: "#/components/schemas/UserWithoutPass"
+            required:
+              - session_id
+              - refresh_token
+              - access_token
+              - user
+              - refresh_token_expired_at
+    RefreshTokenResponse:
+      description: Refresh token response
+      content:
+        application/json:
+          schema:
+            title: RefreshTokenResponse
+            type: object
+            properties:
+              session_id:
+                description: uuid string
+                type: string
+                example: "123e4567-e89b-12d3-a456-426655440000"
+              access_token:
+                description: jwt string
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              refresh_token:
+                description: jwt string
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              refresh_token_expired_at:
+                description: timestamp
+                type: string
+                example: "2022-01-01T00:00:00Z"
+            required:
+              - session_id
+              - access_token
+              - refresh_token
+              - refresh_token_expired_at
   schemas:
-    contract_type:
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - validation_failed
+            - permission_denied
+            - request_not_found
+            - internal_error
+          default: internal_error
+        code:
+          description: Custom error code
+          type: string
+        title:
+          description: Error Summary
+          type: string
+        detail:
+          description: Detailed error description
+          type: string
+      required:
+        - type
+        - code
+        - title
+        - detail
+    ContractType:
       type: string
       enum:
         - FULLTIME
         - FREELANCE
       example: FULLTIME
-    User:
+    UserWithoutPass:
       type: object
       properties:
         nick_name:
@@ -428,7 +340,7 @@ components:
           type: string
           example: "email"
         contract_type:
-          $ref: "#/components/schemas/contract_type"
+          $ref: "#/components/schemas/ContractType"
         is_active:
           type: boolean
           example: true
@@ -441,3 +353,58 @@ components:
         - contract_type
         - is_active
         - is_admin
+    User:
+      type: object
+      properties:
+        nick_name:
+          type: string
+          example: "nickname"
+        email:
+          type: string
+          example: "email"
+        password:
+          type: string
+          example: "password"
+        contract_type:
+          $ref: "#/components/schemas/ContractType"
+        is_active:
+          type: boolean
+          example: true
+        is_admin:
+          type: boolean
+          example: false
+      required:
+        - nick_name
+        - email
+        - contract_type
+        - is_active
+        - is_admin
+    UserLoginBody:
+      type: object
+      properties:
+        nick_name:
+          type: string
+          example: "nickname"
+        password:
+          type: string
+          example: "password"
+      required:
+        - email
+        - password
+      example:
+        email: email
+        password: password
+    RefreshTokenRequestBody:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    Pong:
+      type: object
+      required:
+        - ping
+      properties:
+        ping:
+          type: string
+          example: pong
