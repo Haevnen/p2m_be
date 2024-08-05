@@ -7,13 +7,14 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-openapi/swag v0.23.0
 	github.com/go-sql-driver/mysql v1.8.1
-	github.com/google/go-cmp v0.5.5
+	github.com/google/go-cmp v0.6.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/oklog/ulid/v2 v2.1.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf
 	gorm.io/driver/mysql v1.5.7
+	gorm.io/gen v0.3.26
 	gorm.io/gorm v1.25.11
 )
 
@@ -50,9 +51,15 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/tools v0.23.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/datatypes v1.2.1 // indirect
+	gorm.io/hints v1.1.2 // indirect
+	gorm.io/plugin/dbresolver v1.5.2 // indirect
 )

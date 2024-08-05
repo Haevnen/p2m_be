@@ -1,0 +1,22 @@
+# Application information
+app:
+  name: "P2M API"
+  # file, console
+  logmode: console
+  # InfoLevel, WarnLevel, ErrorLevel, FatalLevel, PanicLevel
+  loglevel: InfoLevel
+  logfile: "/var/log/p2m/p2m.log"
+
+# Server config
+server:
+  host: 0.0.0.0 # if you want to run this API server from a Docker container, set it to 0.0.0.0
+  port: 8000
+  monitor: 8080
+
+# Shipping MySQL Server config
+database:
+  host: 127.0.0.1
+  port: 33306
+  dbname: p2m_db
+  username: root
+  password: root
