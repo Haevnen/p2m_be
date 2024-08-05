@@ -12,3 +12,11 @@ migrate-test:
 
 migrate-repair:
 	docker-compose -f docker-compose-db-tools.yml run --rm flyway repair
+
+codegen:
+	# api
+	mkdir -p "$(APP_API_DIR)"/gen/api
+	docker-compose -f docker-compose-tools.yml run --rm oapi-codegen\
+		-generate "types" -package api /spec/api_service.v1.yaml > "$(APP_API_DIR)"/gen/api/service.types.go
+	docker-compose -f docker-compose-tools.yml run --rm oapi-codegen\
+		-generate "gin-server,spec" -package api /spec/api_service.v1.yaml > "$(APP_API_DIR)"/gen/api/service.server.go
