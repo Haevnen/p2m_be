@@ -1,0 +1,40 @@
+name: Deployment in Production
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  deploy-db:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Pull Flyway Docker image
+        run: |
+          docker pull flyway/flyway:10-alpine
+
+      - name: Setup environment
+        run: |
+          echo "FLYWAY_URL=${{ secrets.FLYWAY_PROD_URL }}" >> $GITHUB_ENV
+          echo "FLYWAY_USER=${{ secrets.FLYWAY_USER }}" >> $GITHUB_ENV
+          echo "FLYWAY_PASSWORD=${{ secrets.FLYWAY_PROD_PASSWORD }}" >> $GITHUB_ENV
+          echo "FLYWAY_SCHEMAS=p2m_db" >> $GITHUB_ENV
+          echo "FLYWAY_LOCATIONS=filesystem:database/migrations" >> $GITHUB_ENV
+
+      - name: Run Flyway migrations using Docker
+        run: |
+          docker run --rm \
+            -v $(pwd)/database:/flyway/sql \
+            -e FLYWAY_URL=$FLYWAY_URL\
+            -e FLYWAY_USER=$FLYWAY_USER \
+            -e FLYWAY_PASSWORD=$FLYWAY_PASSWORD \
+            -e FLYWAY_SCHEMAS=p2m_db \
+            -e FLYWAY_LOCATIONS=filesystem:sql/migrations \
+            flyway/flyway:10-alpine migrate
+
+      - name: Clean up Docker image
+        run: |
+          docker rmi flyway/flyway:10-alpine || true
