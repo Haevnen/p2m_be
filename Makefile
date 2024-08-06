@@ -23,6 +23,6 @@ codegen: codegen-unify
 	# api
 	mkdir -p "$(APP_API_DIR)"/gen/api
 	docker-compose -f docker-compose-tools.yml run --rm oapi-codegen\
-		-generate "types" -package api /api/$(UNIFIED_DIR)/api_service/openapi/openapi.yaml > "$(APP_API_DIR)"/gen/api/service.types.go
+		-generate "types" -package p2m_api /api/$(UNIFIED_DIR)/api_service/openapi/openapi.yaml > "$(APP_API_DIR)"/gen/api/service.types.go
 	docker-compose -f docker-compose-tools.yml run --rm oapi-codegen\
-		-generate "gin-server,spec" -package api /api/$(UNIFIED_DIR)/api_service/openapi/openapi.yaml > "$(APP_API_DIR)"/gen/api/service.server.go
+		-generate "gin-server,spec" -package p2m_api /api/$(UNIFIED_DIR)/api_service/openapi/openapi.yaml > "$(APP_API_DIR)"/gen/api/service.server.go
