@@ -16,6 +16,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // ServerInterface represents all server handlers.
@@ -61,7 +62,7 @@ func (siw *ServerInterfaceWrapper) PostLogin(c *gin.Context) {
 
 	// ------------- Required header parameter "X-Request-Id" -------------
 	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
-		var XRequestId RequestId
+		var XRequestId string
 		n := len(valueList)
 		if n != 1 {
 			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
@@ -105,7 +106,7 @@ func (siw *ServerInterfaceWrapper) PostLogout(c *gin.Context) {
 
 	// ------------- Required header parameter "X-Session-Id" -------------
 	if valueList, found := headers[http.CanonicalHeaderKey("X-Session-Id")]; found {
-		var XSessionId SessionId
+		var XSessionId openapi_types.UUID
 		n := len(valueList)
 		if n != 1 {
 			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Session-Id, got %d", n), http.StatusBadRequest)
@@ -127,7 +128,7 @@ func (siw *ServerInterfaceWrapper) PostLogout(c *gin.Context) {
 
 	// ------------- Required header parameter "X-Request-Id" -------------
 	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
-		var XRequestId RequestId
+		var XRequestId string
 		n := len(valueList)
 		if n != 1 {
 			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
@@ -169,7 +170,7 @@ func (siw *ServerInterfaceWrapper) PostRefreshToken(c *gin.Context) {
 
 	// ------------- Required header parameter "X-Request-Id" -------------
 	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
-		var XRequestId RequestId
+		var XRequestId string
 		n := len(valueList)
 		if n != 1 {
 			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
@@ -241,7 +242,7 @@ func (siw *ServerInterfaceWrapper) PostUsersRegister(c *gin.Context) {
 
 	// ------------- Required header parameter "X-Request-Id" -------------
 	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
-		var XRequestId RequestId
+		var XRequestId string
 		n := len(valueList)
 		if n != 1 {
 			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
@@ -294,7 +295,7 @@ func (siw *ServerInterfaceWrapper) DeleteUsersName(c *gin.Context) {
 
 	// ------------- Required header parameter "X-Request-Id" -------------
 	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
-		var XRequestId RequestId
+		var XRequestId string
 		n := len(valueList)
 		if n != 1 {
 			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
@@ -362,30 +363,34 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"H4sIAAAAAAAC/+xabU/cuhL+K5Hv/XCvlGWzL3DbfANKq0WUVhTuqU6FIm8yu+uS2Knt0G5R/vuRXxLy",
+	"tiXQBdGq0pHIcSaex+PnGY9ne4NClqSMApUC+TeIw5cMhDxgEQE9QGhMKARs/hlCqQZCRiVQ/YjTNCYh",
+	"loTR4WfBqBoT4QoSrJ7+zWGBfPSv4a2HoXkrhvVZ8zx3tWfCIUK+5Bnkbt1zMHoc38Go03vu2sl0DC4E",
+	"cPUXvuEkjaFAwnEoA7lOAfno9cXJyfns7RFyESSYxMi3f11ERIBDSa7BzG0GooRQ5C9wLMBFlIRXAcWJ",
+	"mkg968fcRSlnKXBpd6Lh8seLrBvnJarKIkqAdglCckKXyraCuGJvwFvjOWMxYFpYm+VUjO3K2taVtVax",
+	"lMtuwaltzqdGFNyOKFcQVd1dljMXrHPbIQWaJcpLZTtfnx0dneyfHh6pGW4BVyza8Wtqpr6R5Vp7RsBF",
+	"KRbiK+NR/YtidDSeIBctGE+wrAx3hrIVgg6V1dFyWHAQq0CyK6ANAq2PV/M3IXlHjmcX32ejUzITM3q2",
+	"Gx7O9mZX6cf/Hx6/vBcKDiJlVEAw9ryG4HAYghAFir6uG+Af9FkA31LFvkBHd+yNxwNvNPBG557n6//+",
+	"Ri4SIARhNCAR8tFoPIHp7t7/BvDi5XwwGkeTAZ7u7g2m47293d3p1PM8D7kos2nlCXJJK5nUw3mDIhAh",
+	"J6lKp8hHn79Kx26X+9P77bYp9HTeapvXdCxJAkLiJK353bDDLT/VLW/OnGUk6lpTT2a0fBVU+VHK16dU",
+	"M13W9rm5E7U1WCeX/dRpMkVFnwkIgZfquxO2ZJl0RKZdL7I4XrcPs9K8mk+6vrzrPCgm6ot7/LvnlT9S",
+	"/5Wlfj/5blx/DXJfaUw2SvoMlkRI4A8Rdfe325b1dCP2VxCDhIcg7/pym7inpsjpgWRGr3FMIkdlaIfQ",
+	"NJNbBjK6J5CisnAYdx5Ub1Z9B/f1blThFCrYaiDMAdEDjNWeQeFY7W0ZzaQnln0TkAXjcxJFWw/K9EEh",
+	"oUw6C5bRbQdl2psvqiLaCgx9BIQZJ3L9QVVbxucBFiTcz+SqfSjoV456B1TaNgWyPQV9IVbvbwGtpEzV",
+	"Yg8Ac+DFlHP9f6+Le93xX+fIbfj5kEJIFmvHEuC8KOtKP3qKpqNcx3XBissHNrdUe2s4fPdWYak7ej9+",
+	"6+y/nzkRC7MEqM4/ROoo21fIRdfAhTEf7Xg7uhRhKVCcEuSjyY63M0bqLitXOnzDmC1N1yBlouPIPmFL",
+	"4RDqYJP2MI0cDjLjVDiY1nKAfVch3w7SrrkO/EzVTu+ZkCfaoYLAcQISuED+J0WYNGbRbdNCgUIrwJGO",
+	"nI3Kx8GZaY0NZhFq9ovcSuupvIdjERLSWU3ItQ6cIJqn+aVbabutN5X5tc5cs4GmZjAC0aG11+dttstq",
+	"V3PNoAYTy1PSMfuau8ieK48CQ83dAeOC4kyuGCffITK6zZIE83WRDWJLAYmXavP1oECXylLxkWXyDkKq",
+	"C4ph5EaOMX08P4xkH0zZ1ptkqvrswzH3mdD86UgajO6mqdqpx+dp0JOp9oTRdKmeBJ8uVezaRDY862Ky",
+	"zYWD8hbWTegzmzIb6bSb2Na4OGJ+txyqNumJCTq+g6B2F5+CoeO7GapATB8RxLQLwmlZvNVz+RlQ+OrU",
+	"rr+6CGjeDDq0keln/wYtoUMSb0A6OI4dY9XUwRuQF/bFJv7btqya60sGfH3LfkLDOIsIXQYR6CYuliBQ",
+	"lfbtX0sKmitB/HwGJRIS0a+NWEoOc47XdxC1DNIzSaYKxOQRQUy6IDTvYM5/GI3Xju7O//d+Cb5Jwo00",
+	"HnLbXPlRjrftFyUY3eHtSu565sL0V8juW9lZ2zHv+vH5SQ+Cyf305T0itTtr+wOsrlc6/n8UvhWFd6ly",
+	"s8pvlMJyo+0YJLRVbluV+qI8Xzv2d+S6zo2Nnv3UvH9mKnebqzL9m9vfxTsBpliubuFZy82wnt01ZfpH",
+	"/L+B+B+9Ou4OTKM+7pt+utNFKwHpKfl1kR8yHiMf3ayYkPkQp2R4PUIuusac4HlsxLIqa5AFzmJpO47+",
+	"cBizEMfqrT954b1Q3xX/1GaDgXJ/WWLqygzCdh2t8g3qdhI5x+KqYaqHOkwPY6K2oW5sBzvMX2GxmjPM",
+	"o/oH5TDKL/N/AgAA//+ZJRvjYCcAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
