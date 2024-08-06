@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	apiModel "github.com/Haevnen/p2m_be/gen/api"
+	apiModel "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 )
 
 // optional code omitted
