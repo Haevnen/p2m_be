@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/Haevnen/p2m_be/gen/api"
 
 	"net/http"
@@ -35,8 +34,4 @@ func (a *App) StartGin() error {
 	}
 
 	return s.ListenAndServe()
-	if a.ginApp == nil {
-		return errors.New("initialize ginApp failed")
-	}
-	return a.ginApp.Lio(a.appConfig.Server.Host + ":" + a.appConfig.Server.Port)
 }

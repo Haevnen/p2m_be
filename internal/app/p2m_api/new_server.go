@@ -1,8 +1,9 @@
 package p2m_api
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	apiModel "github.com/Haevnen/p2m_be/gen/api"
 )
