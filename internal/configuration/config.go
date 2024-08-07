@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"fmt"
+	"github.com/Haevnen/p2m_be/pkg/gormdb"
 	"os"
 	"path/filepath"
 
@@ -17,7 +18,7 @@ type Config struct {
 
 type database struct {
 	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
+	Port     int    `yaml:"port"`
 	DBname   string `yaml:"dbname"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
@@ -29,6 +30,7 @@ type app struct {
 	LogLevel     string `yaml:"loglevel"`
 	LogFile      string `yaml:"logfile"`
 	LogFileAudit string `yaml:"logfileAudit"`
+	Mode         string `yaml:"mode"`
 }
 
 type server struct {
@@ -92,4 +94,28 @@ func ValidateConfigPath(path string) error {
 	}
 
 	return nil
+}
+
+// GetGORMConfig build gormdb config from env
+func (e *Config) GetGORMConfig() *gormdb.Config {
+	return &gormdb.Config{
+		DBHost:            e.Database.Host,
+		DBPort:            e.Database.Port,
+		DBUser:            e.Database.Username,
+		DBPass:            e.Database.Password,
+		DBName:            e.Database.DBname,
+		LogSQL:            true,
+		MaxOpenConn:       10,
+		MaxLifetimeSecond: 300,
+	}
+}
+
+// GetURLBase build server config from env
+func (e *Config) GetURLBase() string {
+	return fmt.Sprintf("%s:%s", e.Server.Host, e.Server.Port)
+}
+
+// GetURLProfile build server config from env
+func (e *Config) GetURLProfile() string {
+	return fmt.Sprintf("%s:%s", e.Server.Host, e.Server.Monitor)
 }

@@ -14,6 +14,15 @@ servers:
           - 'http://localhost:38081'
 
 paths:
+  /ping:
+    get:
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
   /login:
     post:
       tags:
@@ -122,6 +131,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         '403':
           $ref: "#/components/responses/Forbidden"
+        default:
+          $ref: '#/components/responses/UnexpectedError'
       operationId: internal_registerUser
   /users/{name}:
     delete:
@@ -217,6 +228,15 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+    UnexpectedError:
+      description: Unexpected errors
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: internal_error
+            title: internal error
     UserLoginResponse:
       description: Successful operation
       content:
@@ -282,11 +302,28 @@ components:
     Error:
       type: object
       properties:
-        message:
+        type:
           type: string
-          example: "Error message"
+          enum:
+            - validation_failed
+            - permission_denied
+            - request_not_found
+            - internal_error
+          default: internal_error
+        code:
+          description: Custom error code
+          type: string
+        title:
+          description: Error Summary
+          type: string
+        detail:
+          description: Detailed error description
+          type: string
       required:
-        - message
+        - type
+        - code
+        - title
+        - detail
     ContractType:
       type: string
       enum:
@@ -363,3 +400,11 @@ components:
         refresh_token:
           type: string
           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    Pong:
+      type: object
+      required:
+        - ping
+      properties:
+        ping:
+          type: string
+          example: pong

@@ -1,26 +1,31 @@
 package main
 
-import "C"
 import (
 	"context"
-	"fmt"
-	"github.com/spf13/viper"
-	"gitlab.citigo.com.vn/kship/kship-add-on/internal/pkg/configuration"
-	"gitlab.citigo.com.vn/kship/kship-add-on/internal/pkg/core/shipping/bank_service"
-	"gitlab.citigo.com.vn/kship/kship-add-on/internal/pkg/core/shipping/bank_service/repository"
-	"gitlab.citigo.com.vn/kship/kship-add-on/internal/pkg/core/shipping/bank_service/usecase"
-	"gitlab.citigo.com.vn/kship/kship-add-on/internal/pkg/models/model"
-	_ "go.uber.org/automaxprocs"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"errors"
+	"net/http"
 	_ "net/http/pprof"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	_ "go.uber.org/automaxprocs"
+
+	"github.com/Haevnen/p2m_be/internal/app/p2m_api"
+	apiModel "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
+	"github.com/Haevnen/p2m_be/internal/configuration"
+	"github.com/Haevnen/p2m_be/internal/di"
+	"github.com/Haevnen/p2m_be/pkg/gormdb"
+	"github.com/Haevnen/p2m_be/pkg/logger"
 )
 
 var config configuration.Config
 
 func init() {
-	viper.SetConfigFile(`configs/config_check_price.yml`)
+	viper.SetConfigFile(`configs/config.yml`)
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)
@@ -32,37 +37,61 @@ func init() {
 }
 
 func main() {
+	go func() {
+		_ = http.ListenAndServe(config.GetURLProfile(), nil)
+	}()
 
-	ctx := context.Context(context.Background())
-	gormdb, _ := gorm.Open(mysql.Open("admin:admin@(10.24.22.234:3306)/kvshipping_prelive?charset=utf8mb4&parseTime=True&loc=Local"))
-	//var test repository.MysqlShopServiceRepository
-	//test := repository2.NewMysqlBankServiceRepository(gormdb)
-	//
-	s := model.Bank{
-		BankCode:   "TFG3",
-		BankName:   "Test from Golang 3",
-		CityID:     "ca nuoc",
-		BranchName: "DONG NAM A (SEA BANK)-317",
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+	ctx := context.Background()
+
+	db, closeFunc, err := gormdb.New(config.GetGORMConfig())
+	if err != nil {
+		logger.Fatal(err, "init DB")
 	}
-	//err := test.Add(ctx, &s)
-	//if err != nil {
-	//	fmt.Println(err)
-	//} else {
-	//	fmt.Println(s.ID)
-	//}
-	//fmt.Println("done test")
+	defer func() {
+		if err := closeFunc(); err != nil {
+			logger.Error(ctx, err, "close DB")
+		}
+	}()
 
-	bankRepo := repository.NewMysqlBankServiceRepository(gormdb)
-	bankUc := usecase.NewBankServiceUseCase(bankRepo)
+	di := di.New(db)
+	serverHandler := p2m_api.NewServer(di)
+	r := gin.Default()
+	gin.SetMode(config.App.Mode)
+	apiModel.RegisterHandlers(r, serverHandler)
 
-	//bankUc.
+	// And we serve HTTP until the world ends.
 
-	u := interface{}(bankUc).(bank_service.UseCase)
-	fmt.Println(u.TestBankUseCase())
-	u.Add(ctx, &s)
-	fmt.Println(s.ID)
-	fmt.Println(u.CountAll(ctx))
+	s := &http.Server{
+		Handler: r,
+		Addr:    config.GetURLBase(),
+	}
 
+	go func() {
+		// service connections
+		if err := s.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Fatal("listen: %s\n", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	quit := make(chan os.Signal, 1)
+	// kill (no param) default send syscall.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logger.Info("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := s.Shutdown(ctx); err != nil {
+		logger.Fatal("Server Shutdown:", err)
+	}
+	// catching ctx.Done(). timeout of 5 seconds.
+	select {
+	case <-ctx.Done():
+		logger.Info("timeout of 5 seconds.")
+	}
+	logger.Info("Server exiting")
 }

@@ -1,6 +1,7 @@
 # Application information
 app:
   name: "P2M API"
+  mode: "debug" # debug, release
   # file, console
   logmode: console
   # InfoLevel, WarnLevel, ErrorLevel, FatalLevel, PanicLevel

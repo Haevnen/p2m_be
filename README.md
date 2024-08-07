@@ -11,3 +11,9 @@ Migrate the database
 ```
 make migrate
 ```
+
+### Generate model
+Add model want to generate in:
+```go
+g.GenerateModel("users"),
+```

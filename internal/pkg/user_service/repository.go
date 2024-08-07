@@ -1,4 +1,4 @@
-package bank_service
+package user_service
 
 import (
 	"github.com/Haevnen/p2m_be/internal/pkg/base_service"

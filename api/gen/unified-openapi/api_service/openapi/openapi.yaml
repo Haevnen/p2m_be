@@ -1,0 +1,575 @@
+openapi: 3.0.2
+info:
+  contact:
+    name: COM
+  description: P2M API document
+  title: P2M API
+  version: 1.0.0
+servers:
+- url: '{host}/api/v1'
+  variables:
+    host:
+      default: http://localhost:38081
+      enum:
+      - http://localhost:38081
+tags:
+- description: Users API
+  name: Users
+- description: Tasks API
+  name: Tasks
+- description: Clients API
+  name: Clients
+- description: Dashboard API
+  name: Dashboard
+paths:
+  /ping:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+          description: pet response
+  /login:
+    post:
+      description: Logs in a user and returns an access token and refresh token.
+      operationId: internal_userLogin
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginBody'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+      summary: User login
+      tags:
+      - Users
+  /logout:
+    post:
+      description: Logs out a user.
+      operationId: internal_userLogout
+      parameters:
+      - explode: false
+        in: header
+        name: X-Session-Id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+      security:
+      - BearerAuth: []
+      summary: User logout
+      tags:
+      - Users
+  /refresh-token:
+    post:
+      description: Refresh an access token.
+      operationId: internal_refreshToken
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestBody'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+          description: Refresh token response
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      summary: Renew refresh_token and access token
+      tags:
+      - Users
+  /users:
+    get:
+      description: Get all users
+      operationId: internal_getAllUsers
+      parameters:
+      - explode: true
+        in: query
+        name: including_deactivates
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - Users
+  /users/register:
+    post:
+      description: Register new user
+      operationId: internal_registerUser
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+        default:
+          content:
+            application/json:
+              example:
+                type: internal_error
+                title: internal error
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected errors
+      security:
+      - BearerAuth: []
+      summary: Register new user
+      tags:
+      - Users
+  /users/{name}:
+    delete:
+      description: Delete user by name
+      operationId: internal_removeUser
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: User nickname
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Delete user by name
+      tags:
+      - Users
+components:
+  parameters:
+    session_id:
+      explode: false
+      in: header
+      name: X-Session-Id
+      required: true
+      schema:
+        format: uuid
+        type: string
+      style: simple
+    request_id:
+      explode: false
+      in: header
+      name: X-Request-Id
+      required: true
+      schema:
+        format: ascii
+        type: string
+      style: simple
+    including_deactivates:
+      explode: true
+      in: query
+      name: including_deactivates
+      required: false
+      schema:
+        type: boolean
+      style: form
+  responses:
+    Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Error if API token key is not set or invalid or has already expired
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Bad request
+    Forbidden:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Access forbidden (only admin)
+    NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Resource not found
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            type: internal_error
+            title: internal error
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected errors
+    UserLoginResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserLoginResponse'
+      description: Successful operation
+    RefreshTokenResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefreshTokenResponse'
+      description: Refresh token response
+  schemas:
+    Error:
+      properties:
+        type:
+          default: internal_error
+          enum:
+          - validation_failed
+          - permission_denied
+          - request_not_found
+          - internal_error
+          type: string
+        code:
+          description: Custom error code
+          type: string
+        title:
+          description: Error Summary
+          type: string
+        detail:
+          description: Detailed error description
+          type: string
+      required:
+      - code
+      - detail
+      - title
+      - type
+      type: object
+    ContractType:
+      enum:
+      - FULLTIME
+      - FREELANCE
+      example: FULLTIME
+      type: string
+    UserWithoutPass:
+      example:
+        is_admin: false
+        contract_type: FULLTIME
+        is_active: true
+        nick_name: nickname
+        email: email
+      properties:
+        nick_name:
+          example: nickname
+          type: string
+        email:
+          example: email
+          type: string
+        contract_type:
+          $ref: '#/components/schemas/ContractType'
+        is_active:
+          example: true
+          type: boolean
+        is_admin:
+          example: false
+          type: boolean
+      required:
+      - contract_type
+      - email
+      - is_active
+      - is_admin
+      - nick_name
+      type: object
+    User:
+      example:
+        is_admin: false
+        contract_type: FULLTIME
+        password: password
+        is_active: true
+        nick_name: nickname
+        email: email
+      properties:
+        nick_name:
+          example: nickname
+          type: string
+        email:
+          example: email
+          type: string
+        password:
+          example: password
+          type: string
+        contract_type:
+          $ref: '#/components/schemas/ContractType'
+        is_active:
+          example: true
+          type: boolean
+        is_admin:
+          example: false
+          type: boolean
+      required:
+      - contract_type
+      - email
+      - is_active
+      - is_admin
+      - nick_name
+      type: object
+    UserLoginBody:
+      example:
+        email: email
+        password: password
+      properties:
+        nick_name:
+          example: nickname
+          type: string
+        password:
+          example: password
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    RefreshTokenRequestBody:
+      example:
+        refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      properties:
+        refresh_token:
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+          type: string
+      type: object
+    Pong:
+      example:
+        ping: pong
+      properties:
+        ping:
+          example: pong
+          type: string
+      required:
+      - ping
+      type: object
+    UserLoginResponse:
+      example:
+        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        refresh_token_expired_at: 2022-01-01T00:00:00Z
+        session_id: 123e4567-e89b-12d3-a456-426655440000
+        user:
+          is_admin: false
+          contract_type: FULLTIME
+          is_active: true
+          nick_name: nickname
+          email: email
+      properties:
+        session_id:
+          description: uuid string
+          example: 123e4567-e89b-12d3-a456-426655440000
+          type: string
+        access_token:
+          description: jwt string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+          type: string
+        refresh_token:
+          description: jwt string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+          type: string
+        refresh_token_expired_at:
+          description: timestamp
+          example: 2022-01-01T00:00:00Z
+          type: string
+        user:
+          $ref: '#/components/schemas/UserWithoutPass'
+      required:
+      - access_token
+      - refresh_token
+      - refresh_token_expired_at
+      - session_id
+      - user
+      title: UserLoginResponse
+      type: object
+    RefreshTokenResponse:
+      example:
+        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        refresh_token_expired_at: 2022-01-01T00:00:00Z
+        session_id: 123e4567-e89b-12d3-a456-426655440000
+      properties:
+        session_id:
+          description: uuid string
+          example: 123e4567-e89b-12d3-a456-426655440000
+          type: string
+        access_token:
+          description: jwt string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+          type: string
+        refresh_token:
+          description: jwt string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+          type: string
+        refresh_token_expired_at:
+          description: timestamp
+          example: 2022-01-01T00:00:00Z
+          type: string
+      required:
+      - access_token
+      - refresh_token
+      - refresh_token_expired_at
+      - session_id
+      title: RefreshTokenResponse
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      description: Specify Access Token
+      scheme: bearer
+      type: http
+    BasicAuth:
+      description: Basic Authentication
+      scheme: basic
+      type: http

@@ -67,6 +67,11 @@ func Error(args ...any) {
 	logger.Error(args...)
 }
 
+// Fatal logs a message at level Error on the standard logger.
+func Fatal(args ...any) {
+	logger.Fatal(args...)
+}
+
 // Infof logs a message at level Info on the standard logger.
 func Infof(format string, args ...any) {
 	logger.Infof(format, args...)

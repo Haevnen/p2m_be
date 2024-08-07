@@ -17,12 +17,36 @@ const (
 	FULLTIME  ContractType = "FULLTIME"
 )
 
+// Defines values for ErrorType.
+const (
+	InternalError    ErrorType = "internal_error"
+	PermissionDenied ErrorType = "permission_denied"
+	RequestNotFound  ErrorType = "request_not_found"
+	ValidationFailed ErrorType = "validation_failed"
+)
+
 // ContractType defines model for ContractType.
 type ContractType string
 
 // Error defines model for Error.
 type Error struct {
-	Message string `json:"message"`
+	// Code Custom error code
+	Code string `json:"code"`
+
+	// Detail Detailed error description
+	Detail string `json:"detail"`
+
+	// Title Error Summary
+	Title string    `json:"title"`
+	Type  ErrorType `json:"type"`
+}
+
+// ErrorType defines model for Error.Type.
+type ErrorType string
+
+// Pong defines model for Pong.
+type Pong struct {
+	Ping string `json:"ping"`
 }
 
 // RefreshTokenRequestBody defines model for RefreshTokenRequestBody.
