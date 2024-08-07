@@ -17,6 +17,14 @@ const (
 	FULLTIME  ContractType = "FULLTIME"
 )
 
+// ContractType defines model for ContractType.
+type ContractType string
+
+// Error defines model for Error.
+type Error struct {
+	Message string `json:"message"`
+}
+
 // User defines model for User.
 type User struct {
 	ContractType ContractType `json:"contract_type"`
@@ -24,19 +32,26 @@ type User struct {
 	IsActive     bool         `json:"is_active"`
 	IsAdmin      bool         `json:"is_admin"`
 	NickName     string       `json:"nick_name"`
+	Password     *string      `json:"password,omitempty"`
 }
 
-// ContractType defines model for contract_type.
-type ContractType string
+// UserLoginBody defines model for UserLoginBody.
+type UserLoginBody struct {
+	NickName *string `json:"nick_name,omitempty"`
+	Password string  `json:"password"`
+}
+
+// UserWithoutPass defines model for UserWithoutPass.
+type UserWithoutPass struct {
+	ContractType ContractType `json:"contract_type"`
+	Email        string       `json:"email"`
+	IsActive     bool         `json:"is_active"`
+	IsAdmin      bool         `json:"is_admin"`
+	NickName     string       `json:"nick_name"`
+}
 
 // InlineObject defines model for inline_object.
 type InlineObject struct {
-	Nickname *string `json:"nickname,omitempty"`
-	Password *string `json:"password,omitempty"`
-}
-
-// InlineObject1 defines model for inline_object_1.
-type InlineObject1 struct {
 	RefreshToken *string `json:"refresh_token,omitempty"`
 }
 
@@ -52,8 +67,8 @@ type InlineResponse200 struct {
 	RefreshTokenExpiredAt *string `json:"refresh_token_expired_at,omitempty"`
 
 	// SessionId uuid string
-	SessionId string `json:"session_id"`
-	User      User   `json:"user"`
+	SessionId string          `json:"session_id"`
+	User      UserWithoutPass `json:"user"`
 }
 
 // InlineResponse2001 defines model for inline_response_200_1.
@@ -86,77 +101,42 @@ type InlineResponse2004 struct {
 	Message string `json:"message"`
 }
 
-// InlineResponse400 defines model for inline_response_400.
-type InlineResponse400 struct {
-	Message string `json:"message"`
-}
-
-// InlineResponse401 defines model for inline_response_401.
-type InlineResponse401 struct {
-	Message *string `json:"message,omitempty"`
-}
-
-// InlineResponse4011 defines model for inline_response_401_1.
-type InlineResponse4011 struct {
-	Message string `json:"message"`
-}
-
-// InlineResponse4012 defines model for inline_response_401_2.
-type InlineResponse4012 struct {
-	Message string `json:"message"`
-}
-
-// InlineResponse403 defines model for inline_response_403.
-type InlineResponse403 struct {
-	Message string `json:"message"`
-}
-
-// InlineResponse404 defines model for inline_response_404.
-type InlineResponse404 struct {
-	Message string `json:"message"`
-}
-
-// InlineResponse4041 defines model for inline_response_404_1.
-type InlineResponse4041 struct {
-	Message string `json:"message"`
-}
-
-// PostLoginParams defines parameters for PostLogin.
-type PostLoginParams struct {
+// InternalUserLoginParams defines parameters for InternalUserLogin.
+type InternalUserLoginParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
-// PostLogoutParams defines parameters for PostLogout.
-type PostLogoutParams struct {
+// InternalUserLogoutParams defines parameters for InternalUserLogout.
+type InternalUserLogoutParams struct {
 	XSessionId openapi_types.UUID `json:"X-Session-Id"`
 	XRequestId string             `json:"X-Request-Id"`
 }
 
-// PostRefreshTokenParams defines parameters for PostRefreshToken.
-type PostRefreshTokenParams struct {
+// InternalRefreshTokenParams defines parameters for InternalRefreshToken.
+type InternalRefreshTokenParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
-// GetUsersParams defines parameters for GetUsers.
-type GetUsersParams struct {
+// InternalGetAllUsersParams defines parameters for InternalGetAllUsers.
+type InternalGetAllUsersParams struct {
 	IncludingDeactivates *bool `form:"including_deactivates,omitempty" json:"including_deactivates,omitempty"`
 }
 
-// PostUsersRegisterParams defines parameters for PostUsersRegister.
-type PostUsersRegisterParams struct {
+// InternalRegisterUserParams defines parameters for InternalRegisterUser.
+type InternalRegisterUserParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
-// DeleteUsersNameParams defines parameters for DeleteUsersName.
-type DeleteUsersNameParams struct {
+// InternalRemoveUserParams defines parameters for InternalRemoveUser.
+type InternalRemoveUserParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
-// PostLoginJSONRequestBody defines body for PostLogin for application/json ContentType.
-type PostLoginJSONRequestBody = InlineObject
+// InternalUserLoginJSONRequestBody defines body for InternalUserLogin for application/json ContentType.
+type InternalUserLoginJSONRequestBody = UserLoginBody
 
-// PostRefreshTokenJSONRequestBody defines body for PostRefreshToken for application/json ContentType.
-type PostRefreshTokenJSONRequestBody = InlineObject1
+// InternalRefreshTokenJSONRequestBody defines body for InternalRefreshToken for application/json ContentType.
+type InternalRefreshTokenJSONRequestBody = InlineObject
 
-// PostUsersRegisterJSONRequestBody defines body for PostUsersRegister for application/json ContentType.
-type PostUsersRegisterJSONRequestBody = User
+// InternalRegisterUserJSONRequestBody defines body for InternalRegisterUser for application/json ContentType.
+type InternalRegisterUserJSONRequestBody = User

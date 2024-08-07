@@ -23,22 +23,22 @@ import (
 type ServerInterface interface {
 	// User login
 	// (POST /login)
-	PostLogin(c *gin.Context, params PostLoginParams)
+	InternalUserLogin(c *gin.Context, params InternalUserLoginParams)
 	// User logout
 	// (POST /logout)
-	PostLogout(c *gin.Context, params PostLogoutParams)
+	InternalUserLogout(c *gin.Context, params InternalUserLogoutParams)
 	// Renew refresh_token and access token
 	// (POST /refresh-token)
-	PostRefreshToken(c *gin.Context, params PostRefreshTokenParams)
+	InternalRefreshToken(c *gin.Context, params InternalRefreshTokenParams)
 	// Get all users
 	// (GET /users)
-	GetUsers(c *gin.Context, params GetUsersParams)
+	InternalGetAllUsers(c *gin.Context, params InternalGetAllUsersParams)
 	// Register new user
 	// (POST /users/register)
-	PostUsersRegister(c *gin.Context, params PostUsersRegisterParams)
+	InternalRegisterUser(c *gin.Context, params InternalRegisterUserParams)
 	// Delete user by name
 	// (DELETE /users/{name})
-	DeleteUsersName(c *gin.Context, name string, params DeleteUsersNameParams)
+	InternalRemoveUser(c *gin.Context, name string, params InternalRemoveUserParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -50,13 +50,13 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// PostLogin operation middleware
-func (siw *ServerInterfaceWrapper) PostLogin(c *gin.Context) {
+// InternalUserLogin operation middleware
+func (siw *ServerInterfaceWrapper) InternalUserLogin(c *gin.Context) {
 
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params PostLoginParams
+	var params InternalUserLoginParams
 
 	headers := c.Request.Header
 
@@ -89,18 +89,18 @@ func (siw *ServerInterfaceWrapper) PostLogin(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostLogin(c, params)
+	siw.Handler.InternalUserLogin(c, params)
 }
 
-// PostLogout operation middleware
-func (siw *ServerInterfaceWrapper) PostLogout(c *gin.Context) {
+// InternalUserLogout operation middleware
+func (siw *ServerInterfaceWrapper) InternalUserLogout(c *gin.Context) {
 
 	var err error
 
 	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params PostLogoutParams
+	var params InternalUserLogoutParams
 
 	headers := c.Request.Header
 
@@ -155,16 +155,16 @@ func (siw *ServerInterfaceWrapper) PostLogout(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostLogout(c, params)
+	siw.Handler.InternalUserLogout(c, params)
 }
 
-// PostRefreshToken operation middleware
-func (siw *ServerInterfaceWrapper) PostRefreshToken(c *gin.Context) {
+// InternalRefreshToken operation middleware
+func (siw *ServerInterfaceWrapper) InternalRefreshToken(c *gin.Context) {
 
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params PostRefreshTokenParams
+	var params InternalRefreshTokenParams
 
 	headers := c.Request.Header
 
@@ -197,18 +197,18 @@ func (siw *ServerInterfaceWrapper) PostRefreshToken(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostRefreshToken(c, params)
+	siw.Handler.InternalRefreshToken(c, params)
 }
 
-// GetUsers operation middleware
-func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
+// InternalGetAllUsers operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetAllUsers(c *gin.Context) {
 
 	var err error
 
 	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetUsersParams
+	var params InternalGetAllUsersParams
 
 	// ------------- Optional query parameter "including_deactivates" -------------
 
@@ -225,18 +225,18 @@ func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetUsers(c, params)
+	siw.Handler.InternalGetAllUsers(c, params)
 }
 
-// PostUsersRegister operation middleware
-func (siw *ServerInterfaceWrapper) PostUsersRegister(c *gin.Context) {
+// InternalRegisterUser operation middleware
+func (siw *ServerInterfaceWrapper) InternalRegisterUser(c *gin.Context) {
 
 	var err error
 
 	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params PostUsersRegisterParams
+	var params InternalRegisterUserParams
 
 	headers := c.Request.Header
 
@@ -269,11 +269,11 @@ func (siw *ServerInterfaceWrapper) PostUsersRegister(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostUsersRegister(c, params)
+	siw.Handler.InternalRegisterUser(c, params)
 }
 
-// DeleteUsersName operation middleware
-func (siw *ServerInterfaceWrapper) DeleteUsersName(c *gin.Context) {
+// InternalRemoveUser operation middleware
+func (siw *ServerInterfaceWrapper) InternalRemoveUser(c *gin.Context) {
 
 	var err error
 
@@ -289,7 +289,7 @@ func (siw *ServerInterfaceWrapper) DeleteUsersName(c *gin.Context) {
 	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params DeleteUsersNameParams
+	var params InternalRemoveUserParams
 
 	headers := c.Request.Header
 
@@ -322,7 +322,7 @@ func (siw *ServerInterfaceWrapper) DeleteUsersName(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteUsersName(c, name, params)
+	siw.Handler.InternalRemoveUser(c, name, params)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -352,45 +352,44 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.POST(options.BaseURL+"/login", wrapper.PostLogin)
-	router.POST(options.BaseURL+"/logout", wrapper.PostLogout)
-	router.POST(options.BaseURL+"/refresh-token", wrapper.PostRefreshToken)
-	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
-	router.POST(options.BaseURL+"/users/register", wrapper.PostUsersRegister)
-	router.DELETE(options.BaseURL+"/users/:name", wrapper.DeleteUsersName)
+	router.POST(options.BaseURL+"/login", wrapper.InternalUserLogin)
+	router.POST(options.BaseURL+"/logout", wrapper.InternalUserLogout)
+	router.POST(options.BaseURL+"/refresh-token", wrapper.InternalRefreshToken)
+	router.GET(options.BaseURL+"/users", wrapper.InternalGetAllUsers)
+	router.POST(options.BaseURL+"/users/register", wrapper.InternalRegisterUser)
+	router.DELETE(options.BaseURL+"/users/:name", wrapper.InternalRemoveUser)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"o/oH5TDKL/N/AgAA//+ZJRvjYCcAAA==",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
