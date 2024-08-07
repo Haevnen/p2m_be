@@ -47,17 +47,7 @@ paths:
         - BearerAuth: []
       responses:
         '200':
-          description: Successful logout
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Logout successfully"
-                required:
-                  - message
+          description: Successful operation
         '401':
           $ref: "#/components/responses/Unauthorized"
       operationId: internal_userLogout
@@ -74,40 +64,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                refresh_token:
-                  type: string
-                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              $ref: "#/components/schemas/RefreshTokenRequestBody"
       responses:
         '200':
-          description: Successful refresh
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  session_id:
-                    description: uuid string
-                    type: string
-                    example: "123e4567-e89b-12d3-a456-426655440000"
-                  access_token:
-                    description: jwt string
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                  refresh_token:
-                    description: jwt string
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                  refresh_token_expired_at:
-                    description: timestamp
-                    type: string
-                    example: "2022-01-01T00:00:00Z"
-                required:
-                  - session_id
-                  - access_token
-                  - refresh_token
-                  - refresh_token_expired_at
+          $ref: "#/components/responses/RefreshTokenResponse"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -156,16 +116,6 @@ paths:
       responses:
         '200':
           description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Register successfully"
-                required:
-                  - message
         '401':
           $ref: "#/components/responses/Unauthorized"
         '400':
@@ -192,16 +142,6 @@ paths:
       responses:
         '200':
           description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Delete successfully"
-                required:
-                  - message
         '401':
           $ref: "#/components/responses/Unauthorized"
         '400':
@@ -282,6 +222,7 @@ components:
       content:
         application/json:
           schema:
+            title: UserLoginResponse
             type: object
             properties:
               session_id:
@@ -307,7 +248,36 @@ components:
               - refresh_token
               - access_token
               - user
-
+              - refresh_token_expired_at
+    RefreshTokenResponse:
+      description: Refresh token response
+      content:
+        application/json:
+          schema:
+            title: RefreshTokenResponse
+            type: object
+            properties:
+              session_id:
+                description: uuid string
+                type: string
+                example: "123e4567-e89b-12d3-a456-426655440000"
+              access_token:
+                description: jwt string
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              refresh_token:
+                description: jwt string
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              refresh_token_expired_at:
+                description: timestamp
+                type: string
+                example: "2022-01-01T00:00:00Z"
+            required:
+              - session_id
+              - access_token
+              - refresh_token
+              - refresh_token_expired_at
   schemas:
     Error:
       type: object
@@ -387,3 +357,9 @@ components:
       example:
         email: email
         password: password
+    RefreshTokenRequestBody:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"

@@ -25,6 +25,26 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+// RefreshTokenRequestBody defines model for RefreshTokenRequestBody.
+type RefreshTokenRequestBody struct {
+	RefreshToken *string `json:"refresh_token,omitempty"`
+}
+
+// RefreshTokenResponse defines model for RefreshTokenResponse.
+type RefreshTokenResponse struct {
+	// AccessToken jwt string
+	AccessToken string `json:"access_token"`
+
+	// RefreshToken jwt string
+	RefreshToken string `json:"refresh_token"`
+
+	// RefreshTokenExpiredAt timestamp
+	RefreshTokenExpiredAt string `json:"refresh_token_expired_at"`
+
+	// SessionId uuid string
+	SessionId string `json:"session_id"`
+}
+
 // User defines model for User.
 type User struct {
 	ContractType ContractType `json:"contract_type"`
@@ -41,43 +61,8 @@ type UserLoginBody struct {
 	Password string  `json:"password"`
 }
 
-// UserWithoutPass defines model for UserWithoutPass.
-type UserWithoutPass struct {
-	ContractType ContractType `json:"contract_type"`
-	Email        string       `json:"email"`
-	IsActive     bool         `json:"is_active"`
-	IsAdmin      bool         `json:"is_admin"`
-	NickName     string       `json:"nick_name"`
-}
-
-// InlineObject defines model for inline_object.
-type InlineObject struct {
-	RefreshToken *string `json:"refresh_token,omitempty"`
-}
-
-// InlineResponse200 defines model for inline_response_200.
-type InlineResponse200 struct {
-	// AccessToken jwt string
-	AccessToken string `json:"access_token"`
-
-	// RefreshToken jwt string
-	RefreshToken string `json:"refresh_token"`
-
-	// RefreshTokenExpiredAt timestamp
-	RefreshTokenExpiredAt *string `json:"refresh_token_expired_at,omitempty"`
-
-	// SessionId uuid string
-	SessionId string          `json:"session_id"`
-	User      UserWithoutPass `json:"user"`
-}
-
-// InlineResponse2001 defines model for inline_response_200_1.
-type InlineResponse2001 struct {
-	Message string `json:"message"`
-}
-
-// InlineResponse2002 defines model for inline_response_200_2.
-type InlineResponse2002 struct {
+// UserLoginResponse defines model for UserLoginResponse.
+type UserLoginResponse struct {
 	// AccessToken jwt string
 	AccessToken string `json:"access_token"`
 
@@ -88,17 +73,17 @@ type InlineResponse2002 struct {
 	RefreshTokenExpiredAt string `json:"refresh_token_expired_at"`
 
 	// SessionId uuid string
-	SessionId string `json:"session_id"`
+	SessionId string          `json:"session_id"`
+	User      UserWithoutPass `json:"user"`
 }
 
-// InlineResponse2003 defines model for inline_response_200_3.
-type InlineResponse2003 struct {
-	Message string `json:"message"`
-}
-
-// InlineResponse2004 defines model for inline_response_200_4.
-type InlineResponse2004 struct {
-	Message string `json:"message"`
+// UserWithoutPass defines model for UserWithoutPass.
+type UserWithoutPass struct {
+	ContractType ContractType `json:"contract_type"`
+	Email        string       `json:"email"`
+	IsActive     bool         `json:"is_active"`
+	IsAdmin      bool         `json:"is_admin"`
+	NickName     string       `json:"nick_name"`
 }
 
 // InternalUserLoginParams defines parameters for InternalUserLogin.
@@ -136,7 +121,7 @@ type InternalRemoveUserParams struct {
 type InternalUserLoginJSONRequestBody = UserLoginBody
 
 // InternalRefreshTokenJSONRequestBody defines body for InternalRefreshToken for application/json ContentType.
-type InternalRefreshTokenJSONRequestBody = InlineObject
+type InternalRefreshTokenJSONRequestBody = RefreshTokenRequestBody
 
 // InternalRegisterUserJSONRequestBody defines body for InternalRegisterUser for application/json ContentType.
 type InternalRegisterUserJSONRequestBody = User
