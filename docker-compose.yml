@@ -8,6 +8,22 @@ x-env: &appenv
     - DB_PASS=${MYSQL_PASSWORD}
     - DB_NAME=${MYSQL_DATABASE}
 services:
+  app-api-internal_api:
+    image: ${PROJECT_NAME}:go-delve-${DOCKER_BUILD_TAG_VERSION}
+    build: ./docker/delve
+    command: air -c .air-internal_api.toml
+    ports:
+      - ${APP_API_INTERNAL_API_PORT}:8000
+      - ${APP_API_INTERNAL_API_PROFILE}:8080
+    volumes:
+      - ${APP_API_ROOT}:${APP_API_GOPATH}
+    working_dir: ${APP_API_GOPATH}
+    <<: *appenv
+    depends_on:
+      - db
+    restart: always
+    container_name: ${PROJECT_NAME}-app-api-internal_api
+
   db:
     image: mysql:8.4.2
     command: ["mysqld", "--mysql-native-password=ON"]

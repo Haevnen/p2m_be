@@ -1,6 +1,6 @@
 include .env
 
-setup:
+run:
 	docker-compose -f docker-compose.yml -p $(PROJECT_NAME) up -d
 
 down:

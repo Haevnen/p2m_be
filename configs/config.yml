@@ -16,8 +16,8 @@ server:
 
 # Shipping MySQL Server config
 database:
-  host: 127.0.0.1
-  port: 33306
+  host: localhost # if you want to run this API server from a Docker container, set it to "db", otherwise set it to "localhost"
+  port: 33306 # if you want to run this API server from a Docker container, set it to 3306, otherwise set it to 33306
   dbname: p2m_db
   username: root
   password: root
