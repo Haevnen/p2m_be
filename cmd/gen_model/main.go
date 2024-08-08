@@ -26,9 +26,6 @@ func main() {
 		//
 		// Generate struct `Sessions` based on table `users`
 		g.GenerateModel("sessions"),
-
-		// Generate struct `User` based on table `users` and generating options
-		// g.GenerateModel("users", gen.FieldIgnore("address"), gen.FieldType("id", "int64")),
 	)
 	// Generate the code
 	g.Execute()
