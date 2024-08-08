@@ -11,3 +11,8 @@ Migrate the database
 ```
 make migrate
 ```
+
+### Codegen
+```
+make codegen
+```
