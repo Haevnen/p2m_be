@@ -2,7 +2,7 @@ version: '3.8'
 
 x-env: &appenv
   environment:
-    - DB_HOST=${MYSQL_HOST}
+    - DB_HOST=${MYSQL_CONTAINER_NAME}
     - DB_PORT=3306
     - DB_USER=${MYSQL_USER}
     - DB_PASS=${MYSQL_PASSWORD}
@@ -24,6 +24,21 @@ services:
       - MYSQL_PASSWORD
     restart: always
     container_name: ${PROJECT_NAME}-db
+  
+  app-api-internal_api:
+    image: ${PROJECT_NAME}:go-delve-${DOCKER_BUILD_TAG_VERSION}
+    build: ./docker/delve
+    command: air -c .air-internal_api.toml
+    ports:
+      - ${API_PORT}:8000
+    volumes:
+      - ${APP_API_ROOT}:${APP_API_GOPATH}
+    working_dir: ${APP_API_GOPATH}
+    <<: *appenv
+    depends_on:
+      - db
+    restart: always
+    container_name: ${PROJECT_NAME}-app-api-internal_api
 
 volumes:
   db-data:
