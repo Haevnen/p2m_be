@@ -38,3 +38,51 @@ jobs:
       - name: Clean up Docker image
         run: |
           docker rmi flyway/flyway:10-alpine || true
+
+  deploy-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.5'
+      
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Build
+        run: |
+          GOOS=linux GOARCH=amd64 go build -gcflags "all=-N -l" -o internal_api ./cmd/p2m_api/main.go
+
+      - name: Overwrite Environment variables
+        run: |
+          echo "DB_PORT=${{ secrets.DB_PORT_PROD }}" > .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
+          echo "MYSQL_USER=${{ secrets.FLYWAY_USER }}" >> .env
+          echo "MYSQL_PASSWORD=${{ secrets.FLYWAY_PROD_PASSWORD }}" >> .env
+          echo "API_PORT=${{ secrets.API_PORT_PROD }}" >> .env
+          echo "API_HOST=${{ secrets.API_HOST }}" >> .env
+          echo "RUN_MODE=${{ secrets.RUN_MODE_PROD }}" >> .env
+
+      - name: Transfer files to server
+        env:
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          API_HOST: ${{ secrets.API_HOST }}
+        run : |
+          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no internal_api .env root@$API_HOST:/root/p2m_prod_tmp
+          
+      - name: Update service
+        env:
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          API_HOST: ${{ secrets.API_HOST }}
+          API_PROD_SERVICE_NAME: ${{ secrets.API_PROD_SERVICE_NAME }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -T root@$API_HOST << EOF
+            sudo systemctl stop $API_PROD_SERVICE_NAME
+            cp /root/p2m_prod_tmp/.env /root/p2m_prod_tmp/internal_api /root/p2m_prod/
+            sudo systemctl start $API_PROD_SERVICE_NAME
+          EOF

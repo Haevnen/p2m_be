@@ -53,7 +53,7 @@ func (h userHandler) InternalRegisterUser(c *gin.Context, params p2m_api.Interna
 		return
 	}
 
-	c.JSON(http.StatusOK, "Register successful")
+	c.JSON(http.StatusOK, "Register very successful")
 }
 
 // Delete user by name

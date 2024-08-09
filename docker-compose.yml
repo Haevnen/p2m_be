@@ -30,7 +30,7 @@ services:
     build: ./docker/delve
     command: air -c .air-internal_api.toml
     ports:
-      - ${API_PORT}:8000
+      - ${API_PORT}:${API_PORT}
     volumes:
       - ${APP_API_ROOT}:${APP_API_GOPATH}
     working_dir: ${APP_API_GOPATH}

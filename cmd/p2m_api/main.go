@@ -58,6 +58,7 @@ func Start() int {
 
 	go func() {
 		// service connections
+		fmt.Println("Starting server at " + config.GetURLBase())
 		if err := s.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Fatal("listen: %s\n", err)
 		}
