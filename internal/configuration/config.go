@@ -23,6 +23,7 @@ type Config struct {
 	DockerBuildTagVersion string `env:"DOCKER_BUILD_TAG_VERSION"`
 
 	APIPort int    `env:"API_PORT"`
+	APIHost string `env:"API_HOST"`
 	Mode    string `env:"RUN_MODE"`
 }
 
@@ -56,5 +57,5 @@ func (e *Config) GetGORMConfig() *gormdb.Config {
 
 // GetURLBase build server config from env
 func (e *Config) GetURLBase() string {
-	return fmt.Sprintf("%s:%d", "0.0.0.0", 8000)
+	return fmt.Sprintf("%s:%d", e.APIHost, e.APIPort)
 }
