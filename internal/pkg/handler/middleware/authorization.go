@@ -14,7 +14,7 @@ import (
 var authorizationMap map[string]bool = map[string]bool{
 	"/users":          true,
 	"/users/register": true,
-	"/users/{name}":   true,
+	"/users/:name":    true,
 }
 
 func needsAuthorization(ctx *gin.Context) bool {
