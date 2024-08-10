@@ -11,6 +11,7 @@ require (
 	github.com/oapi-codegen/runtime v1.1.1
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gen v0.3.26
 	gorm.io/gorm v1.25.11
