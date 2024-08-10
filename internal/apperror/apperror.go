@@ -6,9 +6,10 @@ package apperror
 import (
 	"context"
 	"errors"
-	apiModel "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"net/http"
 	"strings"
+
+	apiModel "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 )
 
 // Error error for application
@@ -23,7 +24,14 @@ type Error struct {
 
 // Define application layer errors
 var (
-	ErrInternalServer = errors.New("ERR_INTERNAL_SERVER")
+	ErrInternalServer                   = errors.New("ERR_INTERNAL_SERVER")
+	ErrInvalidToken                     = errors.New("ERR_INVALID_TOKEN")
+	ErrTokenExpired                     = errors.New("ERR_TOKEN_EXPIRED")
+	ErrInvalidKeySize                   = errors.New("ERR_INVALID_KEY_SIZE")
+	ErrNotProvidedAuthenticationHeader  = errors.New("ERR_NOT_PROVIDED_AUTHENTICATION_HEADER")
+	ErrInvalidAuthorizationHeaderFormat = errors.New("ERR_INVALID_AUTHORIZATION_HEADER_FORMAT")
+	ErrUnsupportedAuthorizationType     = errors.New("ERR_UNSUPPORTED_AUTHORIZATION_TYPE")
+	ErrForbidden                        = errors.New("ERR_FORBIDDEN")
 )
 
 // New constructor

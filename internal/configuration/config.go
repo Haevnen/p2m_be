@@ -22,9 +22,10 @@ type Config struct {
 	SpecDir               string `env:"SPEC_DIR"`
 	DockerBuildTagVersion string `env:"DOCKER_BUILD_TAG_VERSION"`
 
-	APIPort int    `env:"API_PORT"`
-	APIHost string `env:"API_HOST"`
-	Mode    string `env:"RUN_MODE"`
+	APIPort           int    `env:"API_PORT"`
+	APIHost           string `env:"API_HOST"`
+	Mode              string `env:"RUN_MODE"`
+	TokenSymmetricKey string `env:"TOKEN_SYMMETRIC_KEY"`
 }
 
 func LoadConfig() (config Config, err error) {

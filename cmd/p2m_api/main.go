@@ -15,7 +15,9 @@ import (
 	"github.com/Haevnen/p2m_be/internal/configuration"
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/handler"
+	"github.com/Haevnen/p2m_be/internal/pkg/handler/middleware"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry"
+	"github.com/Haevnen/p2m_be/pkg/constants"
 	"github.com/Haevnen/p2m_be/pkg/gormdb"
 	"github.com/Haevnen/p2m_be/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -41,14 +43,18 @@ func Start() int {
 
 	dal.SetDefault(db)
 
-	reg := registry.New()
+	reg := registry.New(config.TokenSymmetricKey)
 
 	serverHandler := handler.New(reg)
 	r := gin.Default()
 	gin.SetMode(config.Mode)
 
 	p2m_api.RegisterHandlersWithOptions(r, serverHandler, p2m_api.GinServerOptions{
-		BaseURL: "/api/v1",
+		BaseURL: constants.BaseURL,
+		Middlewares: []p2m_api.MiddlewareFunc{
+			middleware.Authentication(reg.PasetoMaker()),
+			middleware.Authorization(),
+		},
 	})
 
 	s := &http.Server{

@@ -5,12 +5,24 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 )
 
-type Registry struct{}
+type Registry struct {
+	key string
+}
 
-func New() *Registry {
-	return &Registry{}
+func New(key string) *Registry {
+	return &Registry{
+		key: key,
+	}
 }
 
 func (r *Registry) UserManagementInteractor() interactorinterface.UserManagementInterface {
 	return interactor.NewUserManagement()
+}
+
+func (r *Registry) PasetoMaker() interactorinterface.Maker {
+	paseto, err := interactor.NewPasetoMaker(r.key)
+	if err != nil {
+		panic(err)
+	}
+	return paseto
 }

@@ -35,7 +35,7 @@ func bindRequestBody(ctx *gin.Context, body interface{}) error {
 	return nil
 }
 
-func sendError(ctx *gin.Context, title string, err error) {
+func SendError(ctx *gin.Context, title string, err error) {
 
 	appErr := apperror.New(ctx, err)
 
