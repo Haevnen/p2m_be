@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/google/uuid"
+
+	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 )
 
 type Payload struct {
@@ -17,7 +18,9 @@ type Payload struct {
 }
 
 type UserManagementInterface interface {
-	GetAllUser(context.Context) (*model.User, error)
+	GetAllUser(ctx context.Context, includeDeActive *bool) ([]*p2mapi.User, error)
+	CreateUser(ctx context.Context, user p2mapi.User) (*p2mapi.User, error)
+	RemoveUser(ctx context.Context, nickName string) error
 }
 
 type Maker interface {

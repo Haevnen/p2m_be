@@ -26,6 +26,10 @@ var (
 		ErrNotProvidedAuthenticationHeader: {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authentication header is not provided. Please provide a token."},
 		ErrUnsupportedAuthorizationType:    {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authorization type is not supported. Only Bearer is supported."},
 		ErrForbidden:                       {httpStatus: http.StatusForbidden, resType: string(api.PermissionDenied), errCode: errCodeForbidden, msg: "The user is forbidden to access the resource."},
+		ErrRecordNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.ValidationFailed), errCode: errCode1000, msg: "The record was not found."},
+
+		ErrUserHasNicknameExists: {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2000, msg: "The user has the nickname already exists."},
+		ErrUserHasEmailExists:    {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2001, msg: "The user has the email already exists."},
 	}
 )
 
@@ -38,4 +42,9 @@ const (
 	errCodeInternalServerError = "ERR_9999"
 	errCodeUnauthorized        = "ERR_401"
 	errCodeForbidden           = "ERR_403"
+
+	errCode1000 = "ERR_1000"
+
+	errCode2000 = "ERR_2000"
+	errCode2001 = "ERR_2001"
 )

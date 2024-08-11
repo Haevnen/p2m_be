@@ -35,7 +35,7 @@ func (h userHandler) InternalRefreshToken(c *gin.Context, params p2m_api.Interna
 // Get all users
 // (GET /users)
 func (h userHandler) InternalGetAllUsers(c *gin.Context, params p2m_api.InternalGetAllUsersParams) {
-	user, err := h.userManagementInteractor.GetAllUser(c)
+	user, err := h.userManagementInteractor.GetAllUser(c, params.IncludingDeactivates)
 	if err != nil {
 		SendError(c, "get all user error", err)
 		return
@@ -53,10 +53,23 @@ func (h userHandler) InternalRegisterUser(c *gin.Context, params p2m_api.Interna
 		return
 	}
 
-	c.JSON(http.StatusOK, "Register very successful")
+	res, err := h.userManagementInteractor.CreateUser(c, user)
+	if err != nil {
+		SendError(c, "create or update user error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
 }
 
 // Delete user by name
 // (DELETE /users/{name})
 func (h userHandler) InternalRemoveUser(c *gin.Context, name string, params p2m_api.InternalRemoveUserParams) {
+	err := h.userManagementInteractor.RemoveUser(c, name)
+	if err != nil {
+		SendError(c, "remove user error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, "remove user successfully")
 }

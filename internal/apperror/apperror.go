@@ -32,6 +32,9 @@ var (
 	ErrInvalidAuthorizationHeaderFormat = errors.New("ERR_INVALID_AUTHORIZATION_HEADER_FORMAT")
 	ErrUnsupportedAuthorizationType     = errors.New("ERR_UNSUPPORTED_AUTHORIZATION_TYPE")
 	ErrForbidden                        = errors.New("ERR_FORBIDDEN")
+	ErrRecordNotFound                   = errors.New("ERR_USER_NOT_FOUND")
+	ErrUserHasNicknameExists            = errors.New("ERR_USER_HAS_NICKNAME_EXISTS")
+	ErrUserHasEmailExists               = errors.New("ERR_USER_HAS_EMAIL_EXISTS")
 )
 
 // New constructor
@@ -66,7 +69,7 @@ func New(_ context.Context, err error, params ...any) *Error {
 			e.errCode = errCodeInternalServerError
 			e.httpStatus = http.StatusInternalServerError
 			e.resType = string(apiModel.InternalError)
-			e.details = []string{errMessageMap[ErrInternalServer].msg}
+			e.details = []string{err.Error()}
 		}
 	}
 

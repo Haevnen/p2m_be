@@ -77,6 +77,7 @@ type User struct {
 	IsAdmin      bool         `json:"is_admin"`
 	NickName     string       `json:"nick_name"`
 	Password     *string      `json:"password,omitempty"`
+	UserId       *string      `json:"user_id,omitempty"`
 }
 
 // UserLoginBody defines model for UserLoginBody.
