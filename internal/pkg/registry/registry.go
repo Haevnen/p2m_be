@@ -16,7 +16,7 @@ func New(key string) *Registry {
 }
 
 func (r *Registry) UserManagementInteractor() interactorinterface.UserManagementInterface {
-	return interactor.NewUserManagement()
+	return interactor.NewUserManagement(r.PasetoMaker())
 }
 
 func (r *Registry) PasetoMaker() interactorinterface.Maker {

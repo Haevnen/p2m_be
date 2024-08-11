@@ -50,8 +50,13 @@ paths:
       summary: User logout
       description: Logs out a user.
       parameters:
-        - $ref: "#/components/parameters/session_id"
         - $ref: "#/components/parameters/request_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenBody"
       security:
         - BearerAuth: []
       responses:
@@ -73,14 +78,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RefreshTokenRequestBody"
+              $ref: "#/components/schemas/RefreshTokenBody"
       responses:
         '200':
           $ref: "#/components/responses/RefreshTokenResponse"
         '401':
           $ref: "#/components/responses/Unauthorized"
-        '404':
-          $ref: "#/components/responses/NotFound"
+        '400':
+          $ref: "#/components/responses/BadRequest"
       operationId: internal_refreshToken
   /users:
     get:
@@ -277,27 +282,12 @@ components:
             title: RefreshTokenResponse
             type: object
             properties:
-              session_id:
-                description: uuid string
-                type: string
-                example: "123e4567-e89b-12d3-a456-426655440000"
               access_token:
                 description: jwt string
                 type: string
                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-              refresh_token:
-                description: jwt string
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-              refresh_token_expired_at:
-                description: timestamp
-                type: string
-                example: "2022-01-01T00:00:00Z"
             required:
-              - session_id
               - access_token
-              - refresh_token
-              - refresh_token_expired_at
   schemas:
     Error:
       type: object
@@ -394,12 +384,14 @@ components:
       example:
         email: email
         password: password
-    RefreshTokenRequestBody:
+    RefreshTokenBody:
       type: object
       properties:
         refresh_token:
           type: string
           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+      required:
+        - refresh_token
     Pong:
       type: object
       required:
