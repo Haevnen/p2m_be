@@ -71,11 +71,13 @@ jobs:
           echo "TOKEN_SYMMETRIC_KEY"=${{ secrets.TOKEN_SYMMETRIC_KEY }} >> .env
 
       - name: Transfer files to server
-        env:
-          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
-          API_HOST: ${{ secrets.API_HOST }}
-        run : |
-          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no internal_api .env root@$API_HOST:/root/p2m_prod_tmp
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: $API_HOST
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: "internal_api, .env"
+          target: /root/p2m_prod_tmp
           
       - name: Update service
         env:
