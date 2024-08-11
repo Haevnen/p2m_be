@@ -67,6 +67,8 @@ jobs:
           echo "API_PORT=${{ secrets.API_PORT_STG }}" >> .env
           echo "API_HOST=${{ secrets.API_HOST }}" >> .env
           echo "RUN_MODE=${{ secrets.RUN_MODE_STG }}" >> .env
+          echo "LOG_PATH"=${{ secrets.LOG_PATH }} >> .env
+          echo "TOKEN_SYMMETRIC_KEY"=${{ secrets.TOKEN_SYMMETRIC_KEY }} >> .env
 
       - name: Transfer files to server
         env:
@@ -85,4 +87,5 @@ jobs:
             sudo systemctl stop $API_STG_SERVICE_NAME
             cp /root/p2m_stg_tmp/.env /root/p2m_stg_tmp/internal_api /root/p2m_stg/
             sudo systemctl start $API_STG_SERVICE_NAME
+            sudo systemctl status $API_STG_SERVICE_NAME
           EOF
