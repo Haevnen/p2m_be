@@ -30,6 +30,7 @@ var (
 		ErrRecordNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCodeNotFound, msg: "The record is not found."},
 		ErrInvalidPassword:                 {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The password is invalid."},
 		ErrExpiredRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token has expired. Please login again. "},
+		ErrInvalidRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token is invalid. Please login again. "},
 	}
 )
 
