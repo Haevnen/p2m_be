@@ -33,8 +33,8 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Email = field.NewString(tableName, "email")
 	_user.PasswordHashed = field.NewString(tableName, "password_hashed")
 	_user.ContractType = field.NewString(tableName, "contract_type")
-	_user.IsActive = field.NewField(tableName, "is_active")
-	_user.IsAdmin = field.NewField(tableName, "is_admin")
+	_user.IsActive = field.NewBool(tableName, "is_active")
+	_user.IsAdmin = field.NewBool(tableName, "is_admin")
 	_user.CreatedAt = field.NewTime(tableName, "created_at")
 
 	_user.fillFieldMap()
@@ -52,8 +52,8 @@ type user struct {
 	Email          field.String
 	PasswordHashed field.String
 	ContractType   field.String
-	IsActive       field.Field
-	IsAdmin        field.Field
+	IsActive       field.Bool
+	IsAdmin        field.Bool
 	CreatedAt      field.Time
 
 	fieldMap map[string]field.Expr
@@ -77,8 +77,8 @@ func (u *user) updateTableName(table string) *user {
 	u.Email = field.NewString(table, "email")
 	u.PasswordHashed = field.NewString(table, "password_hashed")
 	u.ContractType = field.NewString(table, "contract_type")
-	u.IsActive = field.NewField(table, "is_active")
-	u.IsAdmin = field.NewField(table, "is_admin")
+	u.IsActive = field.NewBool(table, "is_active")
+	u.IsAdmin = field.NewBool(table, "is_admin")
 	u.CreatedAt = field.NewTime(table, "created_at")
 
 	u.fillFieldMap()

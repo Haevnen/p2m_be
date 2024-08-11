@@ -18,8 +18,8 @@ type User struct {
 	Email          string    `gorm:"column:email;not null" json:"email"`
 	PasswordHashed string    `gorm:"column:password_hashed;not null" json:"password_hashed"`
 	ContractType   string    `gorm:"column:contract_type;not null;default:FULLTIME" json:"contract_type"`
-	IsActive       []uint8   `gorm:"column:is_active;not null;default:b'1'" json:"is_active"`
-	IsAdmin        []uint8   `gorm:"column:is_admin;not null;default:b'0'" json:"is_admin"`
+	IsActive       bool      `gorm:"column:is_active;not null;default:1" json:"is_active"`
+	IsAdmin        bool      `gorm:"column:is_admin;not null" json:"is_admin"`
 	CreatedAt      time.Time `gorm:"column:created_at;not null;default:now()" json:"created_at"`
 }
 

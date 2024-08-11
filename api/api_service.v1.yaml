@@ -389,7 +389,7 @@ components:
           type: string
           example: "password"
       required:
-        - email
+        - nick_name
         - password
       example:
         email: email

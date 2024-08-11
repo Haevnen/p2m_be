@@ -473,7 +473,7 @@ components:
           example: password
           type: string
       required:
-      - email
+      - nick_name
       - password
       type: object
     RefreshTokenRequestBody:

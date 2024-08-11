@@ -81,8 +81,8 @@ type User struct {
 
 // UserLoginBody defines model for UserLoginBody.
 type UserLoginBody struct {
-	NickName *string `json:"nick_name,omitempty"`
-	Password string  `json:"password"`
+	NickName string `json:"nick_name"`
+	Password string `json:"password"`
 }
 
 // UserLoginResponse defines model for UserLoginResponse.
