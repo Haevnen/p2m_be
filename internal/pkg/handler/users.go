@@ -37,7 +37,7 @@ func (h userHandler) InternalRefreshToken(c *gin.Context, params p2m_api.Interna
 func (h userHandler) InternalGetAllUsers(c *gin.Context, params p2m_api.InternalGetAllUsersParams) {
 	user, err := h.userManagementInteractor.GetAllUser(c)
 	if err != nil {
-		sendError(c, "get all user error", err)
+		SendError(c, "get all user error", err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (h userHandler) InternalGetAllUsers(c *gin.Context, params p2m_api.Internal
 func (h userHandler) InternalRegisterUser(c *gin.Context, params p2m_api.InternalRegisterUserParams) {
 	var user p2m_api.User
 	if err := bindRequestBody(c, &user); err != nil {
-		sendError(c, "bind error", err)
+		SendError(c, "bind error", err)
 		return
 	}
 

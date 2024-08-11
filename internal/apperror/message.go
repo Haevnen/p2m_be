@@ -18,8 +18,14 @@ type definedErrorDetail struct {
 var (
 	errMessageMap = map[error]definedErrorDetail{
 
-		context.Canceled:  {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode4999, msg: "The operation was canceled."},
-		ErrInternalServer: {httpStatus: http.StatusInternalServerError, resType: string(api.InternalError), errCode: errCodeInternalServerError, msg: "An Unexpected Error has occurred."},
+		context.Canceled:                   {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode4999, msg: "The operation was canceled."},
+		ErrInternalServer:                  {httpStatus: http.StatusInternalServerError, resType: string(api.InternalError), errCode: errCodeInternalServerError, msg: "An Unexpected Error has occurred."},
+		ErrInvalidToken:                    {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The token is invalid."},
+		ErrTokenExpired:                    {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The token has expired."},
+		ErrInvalidKeySize:                  {httpStatus: http.StatusInternalServerError, resType: string(api.InternalError), errCode: errCodeInternalServerError, msg: "The key size is invalid."},
+		ErrNotProvidedAuthenticationHeader: {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authentication header is not provided. Please provide a token."},
+		ErrUnsupportedAuthorizationType:    {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authorization type is not supported. Only Bearer is supported."},
+		ErrForbidden:                       {httpStatus: http.StatusForbidden, resType: string(api.PermissionDenied), errCode: errCodeForbidden, msg: "The user is forbidden to access the resource."},
 	}
 )
 
@@ -30,4 +36,6 @@ func (d definedErrorDetail) detailsJA(params ...any) []string {
 const (
 	errCode4999                = "ERR_4999"
 	errCodeInternalServerError = "ERR_9999"
+	errCodeUnauthorized        = "ERR_401"
+	errCodeForbidden           = "ERR_403"
 )
