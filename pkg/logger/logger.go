@@ -2,10 +2,14 @@
 package logger
 
 import (
+	"fmt"
 	"os"
+	"time"
 
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
@@ -13,12 +17,25 @@ var (
 	// 	Because we want to puts logs from anywhere without initialization and without injection
 	// We don't integrate rollbar to logger
 	// 	The information to send rollbar and log is different
+
 	logger = func() *zap.SugaredLogger {
 		encodeCfg := zap.NewProductionEncoderConfig()
 		encodeCfg.EncodeTime = zapcore.RFC3339TimeEncoder
 
+		_ = godotenv.Load("./.env")
+		timestamp := time.Now().Format("2006-01-02T15-04-05")
+		logPath := fmt.Sprintf("%v/log_filename-%v-%v.log", os.Getenv("LOG_PATH"), os.Getenv("RUN_MODE"), timestamp)
+
+		lumberjackLogger := &lumberjack.Logger{
+			Filename:   logPath, // Base log file name
+			MaxSize:    10,      // Max size in MB before rotation
+			MaxBackups: 3,       // Max number of old log files to retain
+			MaxAge:     28,      // Max number of days to retain old log files
+			Compress:   true,    // Compress old log files (gzip)
+		}
+
 		return zap.New(
-			zapcore.NewCore(zapcore.NewJSONEncoder(encodeCfg), zapcore.Lock(os.Stdout), zap.NewAtomicLevel()),
+			zapcore.NewCore(zapcore.NewJSONEncoder(encodeCfg), zapcore.Lock(zapcore.AddSync(lumberjackLogger)), zap.NewAtomicLevel()),
 			zap.AddCallerSkip(1)).Sugar()
 	}()
 )
