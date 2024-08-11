@@ -53,7 +53,7 @@ func (h userHandler) InternalUserLogout(c *gin.Context, params p2m_api.InternalU
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, "Logout success")
 }
 
 // Renew refresh_token and access token
