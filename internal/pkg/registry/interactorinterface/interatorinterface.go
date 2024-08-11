@@ -11,7 +11,7 @@ import (
 
 type Payload struct {
 	ID        uuid.UUID `json:"id"`
-	NickName  string    `json:"nick_name"`
+	UserID    string    `json:"user_id"`
 	IsAdmin   bool      `json:"is_admin"`
 	IssuedAt  time.Time `json:"issued_at"`
 	ExpiredAt time.Time `json:"expired_at"`
@@ -26,6 +26,6 @@ type UserManagementInterface interface {
 
 type Maker interface {
 	// Return token, payload and error
-	CreateToken(nickname string, isAdmin bool, duration time.Duration) (string, *Payload, error)
+	CreateToken(userID string, isAdmin bool, duration time.Duration) (string, *Payload, error)
 	VerifyToken(token string) (*Payload, error)
 }

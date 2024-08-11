@@ -13,7 +13,7 @@ import (
 	"github.com/Haevnen/p2m_be/pkg/util"
 	"gorm.io/gorm"
 
-	"github.com/Haevnen/p2m_be/internal/pkg/interactor/interactorinterface"
+	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 )
 
 type UserManagement struct {
@@ -51,18 +51,18 @@ func (ci *UserManagement) LoginUser(ctx context.Context, body p2m_api.UserLoginB
 		return p2m_api.UserLoginResponse{}, apperror.ErrInvalidPassword
 	}
 
-	accessToken, _, err := ci.tokenMaker.CreateToken(user.NickName, user.IsAdmin, constants.AccessTokenDuration)
+	accessToken, _, err := ci.tokenMaker.CreateToken(user.UserID, user.IsAdmin, constants.AccessTokenDuration)
 	if err != nil {
 		return p2m_api.UserLoginResponse{}, err
 	}
 
-	refreshToken, refreshPayload, err := ci.tokenMaker.CreateToken(user.NickName, user.IsAdmin, constants.RefreshTokenDuration)
+	refreshToken, refreshPayload, err := ci.tokenMaker.CreateToken(user.UserID, user.IsAdmin, constants.RefreshTokenDuration)
 	if err != nil {
 		return p2m_api.UserLoginResponse{}, err
 	}
 
 	err = dal.Q.Session.WithContext(ctx).Create(&model.Session{
-		SessionID:    refreshPayload.ID,
+		SessionID:    refreshPayload.ID.String(),
 		UserID:       user.UserID,
 		RefreshToken: refreshToken,
 		ExpiredAt:    refreshPayload.ExpiredAt,
@@ -82,8 +82,8 @@ func (ci *UserManagement) LoginUser(ctx context.Context, body p2m_api.UserLoginB
 	return p2m_api.UserLoginResponse{
 		AccessToken:           accessToken,
 		RefreshToken:          refreshToken,
-		RefreshTokenExpiredAt: refreshPayload.ExpiredAt,
-		SessionId:             refreshPayload.ID,
+		RefreshTokenExpiredAt: refreshPayload.ExpiredAt.Format(constants.DateTimeFormat),
+		SessionId:             refreshPayload.ID.String(),
 		User:                  userWoPass,
 	}, nil
 }
@@ -96,7 +96,7 @@ func (ci *UserManagement) LogoutUser(ctx context.Context, body p2m_api.RefreshTo
 
 	u := dal.Q.Session
 
-	session, err := u.WithContext(ctx).Where(u.SessionID.Eq(refreshPayload.ID)).First()
+	session, err := u.WithContext(ctx).Where(u.SessionID.Eq(refreshPayload.ID.String())).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return apperror.ErrRecordNotFound
@@ -112,17 +112,9 @@ func (ci *UserManagement) LogoutUser(ctx context.Context, body p2m_api.RefreshTo
 		return apperror.ErrInvalidRefreshToken
 	}
 
-	if time.Now().After(session.ExpiredAt) {
-		return nil
-	}
-
 	// remove all refresh token relate to UserID
 	_, err = u.WithContext(ctx).Where(u.UserID.Eq(refreshPayload.UserID)).Delete(&model.Session{})
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (ci *UserManagement) RefreshToken(ctx context.Context, body p2m_api.RefreshTokenBody) (string, error) {
@@ -133,7 +125,7 @@ func (ci *UserManagement) RefreshToken(ctx context.Context, body p2m_api.Refresh
 
 	u := dal.Q.Session
 
-	session, err := u.WithContext(ctx).Where(u.SessionID.Eq(refreshPayload.ID)).First()
+	session, err := u.WithContext(ctx).Where(u.SessionID.Eq(refreshPayload.ID.String())).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", apperror.ErrRecordNotFound
