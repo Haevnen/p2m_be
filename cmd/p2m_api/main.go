@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -11,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
+	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"github.com/Haevnen/p2m_be/internal/configuration"
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/handler"
@@ -26,7 +25,7 @@ import (
 func Start() int {
 	config, err := configuration.LoadConfig()
 	if err != nil {
-		fmt.Println("cannot load config: ", err)
+		logger.Info("cannot load config: ", err)
 		return 1
 	}
 	ctx := context.Background()
@@ -49,9 +48,9 @@ func Start() int {
 	r := gin.Default()
 	gin.SetMode(config.Mode)
 
-	p2m_api.RegisterHandlersWithOptions(r, serverHandler, p2m_api.GinServerOptions{
+	p2mapi.RegisterHandlersWithOptions(r, serverHandler, p2mapi.GinServerOptions{
 		BaseURL: constants.BaseURL,
-		Middlewares: []p2m_api.MiddlewareFunc{
+		Middlewares: []p2mapi.MiddlewareFunc{
 			middleware.Authentication(reg.PasetoMaker()),
 			middleware.Authorization(),
 		},
@@ -64,7 +63,7 @@ func Start() int {
 
 	go func() {
 		// service connections
-		fmt.Println("Starting server at " + config.GetURLBase())
+		logger.Info("Starting server at " + config.GetURLBase())
 		if err := s.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Fatal("listen: %s\n", err)
 		}
