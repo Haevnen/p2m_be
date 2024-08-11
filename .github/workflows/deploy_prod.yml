@@ -73,7 +73,7 @@ jobs:
       - name: Transfer files to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: $API_HOST
+          host: ${{ secrets.API_HOST }}
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           source: "internal_api, .env"
