@@ -34,9 +34,13 @@ var (
 			Compress:   true,    // Compress old log files (gzip)
 		}
 
-		return zap.New(
+		core := zapcore.NewTee(
 			zapcore.NewCore(zapcore.NewJSONEncoder(encodeCfg), zapcore.Lock(zapcore.AddSync(lumberjackLogger)), zap.NewAtomicLevel()),
-			zap.AddCallerSkip(1)).Sugar()
+			zapcore.NewCore(zapcore.NewJSONEncoder(encodeCfg), zapcore.Lock(os.Stdout), zap.NewAtomicLevel()),
+		)
+		l := zap.New(core, zap.AddCallerSkip(1))
+
+		return l.Sugar()
 	}()
 )
 

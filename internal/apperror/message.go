@@ -31,6 +31,8 @@ var (
 		ErrInvalidPassword:                 {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The password is invalid."},
 		ErrExpiredRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token has expired. Please login again. "},
 		ErrInvalidRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token is invalid. Please login again. "},
+		ErrUserHasNicknameExists:           {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2000, msg: "The user has the nickname already exists."},
+		ErrUserHasEmailExists:              {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2001, msg: "The user has the email already exists."},
 	}
 )
 
@@ -43,6 +45,10 @@ const (
 	errCodeInternalServerError = "ERR_9999"
 	errCodeUnauthorized        = "ERR_401"
 	errCodeForbidden           = "ERR_403"
-	errCodeInvalidRequest      = "ERR_400"
-	errCodeNotFound            = "ERR_404"
+
+	errCodeInvalidRequest = "ERR_400"
+
+	errCodeNotFound = "ERR_404"
+	errCode2000     = "ERR_2000"
+	errCode2001     = "ERR_2001"
 )

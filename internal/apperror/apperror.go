@@ -35,6 +35,8 @@ var (
 	ErrInvalidRequestInput              = errors.New("ERR_INVALID_REQUEST_INPUT")
 	ErrRecordNotFound                   = errors.New("ERR_RECORD_NOT_FOUND")
 	ErrInvalidPassword                  = errors.New("ERR_INVALID_PASSWORD")
+	ErrUserHasNicknameExists            = errors.New("ERR_USER_HAS_NICKNAME_EXISTS")
+	ErrUserHasEmailExists               = errors.New("ERR_USER_HAS_EMAIL_EXISTS")
 	ErrExpiredRefreshToken              = errors.New("ERR_EXPIRED_REFRESH_TOKEN")
 	ErrInvalidRefreshToken              = errors.New("ERR_INVALID_REFRESH_TOKEN")
 )
@@ -71,7 +73,7 @@ func New(_ context.Context, err error, params ...any) *Error {
 			e.errCode = errCodeInternalServerError
 			e.httpStatus = http.StatusInternalServerError
 			e.resType = string(apiModel.InternalError)
-			e.details = []string{errMessageMap[ErrInternalServer].msg}
+			e.details = []string{err.Error()}
 		}
 	}
 
