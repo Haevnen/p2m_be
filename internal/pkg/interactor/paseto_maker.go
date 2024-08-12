@@ -28,7 +28,7 @@ func NewPasetoMaker(symmetric_key string) (interactorinterface.Maker, error) {
 	return pasetoMaker, nil
 }
 
-func (p *PasetoMaker) CreateToken(nickname string, isAdmin bool, duration time.Duration) (string, *interactorinterface.Payload, error) {
+func (p *PasetoMaker) CreateToken(userID string, isAdmin bool, duration time.Duration) (string, *interactorinterface.Payload, error) {
 	tokenID, err := uuid.NewRandom()
 	if err != nil {
 		return "", nil, err
@@ -36,7 +36,7 @@ func (p *PasetoMaker) CreateToken(nickname string, isAdmin bool, duration time.D
 
 	payload := &interactorinterface.Payload{
 		ID:        tokenID,
-		NickName:  nickname,
+		UserID:    userID,
 		IsAdmin:   isAdmin,
 		IssuedAt:  time.Now(),
 		ExpiredAt: time.Now().Add(duration),

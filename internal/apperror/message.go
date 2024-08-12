@@ -26,9 +26,12 @@ var (
 		ErrNotProvidedAuthenticationHeader: {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authentication header is not provided. Please provide a token."},
 		ErrUnsupportedAuthorizationType:    {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authorization type is not supported. Only Bearer is supported."},
 		ErrForbidden:                       {httpStatus: http.StatusForbidden, resType: string(api.PermissionDenied), errCode: errCodeForbidden, msg: "The user is forbidden to access the resource."},
-		ErrRecordNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.ValidationFailed), errCode: errCode1000, msg: "The record was not found."},
-
-		ErrUserHasNicknameExists: {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2000, msg: "The user has the nickname already exists."},
+		ErrInvalidRequestInput:             {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCodeInvalidRequest, msg: "The input is invalid."},
+		ErrRecordNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCodeNotFound, msg: "The record is not found."},
+		ErrInvalidPassword:                 {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The password is invalid."},
+		ErrExpiredRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token has expired. Please login again. "},
+		ErrInvalidRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token is invalid. Please login again. "},
+ErrUserHasNicknameExists: {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2000, msg: "The user has the nickname already exists."},
 		ErrUserHasEmailExists:    {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2001, msg: "The user has the email already exists."},
 	}
 )
@@ -43,8 +46,9 @@ const (
 	errCodeUnauthorized        = "ERR_401"
 	errCodeForbidden           = "ERR_403"
 
-	errCode1000 = "ERR_1000"
+	errCodeInvalidRequest      = "ERR_400"
 
+	errCodeNotFound            = "ERR_404"
 	errCode2000 = "ERR_2000"
 	errCode2001 = "ERR_2001"
 )

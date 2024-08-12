@@ -13,7 +13,6 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/o1egl/paseto v1.0.0
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/oklog/ulid/v2 v2.1.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.26.0

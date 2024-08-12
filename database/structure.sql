@@ -26,13 +26,15 @@ CREATE TABLE `sessions` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `session_id` char(36) COLLATE utf8mb4_bin NOT NULL,
   `user_id` char(36) COLLATE utf8mb4_bin NOT NULL,
-  `refresh_token` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `refresh_token` varchar(512) COLLATE utf8mb4_bin NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT (now()),
   `expired_at` timestamp NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `session_id` (`session_id`),
   UNIQUE KEY `refresh_token` (`refresh_token`),
-  KEY `fk_sessions_users` (`user_id`),
+  UNIQUE KEY `refresh_token_2` (`refresh_token`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_session_id` (`session_id`),
   CONSTRAINT `fk_sessions_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -56,7 +58,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT (now()),
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
