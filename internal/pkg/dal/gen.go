@@ -17,12 +17,14 @@ import (
 
 var (
 	Q       = new(Query)
+	Client  *client
 	Session *session
 	User    *user
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	Client = &Q.Client
 	Session = &Q.Session
 	User = &Q.User
 }
@@ -30,6 +32,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:      db,
+		Client:  newClient(db, opts...),
 		Session: newSession(db, opts...),
 		User:    newUser(db, opts...),
 	}
@@ -38,6 +41,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 type Query struct {
 	db *gorm.DB
 
+	Client  client
 	Session session
 	User    user
 }
@@ -47,6 +51,7 @@ func (q *Query) Available() bool { return q.db != nil }
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:      db,
+		Client:  q.Client.clone(db),
 		Session: q.Session.clone(db),
 		User:    q.User.clone(db),
 	}
@@ -63,18 +68,21 @@ func (q *Query) WriteDB() *Query {
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:      db,
+		Client:  q.Client.replaceDB(db),
 		Session: q.Session.replaceDB(db),
 		User:    q.User.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
+	Client  *clientDo
 	Session *sessionDo
 	User    *userDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
+		Client:  q.Client.WithContext(ctx),
 		Session: q.Session.WithContext(ctx),
 		User:    q.User.WithContext(ctx),
 	}
