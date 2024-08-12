@@ -291,6 +291,154 @@ paths:
       summary: Delete user by name
       tags:
       - Users
+  /clients:
+    get:
+      description: Get all clients
+      operationId: internal_getAllClients
+      parameters:
+      - explode: true
+        in: query
+        name: including_deactivates
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ClientResponse'
+                type: array
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Get all clients
+      tags:
+      - Clients
+  /clients/{id}:
+    delete:
+      description: Delete client by id
+      operationId: internal_removeClient
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of client
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Delete client by id
+      tags:
+      - Clients
+  /clients/register:
+    post:
+      description: Register new client
+      operationId: internal_registerClient
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientBody'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+        default:
+          content:
+            application/json:
+              example:
+                type: internal_error
+                title: internal error
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected errors
+      security:
+      - BearerAuth: []
+      summary: Register new client
+      tags:
+      - Clients
 components:
   parameters:
     session_id:
@@ -493,6 +641,59 @@ components:
           type: string
       required:
       - ping
+      type: object
+    ClientResponse:
+      example:
+        requirements: requirements
+        is_active: true
+        id: 1
+        editing_style: Brighten
+        client_id: GMT
+        others: others
+      properties:
+        id:
+          example: 1
+          type: integer
+        client_id:
+          example: GMT
+          type: string
+        is_active:
+          example: true
+          type: boolean
+        editing_style:
+          example: Brighten
+          type: string
+        requirements:
+          example: requirements
+          type: string
+        others:
+          example: others
+          type: string
+      required:
+      - client_id
+      - is_active
+      type: object
+    ClientBody:
+      example:
+        requirements: requirements
+        editing_style: Brighten
+        client_id: GMT
+        others: others
+      properties:
+        client_id:
+          example: GMT
+          type: string
+        editing_style:
+          example: Brighten
+          type: string
+        requirements:
+          example: requirements
+          type: string
+        others:
+          example: others
+          type: string
+      required:
+      - client_id
       type: object
     UserLoginResponse:
       example:

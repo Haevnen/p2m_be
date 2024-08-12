@@ -11,11 +11,13 @@ import (
 
 type Handler struct {
 	userHandler
+	clientHandler
 }
 
 func New(reg *registry.Registry) Handler {
 	h := Handler{}
 	h.userHandler = newUserHandler(reg)
+	h.clientHandler = newClientHandler(reg)
 	return h
 }
 

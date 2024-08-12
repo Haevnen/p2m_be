@@ -20,6 +20,15 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Get all clients
+	// (GET /clients)
+	InternalGetAllClients(c *gin.Context, params InternalGetAllClientsParams)
+	// Register new client
+	// (POST /clients/register)
+	InternalRegisterClient(c *gin.Context, params InternalRegisterClientParams)
+	// Delete client by id
+	// (DELETE /clients/{id})
+	InternalRemoveClient(c *gin.Context, id int, params InternalRemoveClientParams)
 	// User login
 	// (POST /login)
 	InternalUserLogin(c *gin.Context, params InternalUserLoginParams)
@@ -51,6 +60,131 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// InternalGetAllClients operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetAllClients(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalGetAllClientsParams
+
+	// ------------- Optional query parameter "including_deactivates" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "including_deactivates", c.Request.URL.Query(), &params.IncludingDeactivates)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter including_deactivates: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalGetAllClients(c, params)
+}
+
+// InternalRegisterClient operation middleware
+func (siw *ServerInterfaceWrapper) InternalRegisterClient(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalRegisterClientParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalRegisterClient(c, params)
+}
+
+// InternalRemoveClient operation middleware
+func (siw *ServerInterfaceWrapper) InternalRemoveClient(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalRemoveClientParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalRemoveClient(c, id, params)
+}
 
 // InternalUserLogin operation middleware
 func (siw *ServerInterfaceWrapper) InternalUserLogin(c *gin.Context) {
@@ -345,6 +479,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.GET(options.BaseURL+"/clients", wrapper.InternalGetAllClients)
+	router.POST(options.BaseURL+"/clients/register", wrapper.InternalRegisterClient)
+	router.DELETE(options.BaseURL+"/clients/:id", wrapper.InternalRemoveClient)
 	router.POST(options.BaseURL+"/login", wrapper.InternalUserLogin)
 	router.POST(options.BaseURL+"/logout", wrapper.InternalUserLogout)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
@@ -357,35 +494,39 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"vBqv/ggAAP//MjcdLAQlAAA=",
+	"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",
+	"OZ9wIuLqhNVrvBwt/xcAAP//IC6bDwA0AAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

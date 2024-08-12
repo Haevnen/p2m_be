@@ -26,6 +26,9 @@ type UserManagementInterface interface {
 	RefreshToken(context.Context, p2mapi.RefreshTokenBody) (string, error)
 }
 
+type ClientManagementInterface interface {
+}
+
 type Maker interface {
 	// Return token, payload and error
 	CreateToken(userID string, isAdmin bool, duration time.Duration) (string, *Payload, error)
