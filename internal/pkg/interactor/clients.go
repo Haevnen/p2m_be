@@ -28,6 +28,16 @@ func (ci *ClientManagement) CreateClient(ctx context.Context, client p2mapi.Clie
 		return nil, err
 	}
 
+	// validate client
+	// if user has id and is_active is true, return error
+	clientCheck, err := c.WithContext(ctx).Where(c.ClientID.Eq(clientDb.ClientID), c.IsActive).First()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if clientCheck != nil {
+		return nil, apperror.ErrClientHasIDExists
+	}
+
 	err = c.WithContext(ctx).Save(&clientDb)
 	if err != nil {
 		return nil, err
