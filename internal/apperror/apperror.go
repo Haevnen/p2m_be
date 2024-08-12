@@ -39,6 +39,7 @@ var (
 	ErrUserHasEmailExists               = errors.New("ERR_USER_HAS_EMAIL_EXISTS")
 	ErrExpiredRefreshToken              = errors.New("ERR_EXPIRED_REFRESH_TOKEN")
 	ErrInvalidRefreshToken              = errors.New("ERR_INVALID_REFRESH_TOKEN")
+	ErrClientHasIDExists                = errors.New("ERR_CLIENT_HAS_ID_EXISTS")
 )
 
 // New constructor

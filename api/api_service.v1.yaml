@@ -193,7 +193,7 @@ paths:
           $ref: "#/components/responses/Forbidden"
       operationId: internal_getAllClients
 
-  /clients/{id}:
+  /clients/{client_id}:
     delete:
       tags:
         - Clients
@@ -201,12 +201,12 @@ paths:
       description: Delete client by id
       parameters:
         - $ref: "#/components/parameters/request_id"
-        - name: id
+        - name: client_id
           in: path
           description: id of client
           required: true
           schema:
-            type: integer
+            type: string
       security:
         - BearerAuth: []
       responses:
