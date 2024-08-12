@@ -330,7 +330,7 @@ paths:
       summary: Get all clients
       tags:
       - Clients
-  /clients/{id}:
+  /clients/{client_id}:
     delete:
       description: Delete client by id
       operationId: internal_removeClient
@@ -346,10 +346,10 @@ paths:
       - description: id of client
         explode: false
         in: path
-        name: id
+        name: client_id
         required: true
         schema:
-          type: integer
+          type: string
         style: simple
       responses:
         "200":
