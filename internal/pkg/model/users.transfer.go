@@ -6,12 +6,12 @@ import (
 
 	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"github.com/Haevnen/p2m_be/pkg/logger"
-	"github.com/Haevnen/p2m_be/pkg/password"
+	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 func (u *User) ToUser(user p2mapi.User) error {
 	// has password
-	passwordHash, err := password.HashPassword(swag.StringValue(user.Password))
+	passwordHash, err := util.HashPassword(swag.StringValue(user.Password))
 	if err != nil {
 		logger.Errorf("Failed to hash password: %v", err)
 		return err
