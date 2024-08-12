@@ -32,6 +32,11 @@ var (
 	ErrInvalidAuthorizationHeaderFormat = errors.New("ERR_INVALID_AUTHORIZATION_HEADER_FORMAT")
 	ErrUnsupportedAuthorizationType     = errors.New("ERR_UNSUPPORTED_AUTHORIZATION_TYPE")
 	ErrForbidden                        = errors.New("ERR_FORBIDDEN")
+	ErrInvalidRequestInput              = errors.New("ERR_INVALID_REQUEST_INPUT")
+	ErrRecordNotFound                   = errors.New("ERR_RECORD_NOT_FOUND")
+	ErrInvalidPassword                  = errors.New("ERR_INVALID_PASSWORD")
+	ErrExpiredRefreshToken              = errors.New("ERR_EXPIRED_REFRESH_TOKEN")
+	ErrInvalidRefreshToken              = errors.New("ERR_INVALID_REFRESH_TOKEN")
 )
 
 // New constructor

@@ -26,6 +26,11 @@ var (
 		ErrNotProvidedAuthenticationHeader: {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authentication header is not provided. Please provide a token."},
 		ErrUnsupportedAuthorizationType:    {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The authorization type is not supported. Only Bearer is supported."},
 		ErrForbidden:                       {httpStatus: http.StatusForbidden, resType: string(api.PermissionDenied), errCode: errCodeForbidden, msg: "The user is forbidden to access the resource."},
+		ErrInvalidRequestInput:             {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCodeInvalidRequest, msg: "The input is invalid."},
+		ErrRecordNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCodeNotFound, msg: "The record is not found."},
+		ErrInvalidPassword:                 {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The password is invalid."},
+		ErrExpiredRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token has expired. Please login again. "},
+		ErrInvalidRefreshToken:             {httpStatus: http.StatusUnauthorized, resType: string(api.ValidationFailed), errCode: errCodeUnauthorized, msg: "The refresh token is invalid. Please login again. "},
 	}
 )
 
@@ -38,4 +43,6 @@ const (
 	errCodeInternalServerError = "ERR_9999"
 	errCodeUnauthorized        = "ERR_401"
 	errCodeForbidden           = "ERR_403"
+	errCodeInvalidRequest      = "ERR_400"
+	errCodeNotFound            = "ERR_404"
 )
