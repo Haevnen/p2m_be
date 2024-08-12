@@ -24,8 +24,12 @@ func main() {
 		g.GenerateModel("users"),
 
 		//
-		// Generate struct `Sessions` based on table `users`
+		// Generate struct `Sessions` based on table `sessions`
 		g.GenerateModel("sessions"),
+
+		//
+		// Generate struct `Clients` based on table `clients`
+		g.GenerateModel("clients"),
 	)
 	// Generate the code
 	g.Execute()
