@@ -19,6 +19,10 @@ func (r *Registry) UserManagementInteractor() interactorinterface.UserManagement
 	return interactor.NewUserManagement(r.PasetoMaker())
 }
 
+func (r *Registry) ClientManagementInteractor() interactorinterface.ClientManagementInterface {
+	return interactor.NewClientManagement()
+}
+
 func (r *Registry) PasetoMaker() interactorinterface.Maker {
 	paseto, err := interactor.NewPasetoMaker(r.key)
 	if err != nil {

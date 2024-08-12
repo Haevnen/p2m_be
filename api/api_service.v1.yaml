@@ -167,6 +167,89 @@ paths:
         '403':
           $ref: "#/components/responses/Forbidden"
       operationId: internal_removeUser
+
+  /clients:
+    get:
+      tags:
+        - Clients
+      summary: Get all clients
+      description: Get all clients
+      parameters:
+        - $ref: "#/components/parameters/including_deactivates"
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClientResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_getAllClients
+
+  /clients/{id}:
+    delete:
+      tags:
+        - Clients
+      summary: Delete client by id
+      description: Delete client by id
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: id
+          in: path
+          description: id of client
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_removeClient
+
+  /clients/register:
+    post:
+      tags:
+        - Clients
+      summary: Register new client
+      description: Register new client
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientBody"
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+      operationId: internal_registerClient
 tags:
   - name: Users
     description: Users API
@@ -400,3 +483,44 @@ components:
         ping:
           type: string
           example: pong
+    ClientResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        client_id:
+          type: string
+          example: "GMT"
+        is_active:
+          type: boolean
+          example: true
+        editing_style:
+          type: string
+          example: "Brighten"
+        requirements:
+          type: string
+          example: "requirements"
+        others:
+          type: string
+          example: "others"
+      required:
+        - client_id
+        - is_active
+    ClientBody:
+      type: object
+      properties:
+        client_id:
+          type: string
+          example: "GMT"
+        editing_style:
+          type: string
+          example: "Brighten"
+        requirements:
+          type: string
+          example: "requirements"
+        others:
+          type: string
+          example: "others"
+      required:
+        - client_id

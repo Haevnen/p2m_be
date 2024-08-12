@@ -21,6 +21,24 @@ const (
 	ValidationFailed ErrorType = "validation_failed"
 )
 
+// ClientBody defines model for ClientBody.
+type ClientBody struct {
+	ClientId     string  `json:"client_id"`
+	EditingStyle *string `json:"editing_style,omitempty"`
+	Others       *string `json:"others,omitempty"`
+	Requirements *string `json:"requirements,omitempty"`
+}
+
+// ClientResponse defines model for ClientResponse.
+type ClientResponse struct {
+	ClientId     string  `json:"client_id"`
+	EditingStyle *string `json:"editing_style,omitempty"`
+	Id           *int    `json:"id,omitempty"`
+	IsActive     bool    `json:"is_active"`
+	Others       *string `json:"others,omitempty"`
+	Requirements *string `json:"requirements,omitempty"`
+}
+
 // ContractType defines model for ContractType.
 type ContractType string
 
@@ -97,6 +115,21 @@ type UserWithoutPass struct {
 	NickName     string       `json:"nick_name"`
 }
 
+// InternalGetAllClientsParams defines parameters for InternalGetAllClients.
+type InternalGetAllClientsParams struct {
+	IncludingDeactivates *bool `form:"including_deactivates,omitempty" json:"including_deactivates,omitempty"`
+}
+
+// InternalRegisterClientParams defines parameters for InternalRegisterClient.
+type InternalRegisterClientParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalRemoveClientParams defines parameters for InternalRemoveClient.
+type InternalRemoveClientParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
 // InternalUserLoginParams defines parameters for InternalUserLogin.
 type InternalUserLoginParams struct {
 	XRequestId string `json:"X-Request-Id"`
@@ -126,6 +159,9 @@ type InternalRegisterUserParams struct {
 type InternalRemoveUserParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
+
+// InternalRegisterClientJSONRequestBody defines body for InternalRegisterClient for application/json ContentType.
+type InternalRegisterClientJSONRequestBody = ClientBody
 
 // InternalUserLoginJSONRequestBody defines body for InternalUserLogin for application/json ContentType.
 type InternalUserLoginJSONRequestBody = UserLoginBody
