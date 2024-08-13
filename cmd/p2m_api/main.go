@@ -48,7 +48,14 @@ func Start() int {
 
 	serverHandler := handler.New(reg)
 	r := gin.Default()
-	r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Request-Id", "X-Session-Id"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	gin.SetMode(config.Mode)
 
 	p2mapi.RegisterHandlersWithOptions(r, serverHandler, p2mapi.GinServerOptions{
