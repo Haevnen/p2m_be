@@ -10,6 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+
 	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"github.com/Haevnen/p2m_be/internal/configuration"
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
@@ -19,7 +22,6 @@ import (
 	"github.com/Haevnen/p2m_be/pkg/constants"
 	"github.com/Haevnen/p2m_be/pkg/gormdb"
 	"github.com/Haevnen/p2m_be/pkg/logger"
-	"github.com/gin-gonic/gin"
 )
 
 func Start() int {
@@ -46,6 +48,7 @@ func Start() int {
 
 	serverHandler := handler.New(reg)
 	r := gin.Default()
+	r.Use(cors.Default())
 	gin.SetMode(config.Mode)
 
 	p2mapi.RegisterHandlersWithOptions(r, serverHandler, p2mapi.GinServerOptions{
