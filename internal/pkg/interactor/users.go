@@ -31,7 +31,7 @@ func (ci *UserManagement) GetAllUser(ctx context.Context, includeDeActive *bool)
 	var users []*model.User
 	var err error
 
-	if includeDeActive == nil || *includeDeActive == false {
+	if includeDeActive == nil || !(*includeDeActive) {
 		users, err = u.WithContext(ctx).Where(u.IsActive).Find()
 	} else {
 		users, err = u.WithContext(ctx).Find()
@@ -126,7 +126,7 @@ func (ci *UserManagement) LogoutUser(ctx context.Context, body p2mapi.RefreshTok
 		return apperror.ErrInvalidRefreshToken
 	}
 
-	// remove all refresh token relate to UserID
+	// remove all existing session relate to UserID
 	_, err = u.WithContext(ctx).Where(u.UserID.Eq(refreshPayload.UserID)).Delete(&model.Session{})
 	return err
 }
@@ -228,5 +228,8 @@ func (ci *UserManagement) RemoveUser(ctx context.Context, nickName string) error
 		return apperror.ErrInternalServer
 	}
 
-	return nil
+	// Remove all existing session relate to deleted user
+	s := dal.Q.Session
+	_, err = s.WithContext(ctx).Where(s.UserID.Eq(user.UserID)).Delete(&model.Session{})
+	return err
 }
