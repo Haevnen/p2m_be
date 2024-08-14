@@ -66,15 +66,13 @@ func (h userHandler) InternalRefreshToken(c *gin.Context, params p2m_api.Interna
 		return
 	}
 
-	newAccessToken, err := h.userManagementInteractor.RefreshToken(c, oldRefreshToken)
+	refreshTokenResp, err := h.userManagementInteractor.RefreshToken(c, oldRefreshToken)
 	if err != nil {
 		SendError(c, "can not refresh token", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, p2m_api.RefreshTokenResponse{
-		AccessToken: newAccessToken,
-	})
+	c.JSON(http.StatusOK, refreshTokenResp)
 
 }
 

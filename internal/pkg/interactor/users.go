@@ -65,7 +65,7 @@ func (ci *UserManagement) LoginUser(ctx context.Context, body p2mapi.UserLoginBo
 		return p2mapi.UserLoginResponse{}, apperror.ErrInvalidPassword
 	}
 
-	accessToken, _, err := ci.tokenMaker.CreateToken(user.UserID, user.IsAdmin, constants.AccessTokenDuration)
+	accessToken, accessTokenPayload, err := ci.tokenMaker.CreateToken(user.UserID, user.IsAdmin, constants.AccessTokenDuration)
 	if err != nil {
 		return p2mapi.UserLoginResponse{}, err
 	}
@@ -95,6 +95,7 @@ func (ci *UserManagement) LoginUser(ctx context.Context, body p2mapi.UserLoginBo
 
 	return p2mapi.UserLoginResponse{
 		AccessToken:           accessToken,
+		AccessTokenExpiredAt:  accessTokenPayload.ExpiredAt.Format(constants.DateTimeFormat),
 		RefreshToken:          refreshToken,
 		RefreshTokenExpiredAt: refreshPayload.ExpiredAt.Format(constants.DateTimeFormat),
 		SessionId:             refreshPayload.ID.String(),
@@ -131,10 +132,10 @@ func (ci *UserManagement) LogoutUser(ctx context.Context, body p2mapi.RefreshTok
 	return err
 }
 
-func (ci *UserManagement) RefreshToken(ctx context.Context, body p2mapi.RefreshTokenBody) (string, error) {
+func (ci *UserManagement) RefreshToken(ctx context.Context, body p2mapi.RefreshTokenBody) (p2mapi.RefreshTokenResponse, error) {
 	refreshPayload, err := ci.tokenMaker.VerifyToken(body.RefreshToken)
 	if err != nil {
-		return "", apperror.ErrInvalidRefreshToken
+		return p2mapi.RefreshTokenResponse{}, apperror.ErrInvalidRefreshToken
 	}
 
 	u := dal.Q.Session
@@ -142,33 +143,36 @@ func (ci *UserManagement) RefreshToken(ctx context.Context, body p2mapi.RefreshT
 	session, err := u.WithContext(ctx).Where(u.SessionID.Eq(refreshPayload.ID.String())).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", apperror.ErrRecordNotFound
+			return p2mapi.RefreshTokenResponse{}, apperror.ErrRecordNotFound
 		}
-		return "", err
+		return p2mapi.RefreshTokenResponse{}, err
 	}
 
 	if session.RefreshToken != body.RefreshToken {
-		return "", apperror.ErrInvalidRefreshToken
+		return p2mapi.RefreshTokenResponse{}, apperror.ErrInvalidRefreshToken
 	}
 
 	if session.UserID != refreshPayload.UserID {
-		return "", apperror.ErrInvalidRefreshToken
+		return p2mapi.RefreshTokenResponse{}, apperror.ErrInvalidRefreshToken
 	}
 
 	if time.Now().After(session.ExpiredAt) {
-		return "", apperror.ErrExpiredRefreshToken
+		return p2mapi.RefreshTokenResponse{}, apperror.ErrExpiredRefreshToken
 	}
 
-	newAccessToken, _, err := ci.tokenMaker.CreateToken(
+	newAccessToken, newAccessTokenPayload, err := ci.tokenMaker.CreateToken(
 		refreshPayload.UserID,
 		refreshPayload.IsAdmin,
 		constants.AccessTokenDuration,
 	)
 	if err != nil {
-		return "", err
+		return p2mapi.RefreshTokenResponse{}, err
 	}
 
-	return newAccessToken, nil
+	return p2mapi.RefreshTokenResponse{
+		AccessToken:          newAccessToken,
+		AccessTokenExpiredAt: newAccessTokenPayload.ExpiredAt.Format(constants.DateTimeFormat),
+	}, nil
 }
 
 func (ci *UserManagement) CreateUser(ctx context.Context, user p2mapi.User) (*p2mapi.User, error) {

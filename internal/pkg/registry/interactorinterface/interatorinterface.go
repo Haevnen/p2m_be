@@ -23,7 +23,7 @@ type UserManagementInterface interface {
 	RemoveUser(ctx context.Context, nickName string) error
 	LoginUser(ctx context.Context, body p2mapi.UserLoginBody) (p2mapi.UserLoginResponse, error)
 	LogoutUser(context.Context, p2mapi.RefreshTokenBody) error
-	RefreshToken(context.Context, p2mapi.RefreshTokenBody) (string, error)
+	RefreshToken(context.Context, p2mapi.RefreshTokenBody) (p2mapi.RefreshTokenResponse, error)
 }
 
 type ClientManagementInterface interface {

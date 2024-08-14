@@ -341,6 +341,10 @@ components:
                 description: jwt string
                 type: string
                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              access_token_expired_at:
+                description: timestamp
+                type: string
+                example: "2022-01-01T00:00:00Z"
               refresh_token:
                 description: jwt string
                 type: string
@@ -357,6 +361,7 @@ components:
               - access_token
               - user
               - refresh_token_expired_at
+              - access_token_expired_at
     RefreshTokenResponse:
       description: Refresh token response
       content:
@@ -369,8 +374,13 @@ components:
                 description: jwt string
                 type: string
                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              access_token_expired_at:
+                description: timestamp
+                type: string
+                example: "2022-01-01T00:00:00Z"
             required:
               - access_token
+              - access_token_expired_at
   schemas:
     Error:
       type: object

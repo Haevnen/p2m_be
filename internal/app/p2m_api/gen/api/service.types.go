@@ -72,6 +72,9 @@ type RefreshTokenBody struct {
 type RefreshTokenResponse struct {
 	// AccessToken jwt string
 	AccessToken string `json:"access_token"`
+
+	// AccessTokenExpiredAt timestamp
+	AccessTokenExpiredAt string `json:"access_token_expired_at"`
 }
 
 // User defines model for User.
@@ -94,6 +97,9 @@ type UserLoginBody struct {
 type UserLoginResponse struct {
 	// AccessToken jwt string
 	AccessToken string `json:"access_token"`
+
+	// AccessTokenExpiredAt timestamp
+	AccessTokenExpiredAt string `json:"access_token_expired_at"`
 
 	// RefreshToken jwt string
 	RefreshToken string `json:"refresh_token"`

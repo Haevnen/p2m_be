@@ -700,6 +700,7 @@ components:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
         refresh_token_expired_at: 2022-01-01T00:00:00Z
+        access_token_expired_at: 2022-01-01T00:00:00Z
         session_id: 123e4567-e89b-12d3-a456-426655440000
         user:
           is_admin: false
@@ -716,6 +717,10 @@ components:
           description: jwt string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
           type: string
+        access_token_expired_at:
+          description: timestamp
+          example: 2022-01-01T00:00:00Z
+          type: string
         refresh_token:
           description: jwt string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
@@ -728,6 +733,7 @@ components:
           $ref: '#/components/schemas/UserWithoutPass'
       required:
       - access_token
+      - access_token_expired_at
       - refresh_token
       - refresh_token_expired_at
       - session_id
@@ -737,13 +743,19 @@ components:
     RefreshTokenResponse:
       example:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        access_token_expired_at: 2022-01-01T00:00:00Z
       properties:
         access_token:
           description: jwt string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
           type: string
+        access_token_expired_at:
+          description: timestamp
+          example: 2022-01-01T00:00:00Z
+          type: string
       required:
       - access_token
+      - access_token_expired_at
       title: RefreshTokenResponse
       type: object
   securitySchemes:
