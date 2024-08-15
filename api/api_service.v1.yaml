@@ -250,6 +250,41 @@ paths:
         default:
           $ref: '#/components/responses/UnexpectedError'
       operationId: internal_registerClient
+
+  /clients/update/{client_id}:
+    put:
+      tags:
+        - Clients
+      summary: Update client by client id
+      description: Update client by client id
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: client_id
+          in: path
+          description: id of client
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClientBody"
+      responses:
+        '200':
+          description: Update successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_updateClient
 tags:
   - name: Users
     description: Users API
@@ -534,3 +569,15 @@ components:
           example: "others"
       required:
         - client_id
+    UpdateClientBody:
+      type: object
+      properties:
+        editing_style:
+          type: string
+          example: "Brighten"
+        requirements:
+          type: string
+          example: "requirements"
+        others:
+          type: string
+          example: "others"

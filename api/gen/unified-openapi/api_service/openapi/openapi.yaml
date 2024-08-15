@@ -439,6 +439,66 @@ paths:
       summary: Register new client
       tags:
       - Clients
+  /clients/update/{client_id}:
+    put:
+      description: Update client by client id
+      operationId: internal_updateClient
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of client
+        explode: false
+        in: path
+        name: client_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClientBody'
+        required: true
+      responses:
+        "200":
+          description: Update successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Update client by client id
+      tags:
+      - Clients
 components:
   parameters:
     session_id:
@@ -694,6 +754,22 @@ components:
           type: string
       required:
       - client_id
+      type: object
+    UpdateClientBody:
+      example:
+        requirements: requirements
+        editing_style: Brighten
+        others: others
+      properties:
+        editing_style:
+          example: Brighten
+          type: string
+        requirements:
+          example: requirements
+          type: string
+        others:
+          example: others
+          type: string
       type: object
     UserLoginResponse:
       example:

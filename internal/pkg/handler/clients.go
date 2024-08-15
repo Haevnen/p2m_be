@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
+	"github.com/Haevnen/p2m_be/internal/apperror"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 )
@@ -60,4 +61,22 @@ func (ci clientHandler) InternalRemoveClient(c *gin.Context, clientId string, pa
 	}
 
 	c.JSON(http.StatusOK, "remove client successfully")
+}
+
+// Update client by client id
+// (PUT /clients/update/{client_id})
+func (h clientHandler) InternalUpdateClient(c *gin.Context, clientId string, params p2m_api.InternalUpdateClientParams) {
+	var updateClientBody p2m_api.UpdateClientBody
+	if err := bindRequestBody(c, &updateClientBody); err != nil {
+		SendError(c, err.Error(), apperror.ErrInvalidRequestInput)
+		return
+	}
+
+	err := h.clientManagementInteractor.UpdateClient(c, clientId, updateClientBody)
+	if err != nil {
+		SendError(c, "update client error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, "update client successfully")
 }

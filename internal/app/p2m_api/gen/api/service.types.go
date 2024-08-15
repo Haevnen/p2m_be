@@ -77,6 +77,13 @@ type RefreshTokenResponse struct {
 	AccessTokenExpiredAt string `json:"access_token_expired_at"`
 }
 
+// UpdateClientBody defines model for UpdateClientBody.
+type UpdateClientBody struct {
+	EditingStyle *string `json:"editing_style,omitempty"`
+	Others       *string `json:"others,omitempty"`
+	Requirements *string `json:"requirements,omitempty"`
+}
+
 // User defines model for User.
 type User struct {
 	ContractType ContractType `json:"contract_type"`
@@ -131,6 +138,11 @@ type InternalRegisterClientParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
+// InternalUpdateClientParams defines parameters for InternalUpdateClient.
+type InternalUpdateClientParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
 // InternalRemoveClientParams defines parameters for InternalRemoveClient.
 type InternalRemoveClientParams struct {
 	XRequestId string `json:"X-Request-Id"`
@@ -168,6 +180,9 @@ type InternalRemoveUserParams struct {
 
 // InternalRegisterClientJSONRequestBody defines body for InternalRegisterClient for application/json ContentType.
 type InternalRegisterClientJSONRequestBody = ClientBody
+
+// InternalUpdateClientJSONRequestBody defines body for InternalUpdateClient for application/json ContentType.
+type InternalUpdateClientJSONRequestBody = UpdateClientBody
 
 // InternalUserLoginJSONRequestBody defines body for InternalUserLogin for application/json ContentType.
 type InternalUserLoginJSONRequestBody = UserLoginBody

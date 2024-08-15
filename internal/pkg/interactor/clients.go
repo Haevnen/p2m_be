@@ -92,3 +92,30 @@ func (ci *ClientManagement) GetAllClient(ctx context.Context, includeDeActive *b
 
 	return res, nil
 }
+
+func (ci *ClientManagement) UpdateClient(ctx context.Context, clientID string, body p2mapi.UpdateClientBody) error {
+	c := dal.Q.Client
+
+	client, err := c.WithContext(ctx).Where(c.ClientID.Eq(clientID)).Where(c.IsActive.Is(true)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return apperror.ErrRecordNotFound
+		}
+		return err
+	}
+
+	if body.EditingStyle != nil {
+		client.EditingStyle = *body.EditingStyle
+	}
+
+	if body.Others != nil {
+		client.Others = *body.Others
+	}
+
+	if body.Requirements != nil {
+		client.Requirements = *body.Requirements
+	}
+
+	_, err = c.WithContext(ctx).Where(c.ClientID.Eq(clientID)).Where(c.IsActive.Is(true)).UpdateColumns(&client)
+	return err
+}

@@ -30,6 +30,7 @@ type ClientManagementInterface interface {
 	CreateClient(ctx context.Context, client p2mapi.ClientBody) (*p2mapi.ClientResponse, error)
 	RemoveClient(ctx context.Context, id string) error
 	GetAllClient(ctx context.Context, includeDeActive *bool) ([]*p2mapi.ClientResponse, error)
+	UpdateClient(ctx context.Context, clientID string, body p2mapi.UpdateClientBody) error
 }
 
 type Maker interface {

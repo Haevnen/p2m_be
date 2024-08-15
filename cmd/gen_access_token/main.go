@@ -5,11 +5,20 @@ import (
 	"time"
 
 	"github.com/Haevnen/p2m_be/internal/pkg/interactor"
+	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 )
 
 const (
-	secretKey = "12345678901234567890123456789012"
+	secretKey = "ffad96f69973f0cecafe52ab794d5556"
 )
+
+func decodeToken(maker interactorinterface.Maker, token string) {
+	payload, _ := maker.VerifyToken(token)
+	fmt.Println("Expired at: ", payload.ExpiredAt)
+	fmt.Println("Issued at: ", payload.IssuedAt)
+	fmt.Println("ID: ", payload.ID)
+	fmt.Println("User ID: ", payload.UserID)
+}
 
 func main() {
 	pasetoMaker, err := interactor.NewPasetoMaker(secretKey)
@@ -22,5 +31,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(token)
+	fmt.Println("Token: ", token)
+
+	decodeToken(pasetoMaker, token)
 }
