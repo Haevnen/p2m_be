@@ -68,7 +68,7 @@ jobs:
           echo "API_HOST=${{ secrets.API_HOST }}" >> .env
           echo "RUN_MODE=${{ secrets.RUN_MODE_PROD }}" >> .env
           echo "LOG_PATH"=${{ secrets.LOG_PATH }} >> .env
-          echo "TOKEN_SYMMETRIC_KEY"=${{ secrets.TOKEN_SYMMETRIC_KEY }} >> .env
+          echo "TOKEN_SYMMETRIC_KEY"=${{ secrets.TOKEN_SYMMETRIC_KEY_PROD }} >> .env
 
       - name: Transfer files to server
         uses: appleboy/scp-action@v0.1.7
