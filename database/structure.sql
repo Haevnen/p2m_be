@@ -31,6 +31,66 @@ CREATE TABLE `clients` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NOT NULL DEFAULT (now()),
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `comments`
+--
+
+DROP TABLE IF EXISTS `comments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comments` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ticket_id` bigint NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `comment` text COLLATE utf8mb4_bin NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `ticket_id` (`ticket_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`),
+  CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `histories`
+--
+
+DROP TABLE IF EXISTS `histories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `histories` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ticket_id` bigint NOT NULL,
+  `action` text COLLATE utf8mb4_bin,
+  `performed_by` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `ticket_id` (`ticket_id`),
+  KEY `performed_by` (`performed_by`),
+  CONSTRAINT `histories_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`),
+  CONSTRAINT `histories_ibfk_2` FOREIGN KEY (`performed_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `links`
+--
+
+DROP TABLE IF EXISTS `links`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `links` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ticket_id` bigint NOT NULL,
+  `link` varchar(2083) COLLATE utf8mb4_bin NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `ticket_id` (`ticket_id`),
+  CONSTRAINT `links_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -55,6 +115,36 @@ CREATE TABLE `sessions` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_session_id` (`session_id`),
   CONSTRAINT `fk_sessions_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tickets`
+--
+
+DROP TABLE IF EXISTS `tickets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tickets` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `status` enum('BACKLOG','IN_PROGRESS','READY_TO_QC','QC_VERIFYING','QC_DONE','DONE') COLLATE utf8mb4_bin NOT NULL,
+  `qc_id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `editor_id` char(36) COLLATE utf8mb4_bin NOT NULL,
+  `priority` enum('NORMAL','HIGH') COLLATE utf8mb4_bin NOT NULL DEFAULT 'NORMAL',
+  `client_id` int NOT NULL,
+  `description` text COLLATE utf8mb4_bin,
+  `created_by` enum('AUTO','MANUAL') COLLATE utf8mb4_bin NOT NULL DEFAULT 'AUTO',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT (now()),
+  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_tickets_editor_users` (`editor_id`),
+  KEY `fk_tickets_qc_users` (`qc_id`),
+  KEY `fk_tickets_clients` (`client_id`),
+  CONSTRAINT `fk_tickets_clients` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`),
+  CONSTRAINT `fk_tickets_editor_users` FOREIGN KEY (`editor_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `fk_tickets_qc_users` FOREIGN KEY (`qc_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -77,7 +167,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT (now()),
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
