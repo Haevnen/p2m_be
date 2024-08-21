@@ -30,6 +30,22 @@ func main() {
 		//
 		// Generate struct `Clients` based on table `clients`
 		g.GenerateModel("clients"),
+
+		//
+		// Generate struct `Tickets` based on table `tickets`
+		g.GenerateModel("tickets"),
+
+		//
+		// Generate struct `Links` based on table `links`
+		g.GenerateModel("links"),
+
+		//
+		// Generate struct `Comments` based on table `comments`
+		g.GenerateModel("comments"),
+
+		//
+		// Generate struct `Histories` based on table `histories`
+		g.GenerateModel("histories"),
 	)
 	// Generate the code
 	g.Execute()
