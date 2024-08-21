@@ -92,7 +92,7 @@ paths:
       tags:
         - Users
       summary: Get all users
-      description: Get all users
+      description: Get all users (only admin)
       parameters:
         - $ref: "#/components/parameters/including_deactivates"
       security:
@@ -116,7 +116,7 @@ paths:
       tags:
         - Users
       summary: Register new user
-      description: Register new user
+      description: Register new  (only admin)
       parameters:
         - $ref: "#/components/parameters/request_id"
       security:
@@ -144,7 +144,7 @@ paths:
       tags:
         - Users
       summary: Delete user by name
-      description: Delete user by name
+      description: Delete user by  (only admin)
       parameters:
         - $ref: "#/components/parameters/request_id"
         - name: name
@@ -173,7 +173,7 @@ paths:
       tags:
         - Clients
       summary: Get all clients
-      description: Get all clients
+      description: Get all clients (only admin)
       parameters:
         - $ref: "#/components/parameters/including_deactivates"
       security:
@@ -198,7 +198,7 @@ paths:
       tags:
         - Clients
       summary: Delete client by id
-      description: Delete client by id
+      description: Delete client by id (only admin)
       parameters:
         - $ref: "#/components/parameters/request_id"
         - name: client_id
@@ -227,7 +227,7 @@ paths:
       tags:
         - Clients
       summary: Register new client
-      description: Register new client
+      description: Register new client (only admin)
       parameters:
         - $ref: "#/components/parameters/request_id"
       security:
@@ -256,7 +256,7 @@ paths:
       tags:
         - Clients
       summary: Update client by client id
-      description: Update client by client id
+      description: Update client by client id (only admin)
       parameters:
         - $ref: "#/components/parameters/request_id"
         - name: client_id
@@ -285,15 +285,495 @@ paths:
         '403':
           $ref: "#/components/responses/Forbidden"
       operationId: internal_updateClient
+
+  /clients/info/{client_id}:
+    get:
+      tags:
+        - Clients
+      summary: Get client by id
+      description: Get client by id
+      parameters:
+        - name: client_id
+          in: path
+          description: id of client
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_getClient
+
+  /links:
+    post:
+      tags:
+        - Links
+      summary: Create new link
+      description: Create new link (only admin)
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkBody"
+      responses:
+        '200':
+          $ref: "#/components/responses/LinkResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_createLink
+
+  /links/{ticket_id}:
+    get:
+      tags: 
+        - Links
+      summary: Get ticket links
+      description: Get ticket links
+      parameters:
+        - name: ticket_id
+          in: path
+          description: id of ticket
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LinkResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_getAllLinks
+  
+  /links/{link_id}:
+    delete:
+      tags:
+        - Links
+      summary: Delete link by id
+      description: Delete link by id (only admin)
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: link_id
+          in: path
+          description: id of link
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_removeLink
+  
+  /links/update/{link_id}:
+    put:
+      tags:
+        - Links
+      summary: Update link by id
+      description: Update link by id (only admin)
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: link_id
+          in: path
+          description: id of link
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkBody"
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_updateLink
+
+  /comments:
+    post:
+      tags:
+        - Comments 
+      summary: Create new comment
+      description: Create new comment
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentBody"
+      responses:
+        '200':
+          $ref: "#/components/responses/CommentResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+      operationId: internal_createComment
+
+  /comments/{comment_id}:
+    delete:
+      tags:
+        - Comments
+      summary: Delete comment by id
+      description: Delete comment by id
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: comment_id
+          in: path
+          description: id of comment
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_removeComment
+
+  /comments/update/{comment_id}:
+    put:
+      tags:
+        - Comments
+      summary: Update comment by id
+      description: Update comment by id
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: comment_id
+          in: path
+          description: id of comment
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommentBody"
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_updateComment
+      
+  /comments/{ticket_id}:
+    get:
+      tags:
+        - Comments
+      summary: Get all comments
+      description: Get all comments
+      parameters:
+        - name: ticket_id
+          in: path
+          description: id of ticket
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_getComments
+
+  /histories/{ticket_id}:
+    get:
+      tags:
+        - Histories
+      summary: Get all histories of ticket
+      description: Get all histories of ticket
+      parameters:
+        - name: ticket_id
+          in: path
+          description: id of ticket
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_getHistories
+
+  /histories:
+    post:
+      tags:
+        - Histories
+      summary: Create new history
+      description: Create new history
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHistoryBody"
+      responses:
+        '200':
+          $ref: "#/components/responses/HistoryResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_createHistory
+
+  /tickets:
+    get:
+      tags:
+        - Tickets
+      summary: Get all tickets
+      description: Get all tickets
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ListTicketItem"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+      operationId: internal_getTickets
+  
+  /tickets/{ticket_id}:
+    get:
+      tags:
+        - Tickets
+      summary: Get ticket by id
+      description: Get ticket by id
+      parameters:
+        - name: ticket_id
+          in: path
+          description: id of ticket
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SingleTicketResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_getTicket
+
+  /tickets/remove/{ticket_id}:
+    delete:
+      tags:
+        - Tickets
+      summary: Remove ticket by id
+      description: Remove ticket by id (only admin)
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: ticket_id
+          in: path
+          description: id of ticket
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_removeTicket
+  
+  /tickets/add:
+    post:
+      tags:
+        - Tickets
+      summary: Add new ticket
+      description: Add new ticket (only admin)
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTicketBody"
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_addTicket
+
+  /tickets/update/{ticket_id}:
+    put:
+      tags:
+        - Tickets
+      summary: Update ticket by id
+      description: Update ticket by id
+      parameters:
+        - $ref: "#/components/parameters/request_id"
+        - name: ticket_id
+          in: path
+          description: id of ticket
+          required: true
+          schema:
+            type: integer
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTicketBody"
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+      operationId: internal_updateTicket
+
 tags:
   - name: Users
     description: Users API
-  - name: Tasks
-    description: Tasks API
+  - name: Tickets
+    description: Tickets API
   - name: Clients
     description: Clients API
   - name: Dashboard
     description: Dashboard API
+  - name: Links
+    description: Ticket Links API
+  - name: Comments
+    description: Ticket Comments API
+  - name: Histories
+    description: Ticket Histories API
 
 components:
   securitySchemes:
@@ -416,6 +896,24 @@ components:
             required:
               - access_token
               - access_token_expired_at
+    LinkResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LinkResponse"
+    CommentResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CommentResponse"
+    HistoryResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HistoryResponse"
   schemas:
     Error:
       type: object
@@ -448,6 +946,25 @@ components:
         - FULLTIME
         - FREELANCE
       example: FULLTIME
+    Status:
+      type: string
+      enum:
+        - BACKLOG
+        - IN_PROGRESS
+        - READY_TO_QC
+        - QC_VERIFYING
+        - QC_DONE
+        - DONE
+    CreatedBy:
+      type: string
+      enum:
+        - MANUAL
+        - AUTO
+    Priority:
+      type: string
+      enum:
+        - NORMAL
+        - HIGH
     UserWithoutPass:
       type: object
       properties:
@@ -581,3 +1098,237 @@ components:
         others:
           type: string
           example: "others"
+    LinkResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        url:
+          type: string
+          example: "https://example.com"
+          format: uri
+        ticket_id:
+          type: integer
+          example: 1
+      required:
+        - url
+        - id
+        - ticket_id
+    LinkBody:
+      type: object
+      properties:
+        url:
+          type: string
+          example: "https://example.com"
+          format: uri
+        ticket_id:
+          type: integer
+          example: 1
+      required:
+        - url
+        - ticket_id
+    CreateCommentBody:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: "comment"
+        ticket_id:
+          type: integer
+          example: 1
+        nick_name:
+          type: string
+          example: "nickname"
+      required:
+        - comment
+        - ticket_id
+        - nick_name
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        comment:
+          type: string
+          example: "comment"
+        ticket_id:
+          type: integer
+          example: 1
+        nick_name:
+          type: string
+          example: "nickname"
+      required:
+        - id
+        - comment
+        - ticket_id
+        - nick_name
+    UpdateCommentBody:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: "comment"
+      required:
+        - comment
+    HistoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        ticket_id:
+          type: integer
+          example: 1
+        nick_name:
+          type: string
+          example: "nickname"
+        action:
+          type: string
+          example: "action"
+      required:
+        - id
+        - ticket_id
+        - nick_name
+        - action
+    CreateHistoryBody:
+      type: object
+      properties:
+        ticket_id:
+          type: integer
+          example: 1
+        nick_name:
+          type: string
+          example: "nickname"
+        action:
+          type: string
+          example: "action"
+      required:
+        - ticket_id
+        - nick_name
+        - action
+    ListTicket:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "title"
+        qc_name:
+          type: string
+          example: "qc_name"
+        editor_name:
+          type: string
+          example: "editor_name"
+        priority:
+          $ref: "#/components/schemas/Priority"
+      required:
+        - id
+        - title
+        - qc_name
+        - editor_name
+        - priority
+    ListTicketItem:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/Status"
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/ListTicket"
+      required:
+        - status
+        - tickets
+    SingleTicketResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "title"
+        qc_name:
+          type: string
+          example: "qc_name"
+        editor_name:
+          type: string
+          example: "editor_name"
+        priority:
+          $ref: "#/components/schemas/Priority"
+        status:
+          $ref: "#/components/schemas/Status"
+        created_by:
+          $ref: "#/components/schemas/CreatedBy"
+        client_id:
+          type: string
+          example: "GMT"
+        description:
+          type: string
+          example: "description"
+      required:
+        - id
+        - title
+        - qc_name
+        - editor_name
+        - priority
+        - status
+        - created_by
+        - client_id
+        - description
+    CreateTicketBody:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "title"
+        qc_name:
+          type: string
+          example: "qc_name"
+        editor_name:
+          type: string
+          example: "editor_name"
+        priority:
+          $ref: "#/components/schemas/Priority"
+        client_id:
+          type: string
+          example: "GMT"
+        description:
+          type: string
+          example: "description"
+        links:
+          type: array
+          items:
+            type: string
+            format: uri
+      required:
+        - title
+        - qc_name
+        - editor_name
+        - priority
+        - client_id
+        - description
+    UpdateTicketBody:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "title"
+        qc_name:
+          type: string
+          example: "qc_name"
+        editor_name:
+          type: string
+          example: "editor_name"
+        priority:
+          $ref: "#/components/schemas/Priority"
+        client_id:
+          type: string
+          example: "GMT"
+        description:
+          type: string
+          example: "description"

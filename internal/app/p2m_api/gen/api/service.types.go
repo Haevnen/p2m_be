@@ -13,12 +13,34 @@ const (
 	FULLTIME  ContractType = "FULLTIME"
 )
 
+// Defines values for CreatedBy.
+const (
+	AUTO   CreatedBy = "AUTO"
+	MANUAL CreatedBy = "MANUAL"
+)
+
 // Defines values for ErrorType.
 const (
 	InternalError    ErrorType = "internal_error"
 	PermissionDenied ErrorType = "permission_denied"
 	RequestNotFound  ErrorType = "request_not_found"
 	ValidationFailed ErrorType = "validation_failed"
+)
+
+// Defines values for Priority.
+const (
+	HIGH   Priority = "HIGH"
+	NORMAL Priority = "NORMAL"
+)
+
+// Defines values for Status.
+const (
+	BACKLOG     Status = "BACKLOG"
+	DONE        Status = "DONE"
+	INPROGRESS  Status = "IN_PROGRESS"
+	QCDONE      Status = "QC_DONE"
+	QCVERIFYING Status = "QC_VERIFYING"
+	READYTOQC   Status = "READY_TO_QC"
 )
 
 // ClientBody defines model for ClientBody.
@@ -39,8 +61,44 @@ type ClientResponse struct {
 	Requirements *string `json:"requirements,omitempty"`
 }
 
+// CommentResponse defines model for CommentResponse.
+type CommentResponse struct {
+	Comment  string `json:"comment"`
+	Id       int    `json:"id"`
+	NickName string `json:"nick_name"`
+	TicketId int    `json:"ticket_id"`
+}
+
 // ContractType defines model for ContractType.
 type ContractType string
+
+// CreateCommentBody defines model for CreateCommentBody.
+type CreateCommentBody struct {
+	Comment  string `json:"comment"`
+	NickName string `json:"nick_name"`
+	TicketId int    `json:"ticket_id"`
+}
+
+// CreateHistoryBody defines model for CreateHistoryBody.
+type CreateHistoryBody struct {
+	Action   string `json:"action"`
+	NickName string `json:"nick_name"`
+	TicketId int    `json:"ticket_id"`
+}
+
+// CreateTicketBody defines model for CreateTicketBody.
+type CreateTicketBody struct {
+	ClientId    string    `json:"client_id"`
+	Description string    `json:"description"`
+	EditorName  string    `json:"editor_name"`
+	Links       *[]string `json:"links,omitempty"`
+	Priority    Priority  `json:"priority"`
+	QcName      string    `json:"qc_name"`
+	Title       string    `json:"title"`
+}
+
+// CreatedBy defines model for CreatedBy.
+type CreatedBy string
 
 // Error defines model for Error.
 type Error struct {
@@ -58,10 +116,49 @@ type Error struct {
 // ErrorType defines model for Error.Type.
 type ErrorType string
 
+// HistoryResponse defines model for HistoryResponse.
+type HistoryResponse struct {
+	Action   string `json:"action"`
+	Id       int    `json:"id"`
+	NickName string `json:"nick_name"`
+	TicketId int    `json:"ticket_id"`
+}
+
+// LinkBody defines model for LinkBody.
+type LinkBody struct {
+	TicketId int    `json:"ticket_id"`
+	Url      string `json:"url"`
+}
+
+// LinkResponse defines model for LinkResponse.
+type LinkResponse struct {
+	Id       int    `json:"id"`
+	TicketId int    `json:"ticket_id"`
+	Url      string `json:"url"`
+}
+
+// ListTicket defines model for ListTicket.
+type ListTicket struct {
+	EditorName string   `json:"editor_name"`
+	Id         int      `json:"id"`
+	Priority   Priority `json:"priority"`
+	QcName     string   `json:"qc_name"`
+	Title      string   `json:"title"`
+}
+
+// ListTicketItem defines model for ListTicketItem.
+type ListTicketItem struct {
+	Status  Status       `json:"status"`
+	Tickets []ListTicket `json:"tickets"`
+}
+
 // Pong defines model for Pong.
 type Pong struct {
 	Ping string `json:"ping"`
 }
+
+// Priority defines model for Priority.
+type Priority string
 
 // RefreshTokenBody defines model for RefreshTokenBody.
 type RefreshTokenBody struct {
@@ -77,11 +174,42 @@ type RefreshTokenResponse struct {
 	AccessTokenExpiredAt string `json:"access_token_expired_at"`
 }
 
+// SingleTicketResponse defines model for SingleTicketResponse.
+type SingleTicketResponse struct {
+	ClientId    string    `json:"client_id"`
+	CreatedBy   CreatedBy `json:"created_by"`
+	Description string    `json:"description"`
+	EditorName  string    `json:"editor_name"`
+	Id          int       `json:"id"`
+	Priority    Priority  `json:"priority"`
+	QcName      string    `json:"qc_name"`
+	Status      Status    `json:"status"`
+	Title       string    `json:"title"`
+}
+
+// Status defines model for Status.
+type Status string
+
 // UpdateClientBody defines model for UpdateClientBody.
 type UpdateClientBody struct {
 	EditingStyle *string `json:"editing_style,omitempty"`
 	Others       *string `json:"others,omitempty"`
 	Requirements *string `json:"requirements,omitempty"`
+}
+
+// UpdateCommentBody defines model for UpdateCommentBody.
+type UpdateCommentBody struct {
+	Comment string `json:"comment"`
+}
+
+// UpdateTicketBody defines model for UpdateTicketBody.
+type UpdateTicketBody struct {
+	ClientId    *string   `json:"client_id,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	EditorName  *string   `json:"editor_name,omitempty"`
+	Priority    *Priority `json:"priority,omitempty"`
+	QcName      *string   `json:"qc_name,omitempty"`
+	Title       *string   `json:"title,omitempty"`
 }
 
 // User defines model for User.
@@ -148,6 +276,41 @@ type InternalRemoveClientParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
+// InternalCreateCommentParams defines parameters for InternalCreateComment.
+type InternalCreateCommentParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalUpdateCommentParams defines parameters for InternalUpdateComment.
+type InternalUpdateCommentParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalRemoveCommentParams defines parameters for InternalRemoveComment.
+type InternalRemoveCommentParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalCreateHistoryParams defines parameters for InternalCreateHistory.
+type InternalCreateHistoryParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalCreateLinkParams defines parameters for InternalCreateLink.
+type InternalCreateLinkParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalUpdateLinkParams defines parameters for InternalUpdateLink.
+type InternalUpdateLinkParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalRemoveLinkParams defines parameters for InternalRemoveLink.
+type InternalRemoveLinkParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
 // InternalUserLoginParams defines parameters for InternalUserLogin.
 type InternalUserLoginParams struct {
 	XRequestId string `json:"X-Request-Id"`
@@ -160,6 +323,21 @@ type InternalUserLogoutParams struct {
 
 // InternalRefreshTokenParams defines parameters for InternalRefreshToken.
 type InternalRefreshTokenParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalAddTicketParams defines parameters for InternalAddTicket.
+type InternalAddTicketParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalRemoveTicketParams defines parameters for InternalRemoveTicket.
+type InternalRemoveTicketParams struct {
+	XRequestId string `json:"X-Request-Id"`
+}
+
+// InternalUpdateTicketParams defines parameters for InternalUpdateTicket.
+type InternalUpdateTicketParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
@@ -184,6 +362,21 @@ type InternalRegisterClientJSONRequestBody = ClientBody
 // InternalUpdateClientJSONRequestBody defines body for InternalUpdateClient for application/json ContentType.
 type InternalUpdateClientJSONRequestBody = UpdateClientBody
 
+// InternalCreateCommentJSONRequestBody defines body for InternalCreateComment for application/json ContentType.
+type InternalCreateCommentJSONRequestBody = CreateCommentBody
+
+// InternalUpdateCommentJSONRequestBody defines body for InternalUpdateComment for application/json ContentType.
+type InternalUpdateCommentJSONRequestBody = UpdateCommentBody
+
+// InternalCreateHistoryJSONRequestBody defines body for InternalCreateHistory for application/json ContentType.
+type InternalCreateHistoryJSONRequestBody = CreateHistoryBody
+
+// InternalCreateLinkJSONRequestBody defines body for InternalCreateLink for application/json ContentType.
+type InternalCreateLinkJSONRequestBody = LinkBody
+
+// InternalUpdateLinkJSONRequestBody defines body for InternalUpdateLink for application/json ContentType.
+type InternalUpdateLinkJSONRequestBody = LinkBody
+
 // InternalUserLoginJSONRequestBody defines body for InternalUserLogin for application/json ContentType.
 type InternalUserLoginJSONRequestBody = UserLoginBody
 
@@ -192,6 +385,12 @@ type InternalUserLogoutJSONRequestBody = RefreshTokenBody
 
 // InternalRefreshTokenJSONRequestBody defines body for InternalRefreshToken for application/json ContentType.
 type InternalRefreshTokenJSONRequestBody = RefreshTokenBody
+
+// InternalAddTicketJSONRequestBody defines body for InternalAddTicket for application/json ContentType.
+type InternalAddTicketJSONRequestBody = CreateTicketBody
+
+// InternalUpdateTicketJSONRequestBody defines body for InternalUpdateTicket for application/json ContentType.
+type InternalUpdateTicketJSONRequestBody = UpdateTicketBody
 
 // InternalRegisterUserJSONRequestBody defines body for InternalRegisterUser for application/json ContentType.
 type InternalRegisterUserJSONRequestBody = User

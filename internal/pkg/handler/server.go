@@ -12,12 +12,20 @@ import (
 type Handler struct {
 	userHandler
 	clientHandler
+	linkHandler
+	commentHandler
+	historyHandler
+	ticketHandler
 }
 
 func New(reg *registry.Registry) Handler {
 	h := Handler{}
 	h.userHandler = newUserHandler(reg)
 	h.clientHandler = newClientHandler(reg)
+	h.linkHandler = newLinkHandler(reg)
+	h.commentHandler = newCommentHandler(reg)
+	h.historyHandler = newHistoryHandler(reg)
+	h.ticketHandler = newTicketHandler(reg)
 	return h
 }
 

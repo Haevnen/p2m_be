@@ -19,6 +19,11 @@ var authorizationMap map[string]bool = map[string]bool{
 	"/clients/:client_id":        true,
 	"/clients/register":          true,
 	"/clients/update/:client_id": true,
+	"/links":                     true,
+	"/links/update/:link_id":     true,
+	"/links/:link_id":            true,
+	"/tickets/add":               true,
+	"/tickets/remove/:ticket_id": true,
 }
 
 func needsAuthorization(ctx *gin.Context) bool {

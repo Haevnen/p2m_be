@@ -15,12 +15,18 @@ servers:
 tags:
 - description: Users API
   name: Users
-- description: Tasks API
-  name: Tasks
+- description: Tickets API
+  name: Tickets
 - description: Clients API
   name: Clients
 - description: Dashboard API
   name: Dashboard
+- description: Ticket Links API
+  name: Links
+- description: Ticket Comments API
+  name: Comments
+- description: Ticket Histories API
+  name: Histories
 paths:
   /ping:
     get:
@@ -145,7 +151,7 @@ paths:
       - Users
   /users:
     get:
-      description: Get all users
+      description: Get all users (only admin)
       operationId: internal_getAllUsers
       parameters:
       - explode: true
@@ -184,7 +190,7 @@ paths:
       - Users
   /users/register:
     post:
-      description: Register new user
+      description: Register new  (only admin)
       operationId: internal_registerUser
       parameters:
       - explode: false
@@ -239,7 +245,7 @@ paths:
       - Users
   /users/{name}:
     delete:
-      description: Delete user by name
+      description: Delete user by  (only admin)
       operationId: internal_removeUser
       parameters:
       - explode: false
@@ -293,7 +299,7 @@ paths:
       - Users
   /clients:
     get:
-      description: Get all clients
+      description: Get all clients (only admin)
       operationId: internal_getAllClients
       parameters:
       - explode: true
@@ -332,7 +338,7 @@ paths:
       - Clients
   /clients/{client_id}:
     delete:
-      description: Delete client by id
+      description: Delete client by id (only admin)
       operationId: internal_removeClient
       parameters:
       - explode: false
@@ -386,7 +392,7 @@ paths:
       - Clients
   /clients/register:
     post:
-      description: Register new client
+      description: Register new client (only admin)
       operationId: internal_registerClient
       parameters:
       - explode: false
@@ -441,7 +447,7 @@ paths:
       - Clients
   /clients/update/{client_id}:
     put:
-      description: Update client by client id
+      description: Update client by client id (only admin)
       operationId: internal_updateClient
       parameters:
       - explode: false
@@ -499,6 +505,783 @@ paths:
       summary: Update client by client id
       tags:
       - Clients
+  /clients/info/{client_id}:
+    get:
+      description: Get client by id
+      operationId: internal_getClient
+      parameters:
+      - description: id of client
+        explode: false
+        in: path
+        name: client_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Get client by id
+      tags:
+      - Clients
+  /links:
+    post:
+      description: Create new link (only admin)
+      operationId: internal_createLink
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkBody'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkResponse'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Create new link
+      tags:
+      - Links
+  /links/{ticket_id}:
+    get:
+      description: Get ticket links
+      operationId: internal_getAllLinks
+      parameters:
+      - description: id of ticket
+        explode: false
+        in: path
+        name: ticket_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LinkResponse'
+                type: array
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Get ticket links
+      tags:
+      - Links
+  /links/{link_id}:
+    delete:
+      description: Delete link by id (only admin)
+      operationId: internal_removeLink
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of link
+        explode: false
+        in: path
+        name: link_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Delete link by id
+      tags:
+      - Links
+  /links/update/{link_id}:
+    put:
+      description: Update link by id (only admin)
+      operationId: internal_updateLink
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of link
+        explode: false
+        in: path
+        name: link_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkBody'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Update link by id
+      tags:
+      - Links
+  /comments:
+    post:
+      description: Create new comment
+      operationId: internal_createComment
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentBody'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      security:
+      - BearerAuth: []
+      summary: Create new comment
+      tags:
+      - Comments
+  /comments/{comment_id}:
+    delete:
+      description: Delete comment by id
+      operationId: internal_removeComment
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of comment
+        explode: false
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Delete comment by id
+      tags:
+      - Comments
+  /comments/update/{comment_id}:
+    put:
+      description: Update comment by id
+      operationId: internal_updateComment
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of comment
+        explode: false
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommentBody'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Update comment by id
+      tags:
+      - Comments
+  /comments/{ticket_id}:
+    get:
+      description: Get all comments
+      operationId: internal_getComments
+      parameters:
+      - description: id of ticket
+        explode: false
+        in: path
+        name: ticket_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CommentResponse'
+                type: array
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Get all comments
+      tags:
+      - Comments
+  /histories/{ticket_id}:
+    get:
+      description: Get all histories of ticket
+      operationId: internal_getHistories
+      parameters:
+      - description: id of ticket
+        explode: false
+        in: path
+        name: ticket_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/HistoryResponse'
+                type: array
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Get all histories of ticket
+      tags:
+      - Histories
+  /histories:
+    post:
+      description: Create new history
+      operationId: internal_createHistory
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHistoryBody'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryResponse'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Create new history
+      tags:
+      - Histories
+  /tickets:
+    get:
+      description: Get all tickets
+      operationId: internal_getTickets
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ListTicketItem'
+                type: array
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+      security:
+      - BearerAuth: []
+      summary: Get all tickets
+      tags:
+      - Tickets
+  /tickets/{ticket_id}:
+    get:
+      description: Get ticket by id
+      operationId: internal_getTicket
+      parameters:
+      - description: id of ticket
+        explode: false
+        in: path
+        name: ticket_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleTicketResponse'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Get ticket by id
+      tags:
+      - Tickets
+  /tickets/remove/{ticket_id}:
+    delete:
+      description: Remove ticket by id (only admin)
+      operationId: internal_removeTicket
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of ticket
+        explode: false
+        in: path
+        name: ticket_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Remove ticket by id
+      tags:
+      - Tickets
+  /tickets/add:
+    post:
+      description: Add new ticket (only admin)
+      operationId: internal_addTicket
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicketBody'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Add new ticket
+      tags:
+      - Tickets
+  /tickets/update/{ticket_id}:
+    put:
+      description: Update ticket by id
+      operationId: internal_updateTicket
+      parameters:
+      - explode: false
+        in: header
+        name: X-Request-Id
+        required: true
+        schema:
+          format: ascii
+          type: string
+        style: simple
+      - description: id of ticket
+        explode: false
+        in: path
+        name: ticket_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTicketBody'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Access forbidden (only admin)
+      security:
+      - BearerAuth: []
+      summary: Update ticket by id
+      tags:
+      - Tickets
 components:
   parameters:
     session_id:
@@ -573,6 +1356,24 @@ components:
           schema:
             $ref: '#/components/schemas/RefreshTokenResponse'
       description: Refresh token response
+    LinkResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkResponse'
+      description: Successful operation
+    CommentResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CommentResponse'
+      description: Successful operation
+    HistoryResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HistoryResponse'
+      description: Successful operation
   schemas:
     Error:
       properties:
@@ -604,6 +1405,25 @@ components:
       - FULLTIME
       - FREELANCE
       example: FULLTIME
+      type: string
+    Status:
+      enum:
+      - BACKLOG
+      - IN_PROGRESS
+      - READY_TO_QC
+      - QC_VERIFYING
+      - QC_DONE
+      - DONE
+      type: string
+    CreatedBy:
+      enum:
+      - MANUAL
+      - AUTO
+      type: string
+    Priority:
+      enum:
+      - NORMAL
+      - HIGH
       type: string
     UserWithoutPass:
       example:
@@ -769,6 +1589,304 @@ components:
           type: string
         others:
           example: others
+          type: string
+      type: object
+    LinkResponse:
+      example:
+        id: 1
+        ticket_id: 1
+        url: https://example.com
+      properties:
+        id:
+          example: 1
+          type: integer
+        url:
+          example: https://example.com
+          format: uri
+          type: string
+        ticket_id:
+          example: 1
+          type: integer
+      required:
+      - id
+      - ticket_id
+      - url
+      type: object
+    LinkBody:
+      example:
+        ticket_id: 1
+        url: https://example.com
+      properties:
+        url:
+          example: https://example.com
+          format: uri
+          type: string
+        ticket_id:
+          example: 1
+          type: integer
+      required:
+      - ticket_id
+      - url
+      type: object
+    CreateCommentBody:
+      example:
+        nick_name: nickname
+        comment: comment
+        ticket_id: 1
+      properties:
+        comment:
+          example: comment
+          type: string
+        ticket_id:
+          example: 1
+          type: integer
+        nick_name:
+          example: nickname
+          type: string
+      required:
+      - comment
+      - nick_name
+      - ticket_id
+      type: object
+    CommentResponse:
+      example:
+        nick_name: nickname
+        comment: comment
+        id: 1
+        ticket_id: 1
+      properties:
+        id:
+          example: 1
+          type: integer
+        comment:
+          example: comment
+          type: string
+        ticket_id:
+          example: 1
+          type: integer
+        nick_name:
+          example: nickname
+          type: string
+      required:
+      - comment
+      - id
+      - nick_name
+      - ticket_id
+      type: object
+    UpdateCommentBody:
+      example:
+        comment: comment
+      properties:
+        comment:
+          example: comment
+          type: string
+      required:
+      - comment
+      type: object
+    HistoryResponse:
+      example:
+        nick_name: nickname
+        action: action
+        id: 1
+        ticket_id: 1
+      properties:
+        id:
+          example: 1
+          type: integer
+        ticket_id:
+          example: 1
+          type: integer
+        nick_name:
+          example: nickname
+          type: string
+        action:
+          example: action
+          type: string
+      required:
+      - action
+      - id
+      - nick_name
+      - ticket_id
+      type: object
+    CreateHistoryBody:
+      example:
+        nick_name: nickname
+        action: action
+        ticket_id: 1
+      properties:
+        ticket_id:
+          example: 1
+          type: integer
+        nick_name:
+          example: nickname
+          type: string
+        action:
+          example: action
+          type: string
+      required:
+      - action
+      - nick_name
+      - ticket_id
+      type: object
+    ListTicket:
+      example:
+        editor_name: editor_name
+        qc_name: qc_name
+        id: 1
+        title: title
+      properties:
+        id:
+          example: 1
+          type: integer
+        title:
+          example: title
+          type: string
+        qc_name:
+          example: qc_name
+          type: string
+        editor_name:
+          example: editor_name
+          type: string
+        priority:
+          $ref: '#/components/schemas/Priority'
+      required:
+      - editor_name
+      - id
+      - priority
+      - qc_name
+      - title
+      type: object
+    ListTicketItem:
+      example:
+        tickets:
+        - editor_name: editor_name
+          qc_name: qc_name
+          id: 1
+          title: title
+        - editor_name: editor_name
+          qc_name: qc_name
+          id: 1
+          title: title
+      properties:
+        status:
+          $ref: '#/components/schemas/Status'
+        tickets:
+          items:
+            $ref: '#/components/schemas/ListTicket'
+          type: array
+      required:
+      - status
+      - tickets
+      type: object
+    SingleTicketResponse:
+      example:
+        editor_name: editor_name
+        qc_name: qc_name
+        description: description
+        id: 1
+        title: title
+        client_id: GMT
+      properties:
+        id:
+          example: 1
+          type: integer
+        title:
+          example: title
+          type: string
+        qc_name:
+          example: qc_name
+          type: string
+        editor_name:
+          example: editor_name
+          type: string
+        priority:
+          $ref: '#/components/schemas/Priority'
+        status:
+          $ref: '#/components/schemas/Status'
+        created_by:
+          $ref: '#/components/schemas/CreatedBy'
+        client_id:
+          example: GMT
+          type: string
+        description:
+          example: description
+          type: string
+      required:
+      - client_id
+      - created_by
+      - description
+      - editor_name
+      - id
+      - priority
+      - qc_name
+      - status
+      - title
+      type: object
+    CreateTicketBody:
+      example:
+        editor_name: editor_name
+        qc_name: qc_name
+        description: description
+        links:
+        - https://openapi-generator.tech
+        - https://openapi-generator.tech
+        title: title
+        client_id: GMT
+      properties:
+        title:
+          example: title
+          type: string
+        qc_name:
+          example: qc_name
+          type: string
+        editor_name:
+          example: editor_name
+          type: string
+        priority:
+          $ref: '#/components/schemas/Priority'
+        client_id:
+          example: GMT
+          type: string
+        description:
+          example: description
+          type: string
+        links:
+          items:
+            format: uri
+            type: string
+          type: array
+      required:
+      - client_id
+      - description
+      - editor_name
+      - priority
+      - qc_name
+      - title
+      type: object
+    UpdateTicketBody:
+      example:
+        editor_name: editor_name
+        qc_name: qc_name
+        description: description
+        title: title
+        client_id: GMT
+      properties:
+        title:
+          example: title
+          type: string
+        qc_name:
+          example: qc_name
+          type: string
+        editor_name:
+          example: editor_name
+          type: string
+        priority:
+          $ref: '#/components/schemas/Priority'
+        client_id:
+          example: GMT
+          type: string
+        description:
+          example: description
           type: string
       type: object
     UserLoginResponse:
