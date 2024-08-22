@@ -32,9 +32,9 @@ func (ci *UserManagement) GetAllUser(ctx context.Context, includeDeActive *bool)
 	var err error
 
 	if includeDeActive == nil || !(*includeDeActive) {
-		users, err = u.WithContext(ctx).Where(u.IsActive).Find()
+		users, err = u.WithContext(ctx).Where(u.IsActive).Order(u.ContractType, u.NickName).Find()
 	} else {
-		users, err = u.WithContext(ctx).Find()
+		users, err = u.WithContext(ctx).Order(u.ContractType, u.NickName).Find()
 	}
 
 	if err != nil {
