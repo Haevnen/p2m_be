@@ -18,14 +18,22 @@ import (
 var (
 	Q       = new(Query)
 	Client  *client
+	Comment *comment
+	History *history
+	Link    *link
 	Session *session
+	Ticket  *ticket
 	User    *user
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Client = &Q.Client
+	Comment = &Q.Comment
+	History = &Q.History
+	Link = &Q.Link
 	Session = &Q.Session
+	Ticket = &Q.Ticket
 	User = &Q.User
 }
 
@@ -33,7 +41,11 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:      db,
 		Client:  newClient(db, opts...),
+		Comment: newComment(db, opts...),
+		History: newHistory(db, opts...),
+		Link:    newLink(db, opts...),
 		Session: newSession(db, opts...),
+		Ticket:  newTicket(db, opts...),
 		User:    newUser(db, opts...),
 	}
 }
@@ -42,7 +54,11 @@ type Query struct {
 	db *gorm.DB
 
 	Client  client
+	Comment comment
+	History history
+	Link    link
 	Session session
+	Ticket  ticket
 	User    user
 }
 
@@ -52,7 +68,11 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:      db,
 		Client:  q.Client.clone(db),
+		Comment: q.Comment.clone(db),
+		History: q.History.clone(db),
+		Link:    q.Link.clone(db),
 		Session: q.Session.clone(db),
+		Ticket:  q.Ticket.clone(db),
 		User:    q.User.clone(db),
 	}
 }
@@ -69,21 +89,33 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:      db,
 		Client:  q.Client.replaceDB(db),
+		Comment: q.Comment.replaceDB(db),
+		History: q.History.replaceDB(db),
+		Link:    q.Link.replaceDB(db),
 		Session: q.Session.replaceDB(db),
+		Ticket:  q.Ticket.replaceDB(db),
 		User:    q.User.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
 	Client  *clientDo
+	Comment *commentDo
+	History *historyDo
+	Link    *linkDo
 	Session *sessionDo
+	Ticket  *ticketDo
 	User    *userDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		Client:  q.Client.WithContext(ctx),
+		Comment: q.Comment.WithContext(ctx),
+		History: q.History.WithContext(ctx),
+		Link:    q.Link.WithContext(ctx),
 		Session: q.Session.WithContext(ctx),
+		Ticket:  q.Ticket.WithContext(ctx),
 		User:    q.User.WithContext(ctx),
 	}
 }
