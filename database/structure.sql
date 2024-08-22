@@ -135,7 +135,7 @@ CREATE TABLE `tickets` (
   `client_id` int NOT NULL,
   `description` text COLLATE utf8mb4_bin,
   `created_by` enum('AUTO','MANUAL') COLLATE utf8mb4_bin NOT NULL DEFAULT 'AUTO',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NOT NULL DEFAULT (now()),
   `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

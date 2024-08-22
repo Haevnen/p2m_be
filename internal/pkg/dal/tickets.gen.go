@@ -36,7 +36,7 @@ func newTicket(db *gorm.DB, opts ...gen.DOOption) ticket {
 	_ticket.ClientID = field.NewInt32(tableName, "client_id")
 	_ticket.Description = field.NewString(tableName, "description")
 	_ticket.CreatedBy = field.NewString(tableName, "created_by")
-	_ticket.IsDeleted = field.NewBool(tableName, "is_deleted")
+	_ticket.IsActive = field.NewBool(tableName, "is_active")
 	_ticket.CreatedAt = field.NewTime(tableName, "created_at")
 	_ticket.UpdatedAt = field.NewTime(tableName, "updated_at")
 
@@ -58,7 +58,7 @@ type ticket struct {
 	ClientID    field.Int32
 	Description field.String
 	CreatedBy   field.String
-	IsDeleted   field.Bool
+	IsActive    field.Bool
 	CreatedAt   field.Time
 	UpdatedAt   field.Time
 
@@ -86,7 +86,7 @@ func (t *ticket) updateTableName(table string) *ticket {
 	t.ClientID = field.NewInt32(table, "client_id")
 	t.Description = field.NewString(table, "description")
 	t.CreatedBy = field.NewString(table, "created_by")
-	t.IsDeleted = field.NewBool(table, "is_deleted")
+	t.IsActive = field.NewBool(table, "is_active")
 	t.CreatedAt = field.NewTime(table, "created_at")
 	t.UpdatedAt = field.NewTime(table, "updated_at")
 
@@ -123,7 +123,7 @@ func (t *ticket) fillFieldMap() {
 	t.fieldMap["client_id"] = t.ClientID
 	t.fieldMap["description"] = t.Description
 	t.fieldMap["created_by"] = t.CreatedBy
-	t.fieldMap["is_deleted"] = t.IsDeleted
+	t.fieldMap["is_active"] = t.IsActive
 	t.fieldMap["created_at"] = t.CreatedAt
 	t.fieldMap["updated_at"] = t.UpdatedAt
 }

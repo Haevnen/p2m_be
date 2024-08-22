@@ -69,7 +69,7 @@ Table tickets {
     priority ticket_priority [not null]
     client_id integer [not null, ref: > clients.id]
     description text
-    is_deleted tinyint(1) [not null, default: `0`]
+    is_active tinyint(1) [not null, default: `1`]
     created_by ticket_created_by [not null]
     created_at timestamp [not null, default: `now()`]
     updated_at timestamp [not null, default: `now()`]

@@ -9,7 +9,7 @@ CREATE TABLE `tickets` (
   `client_id` integer NOT NULL,
   `description` text,
   `created_by` ENUM ('AUTO', 'MANUAL') NOT NULL DEFAULT 'AUTO',
-  `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT (now()),
   `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

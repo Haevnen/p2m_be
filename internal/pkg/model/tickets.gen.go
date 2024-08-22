@@ -21,7 +21,7 @@ type Ticket struct {
 	ClientID    int32     `gorm:"column:client_id;not null" json:"client_id"`
 	Description string    `gorm:"column:description" json:"description"`
 	CreatedBy   string    `gorm:"column:created_by;not null;default:AUTO" json:"created_by"`
-	IsDeleted   bool      `gorm:"column:is_deleted;not null" json:"is_deleted"`
+	IsActive    bool      `gorm:"column:is_active;not null;default:1" json:"is_active"`
 	CreatedAt   time.Time `gorm:"column:created_at;not null;default:now()" json:"created_at"`
 	UpdatedAt   time.Time `gorm:"column:updated_at;not null;default:now()" json:"updated_at"`
 }
