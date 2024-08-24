@@ -6,6 +6,7 @@ import (
 
 	"github.com/Haevnen/p2m_be/internal/pkg/interactor"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
+	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 const (
@@ -34,4 +35,12 @@ func main() {
 	fmt.Println("Token: ", token)
 
 	decodeToken(pasetoMaker, token)
+
+	password := "Ck27082021$"
+
+	hashedPassword, err := util.HashPassword(password)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(hashedPassword)
 }

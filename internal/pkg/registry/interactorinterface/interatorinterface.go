@@ -33,6 +33,13 @@ type ClientManagementInterface interface {
 	UpdateClient(ctx context.Context, clientID string, body p2mapi.UpdateClientBody) error
 }
 
+type LinkManagementInterface interface{}
+
+type CommentManagementInterface interface{}
+
+type HistoryManagementInterface interface{}
+
+type TicketManagementInterface interface{}
 type Maker interface {
 	// Return token, payload and error
 	CreateToken(userID string, isAdmin bool, duration time.Duration) (string, *Payload, error)

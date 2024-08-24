@@ -23,6 +23,9 @@ type ServerInterface interface {
 	// Get all clients
 	// (GET /clients)
 	InternalGetAllClients(c *gin.Context, params InternalGetAllClientsParams)
+	// Get client by id
+	// (GET /clients/info/{client_id})
+	InternalGetClient(c *gin.Context, clientId string)
 	// Register new client
 	// (POST /clients/register)
 	InternalRegisterClient(c *gin.Context, params InternalRegisterClientParams)
@@ -32,6 +35,36 @@ type ServerInterface interface {
 	// Delete client by id
 	// (DELETE /clients/{client_id})
 	InternalRemoveClient(c *gin.Context, clientId string, params InternalRemoveClientParams)
+	// Create new comment
+	// (POST /comments)
+	InternalCreateComment(c *gin.Context, params InternalCreateCommentParams)
+	// Update comment by id
+	// (PUT /comments/update/{comment_id})
+	InternalUpdateComment(c *gin.Context, commentId int, params InternalUpdateCommentParams)
+	// Delete comment by id
+	// (DELETE /comments/{comment_id})
+	InternalRemoveComment(c *gin.Context, commentId int, params InternalRemoveCommentParams)
+	// Get all comments
+	// (GET /comments/{ticket_id})
+	InternalGetComments(c *gin.Context, ticketId int)
+	// Create new history
+	// (POST /histories)
+	InternalCreateHistory(c *gin.Context, params InternalCreateHistoryParams)
+	// Get all histories of ticket
+	// (GET /histories/{ticket_id})
+	InternalGetHistories(c *gin.Context, ticketId int)
+	// Create new link
+	// (POST /links)
+	InternalCreateLink(c *gin.Context, params InternalCreateLinkParams)
+	// Update link by id
+	// (PUT /links/update/{link_id})
+	InternalUpdateLink(c *gin.Context, linkId int, params InternalUpdateLinkParams)
+	// Delete link by id
+	// (DELETE /links/{link_id})
+	InternalRemoveLink(c *gin.Context, linkId int, params InternalRemoveLinkParams)
+	// Get ticket links
+	// (GET /links/{ticket_id})
+	InternalGetAllLinks(c *gin.Context, ticketId int)
 	// User login
 	// (POST /login)
 	InternalUserLogin(c *gin.Context, params InternalUserLoginParams)
@@ -44,6 +77,21 @@ type ServerInterface interface {
 	// Renew refresh_token and access token
 	// (POST /refresh-token)
 	InternalRefreshToken(c *gin.Context, params InternalRefreshTokenParams)
+	// Get all tickets
+	// (GET /tickets)
+	InternalGetTickets(c *gin.Context)
+	// Add new ticket
+	// (POST /tickets/add)
+	InternalAddTicket(c *gin.Context, params InternalAddTicketParams)
+	// Remove ticket by id
+	// (DELETE /tickets/remove/{ticket_id})
+	InternalRemoveTicket(c *gin.Context, ticketId int, params InternalRemoveTicketParams)
+	// Update ticket by id
+	// (PUT /tickets/update/{ticket_id})
+	InternalUpdateTicket(c *gin.Context, ticketId int, params InternalUpdateTicketParams)
+	// Get ticket by id
+	// (GET /tickets/{ticket_id})
+	InternalGetTicket(c *gin.Context, ticketId int)
 	// Get all users
 	// (GET /users)
 	InternalGetAllUsers(c *gin.Context, params InternalGetAllUsersParams)
@@ -90,6 +138,32 @@ func (siw *ServerInterfaceWrapper) InternalGetAllClients(c *gin.Context) {
 	}
 
 	siw.Handler.InternalGetAllClients(c, params)
+}
+
+// InternalGetClient operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetClient(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "client_id" -------------
+	var clientId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "client_id", c.Param("client_id"), &clientId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter client_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalGetClient(c, clientId)
 }
 
 // InternalRegisterClient operation middleware
@@ -242,6 +316,428 @@ func (siw *ServerInterfaceWrapper) InternalRemoveClient(c *gin.Context) {
 	siw.Handler.InternalRemoveClient(c, clientId, params)
 }
 
+// InternalCreateComment operation middleware
+func (siw *ServerInterfaceWrapper) InternalCreateComment(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalCreateCommentParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalCreateComment(c, params)
+}
+
+// InternalUpdateComment operation middleware
+func (siw *ServerInterfaceWrapper) InternalUpdateComment(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "comment_id" -------------
+	var commentId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "comment_id", c.Param("comment_id"), &commentId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter comment_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalUpdateCommentParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalUpdateComment(c, commentId, params)
+}
+
+// InternalRemoveComment operation middleware
+func (siw *ServerInterfaceWrapper) InternalRemoveComment(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "comment_id" -------------
+	var commentId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "comment_id", c.Param("comment_id"), &commentId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter comment_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalRemoveCommentParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalRemoveComment(c, commentId, params)
+}
+
+// InternalGetComments operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetComments(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ticket_id" -------------
+	var ticketId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ticket_id", c.Param("ticket_id"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ticket_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalGetComments(c, ticketId)
+}
+
+// InternalCreateHistory operation middleware
+func (siw *ServerInterfaceWrapper) InternalCreateHistory(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalCreateHistoryParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalCreateHistory(c, params)
+}
+
+// InternalGetHistories operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetHistories(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ticket_id" -------------
+	var ticketId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ticket_id", c.Param("ticket_id"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ticket_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalGetHistories(c, ticketId)
+}
+
+// InternalCreateLink operation middleware
+func (siw *ServerInterfaceWrapper) InternalCreateLink(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalCreateLinkParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalCreateLink(c, params)
+}
+
+// InternalUpdateLink operation middleware
+func (siw *ServerInterfaceWrapper) InternalUpdateLink(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "link_id" -------------
+	var linkId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "link_id", c.Param("link_id"), &linkId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter link_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalUpdateLinkParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalUpdateLink(c, linkId, params)
+}
+
+// InternalRemoveLink operation middleware
+func (siw *ServerInterfaceWrapper) InternalRemoveLink(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "link_id" -------------
+	var linkId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "link_id", c.Param("link_id"), &linkId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter link_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalRemoveLinkParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalRemoveLink(c, linkId, params)
+}
+
+// InternalGetAllLinks operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetAllLinks(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ticket_id" -------------
+	var ticketId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ticket_id", c.Param("ticket_id"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ticket_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalGetAllLinks(c, ticketId)
+}
+
 // InternalUserLogin operation middleware
 func (siw *ServerInterfaceWrapper) InternalUserLogin(c *gin.Context) {
 
@@ -381,6 +877,197 @@ func (siw *ServerInterfaceWrapper) InternalRefreshToken(c *gin.Context) {
 	}
 
 	siw.Handler.InternalRefreshToken(c, params)
+}
+
+// InternalGetTickets operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetTickets(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalGetTickets(c)
+}
+
+// InternalAddTicket operation middleware
+func (siw *ServerInterfaceWrapper) InternalAddTicket(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalAddTicketParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalAddTicket(c, params)
+}
+
+// InternalRemoveTicket operation middleware
+func (siw *ServerInterfaceWrapper) InternalRemoveTicket(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ticket_id" -------------
+	var ticketId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ticket_id", c.Param("ticket_id"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ticket_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalRemoveTicketParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalRemoveTicket(c, ticketId, params)
+}
+
+// InternalUpdateTicket operation middleware
+func (siw *ServerInterfaceWrapper) InternalUpdateTicket(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ticket_id" -------------
+	var ticketId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ticket_id", c.Param("ticket_id"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ticket_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params InternalUpdateTicketParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Request-Id" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Request-Id")]; found {
+		var XRequestId string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Request-Id, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Request-Id", valueList[0], &XRequestId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Request-Id: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XRequestId = XRequestId
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Request-Id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalUpdateTicket(c, ticketId, params)
+}
+
+// InternalGetTicket operation middleware
+func (siw *ServerInterfaceWrapper) InternalGetTicket(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "ticket_id" -------------
+	var ticketId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "ticket_id", c.Param("ticket_id"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter ticket_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.InternalGetTicket(c, ticketId)
 }
 
 // InternalGetAllUsers operation middleware
@@ -536,13 +1223,29 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/clients", wrapper.InternalGetAllClients)
+	router.GET(options.BaseURL+"/clients/info/:client_id", wrapper.InternalGetClient)
 	router.POST(options.BaseURL+"/clients/register", wrapper.InternalRegisterClient)
 	router.PUT(options.BaseURL+"/clients/update/:client_id", wrapper.InternalUpdateClient)
 	router.DELETE(options.BaseURL+"/clients/:client_id", wrapper.InternalRemoveClient)
+	router.POST(options.BaseURL+"/comments", wrapper.InternalCreateComment)
+	router.PUT(options.BaseURL+"/comments/update/:comment_id", wrapper.InternalUpdateComment)
+	router.DELETE(options.BaseURL+"/comments/:comment_id", wrapper.InternalRemoveComment)
+	router.GET(options.BaseURL+"/comments/:ticket_id", wrapper.InternalGetComments)
+	router.POST(options.BaseURL+"/histories", wrapper.InternalCreateHistory)
+	router.GET(options.BaseURL+"/histories/:ticket_id", wrapper.InternalGetHistories)
+	router.POST(options.BaseURL+"/links", wrapper.InternalCreateLink)
+	router.PUT(options.BaseURL+"/links/update/:link_id", wrapper.InternalUpdateLink)
+	router.DELETE(options.BaseURL+"/links/:link_id", wrapper.InternalRemoveLink)
+	router.GET(options.BaseURL+"/links/:ticket_id", wrapper.InternalGetAllLinks)
 	router.POST(options.BaseURL+"/login", wrapper.InternalUserLogin)
 	router.POST(options.BaseURL+"/logout", wrapper.InternalUserLogout)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 	router.POST(options.BaseURL+"/refresh-token", wrapper.InternalRefreshToken)
+	router.GET(options.BaseURL+"/tickets", wrapper.InternalGetTickets)
+	router.POST(options.BaseURL+"/tickets/add", wrapper.InternalAddTicket)
+	router.DELETE(options.BaseURL+"/tickets/remove/:ticket_id", wrapper.InternalRemoveTicket)
+	router.PUT(options.BaseURL+"/tickets/update/:ticket_id", wrapper.InternalUpdateTicket)
+	router.GET(options.BaseURL+"/tickets/:ticket_id", wrapper.InternalGetTicket)
 	router.GET(options.BaseURL+"/users", wrapper.InternalGetAllUsers)
 	router.POST(options.BaseURL+"/users/register", wrapper.InternalRegisterUser)
 	router.DELETE(options.BaseURL+"/users/:name", wrapper.InternalRemoveUser)
@@ -551,40 +1254,61 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xbe2/bOBL/KgLv/rgDlFjO67r+L8mmgYt0N3CT28UVhkFLY5uNRGpJKq0v8Hdf8CGL",
-	"kuhH2qZNGwMFKovD4cxw5jfDofKAYpbljAKVAvUekIhnkGH9eJ4SoPKMJXP1Cz7hLE9BPcZ6YEQS1EOX",
-	"b29QiCAhktDpSMi5IkFnnExnEigKEZMz4AL1yocQcfirIBwys2T95yJEOWc5cElANNZyZLDLynmufgjJ",
-	"CZ2quQ053BmOSK1ppYwu/VLcFnVdfndObaQ1s5qaoN57R7PhkpSNP0As1SLG+AMQOaMCvmQDFFU3RESM",
-	"cCzJPaCe5AX8GBvT4N5dkhAqYQpc01SKOaRGR0s9ZiwFTJ/BVrvieredUclxLG/0wAMCWmSKw+vbq6ub",
-	"/tsLFKLXg4uLq9Pfzi8Ug0ogh6KlxgXnjCt2jS1kiV4kARFzkkvCKOqh80JIlgWg5gSaxMMxAYlJ2p78",
-	"q34PiZ3uDnq4SCJTjwRa3OBdkWWYz73zrHUSmOAildYfOMXpSK+rAsIa7h6nJMGK8WiiJUMhyoFnRAj1",
-	"LgFK9Du1XSDkiDI5mrCC6q2qMx1u3GZjLGubUj07y7fb14xOG6GdK8Y9lDOjaX3DzKDrhppuk1x6mm/9",
-	"AUw4iNkNuwPqwXluhkdSjaMegvmb2fgyJr+TN/3b//e7v5G+6NPBcXzeP+nf5X/+9/zNL22hG1xc6bdi",
-	"uEm7Ov9Naq5AVBzHIMTjNA1rs0bwKVcijbDyx4Po4GAv6u5F3Zso6ul//2ubpr5qMww+fJSB1Tn8YqOt",
-	"Eba5riQZCImzvLasV6NNe1NTcLUIwyUU+PfKs6e3eYIlrCxRnq4gee4lRttSAnizfrBZZmSJndwBmcZ1",
-	"+7+nbFAvkoxQ1JvgVECIKInvRhRnipF61o8hyrEQHxlXJcrysV1E1AV5QP/kMEE99I9OVZV2bEnaqeXG",
-	"xVLUGqBYqduFxKOKhEpHh9iq26Z2DODK4tiiJU5lnBqYl283JxrXbKFnsxwdXAGHK/zjik2JLwM0vWGr",
-	"Tf329qhWdFit1fV7poHw8xJrY9pWCwkwZY4+KXQPDuHo+OQ/e/Dql/Fe9yA53MNHxyd7RwcnJ8fHR0dR",
-	"FEUoRIXFi6cHicULSIhhu/55UqVW+8jX1cr1rCbnoiCJT6ctHbC1VumR65KDiuw/iJyxQl5jIT63Emlu",
-	"1xqD1mxghXQKmTbUrMAjV+pvnaZ3CfmJ06uOlLjgRM7fKasZK59hQeLTQs7asaOHAjUGVJIY26OzNrlW",
-	"U41XGsykzJXKZ4A58JLlWP96zXimk8ObP270sdRd510OMZnMg1MdCMGN9fZqHc2iuZDSh9AJK10FxxpY",
-	"rFud//7W9Abcha4P3gan1/0gYXGhqlZUhYgdQiG6By4MeXc/2o90wZwDxTlBPXS4H+0f6MwuZ9p8HdNP",
-	"0c9T8EDbJcgAp2lQ0mluXNuyrzJh3x7sL0Gepun5kirHHGcgdaH+XrlOnuoWiQ0pxfqvAnRPwqpMaJwW",
-	"iToPJKB9A0sQpR2xkqztnuWZZMJ4hhZD5XsGIbRCB1FUWldZSyXFPE+tJ3Q+CEarNq16IhIysTFS693E",
-	"6piAOcdzs68N/yi0Y0yKNFjaTs07irqPEm+dVKYt5VncNIDIRDuOBt7gDuYBEQFlMhAgAzVMdW9HPc6w",
-	"CHDKASfzwCK0kfXw6WW1ATRhfEySBGjwL0bTeaDB4d81ANA+5Qbq+6HafWH7XD63lXiqXBGVLjpU/Er3",
-	"73CYEiFNbsyZ8ATCwFIEFD5atiuDoaQ9L8lWRYPFXR0OM8CJhgkbD3/uDUwjba+fIBdVTQhVtp6U4IRF",
-	"TIi3wrBhIojGbxMomnd5UPkqG+u0EBb1RKBEXvijc9tYiZ7e/85wEli77OLz8fEZVk3kjZI4pVmZwsoW",
-	"cVD2nZ37Cad1vAi/VI1bCp9yiGXZWhePgxY/EKyHl0K32DoPy9uLhQaawoMzphtnGQfjefmkK2M/3LgN",
-	"vOcHNmFTQ+XIk8pyXvlUgVJJ5176rBbte8Feq3/6ueBnt17sMPAHxsCj6OjppRiAYAWPQRvI3LE9CsPW",
-	"gsx6KGtgWAIpSPDdXqr3zgpr8GsAGbvf4dd2+LWroHbo8Z3Rwx/bfthI2dT0mvynqis2FQGhAQ4KATzA",
-	"VPmPLDgVAaaBaS3aTTVjuoNo3uyvLojKhuGLOXrVb562L0C+7uJVV+Rn7IIsahlUuWtqfax0ffXScXxm",
-	"6vs1ns8KaV1/ozMrZi/Fm1sf03z9dsKP5HRbV3XWJ42r+Jyy/OrJtnrrDncJ8trcMz0ZUuivtDymykEG",
-	"3AEPJavF+r3lZd+qvpxJCY10sb+m2qycaxdR3yhFeL9F8pYmToJ3XGJXvz4iNw2Awsegdtuqqyc3PlYA",
-	"RCHsp1VrL4MM1fqroFtL89NeBOmPwXbXP8/6+qd01JWu/tiLH/1pwqZrn1tD9HJOHrvrnt11z4u47rHh",
-	"vxpOHlQcb9MY1e2O8TywX9Gsa4w+TzhptUX16cP5MGiLvqil3LVEdyjzc7REG1HdwgnNkt+XMVzwFPXQ",
-	"w4wJuejgnHTuuyhE95gTPE6NQ8+WNUn591kzKfNep5OyGKdqtHf4KnrVdf5OawWBWn64lMkXvcJ+Qmaj",
-	"00jdDvQbLO4apPqVh9T2guvEZYO4Tf4rFrMxwzypT1i+Rovh4u8AAAD//y5xMnZmOwAA",
+	"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",
+	"XxNd3iz/FwAA//8KCl5V64wAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
