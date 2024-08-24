@@ -1332,3 +1332,5 @@ components:
         description:
           type: string
           example: "description"
+        status:
+          $ref: "#/components/schemas/Status"
