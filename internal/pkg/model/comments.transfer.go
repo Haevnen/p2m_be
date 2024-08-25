@@ -14,5 +14,6 @@ func (c *Comment) FromComment() *p2mapi.CommentResponse {
 		Comment:  c.Comment,
 		TicketId: c.TicketID,
 		Id:       c.ID,
+		NickName: &c.NickName,
 	}
 }

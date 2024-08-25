@@ -1,9 +1,10 @@
 package interactor
 
 import (
+	"context"
 	"errors"
-	
-	"github.com/gin-gonic/gin"
+	"github.com/Haevnen/p2m_be/pkg/logger"
+
 	"gorm.io/gorm"
 
 	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
@@ -20,13 +21,14 @@ func NewCommentManagement() *CommentManagement {
 	return &CommentManagement{}
 }
 
-func (ci *CommentManagement) CreateComment(ctx *gin.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error) {
+func (ci *CommentManagement) CreateComment(ctx context.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error) {
 	c := dal.Q.Comment
+	u := dal.Q.User
 
 	var commentDb model.Comment
 	commentDb.ToComment(client)
 	// add userId
-	payload := ctx.MustGet(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
+	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
 	if payload == nil {
 		return nil, apperror.ErrUserNotExists
 	}
@@ -37,10 +39,23 @@ func (ci *CommentManagement) CreateComment(ctx *gin.Context, client p2mapi.Creat
 		return nil, err
 	}
 
+	// get nick-name from userID
+	nickName := ""
+	user, err := u.WithContext(ctx).Where(u.UserID.Eq(payload.UserID)).First()
+	if err != nil {
+		logger.Errorf("find user when create comment has error: %v", err)
+	}
+	if user != nil {
+		nickName = user.NickName
+	} else {
+		logger.Error("find user when create comment has error: user is nil")
+	}
+	commentDb.NickName = nickName
+
 	return commentDb.FromComment(), nil
 }
 
-func (ci *CommentManagement) UpdateComment(ctx *gin.Context, commentID int64, body p2mapi.UpdateCommentBody) error {
+func (ci *CommentManagement) UpdateComment(ctx context.Context, commentID int64, body p2mapi.UpdateCommentBody) error {
 	c := dal.Q.Comment
 
 	comment, err := c.WithContext(ctx).Where(c.ID.Eq(commentID)).First()
@@ -57,7 +72,7 @@ func (ci *CommentManagement) UpdateComment(ctx *gin.Context, commentID int64, bo
 	return err
 }
 
-func (ci *CommentManagement) DeleteComment(ctx *gin.Context, commentID int64) error {
+func (ci *CommentManagement) DeleteComment(ctx context.Context, commentID int64) error {
 	c := dal.Q.Comment
 	comment, err := c.WithContext(ctx).Where(c.ID.Eq(commentID)).First()
 	if err != nil {
@@ -70,10 +85,14 @@ func (ci *CommentManagement) DeleteComment(ctx *gin.Context, commentID int64) er
 	return err
 }
 
-func (ci *CommentManagement) GetAllComment(ctx *gin.Context) ([]*p2mapi.CommentResponse, error) {
+func (ci *CommentManagement) GetAllComment(ctx context.Context, ticketID int64) ([]*p2mapi.CommentResponse, error) {
 	c := dal.Q.Comment
+	u := dal.Q.User
+
 	var comments []*model.Comment
-	comments, err := c.WithContext(ctx).Order(c.CreatedAt.Desc()).Find()
+	comments, err := c.WithContext(ctx).Select(c.ID, c.TicketID, c.UserID, c.Comment, c.CreatedAt, u.NickName).
+		LeftJoin(u, c.UserID.EqCol(u.UserID)).
+		Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Find()
 
 	if err != nil {
 		return nil, err

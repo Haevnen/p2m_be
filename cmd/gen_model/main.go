@@ -17,6 +17,9 @@ func main() {
 	gormdb, _ := gorm.Open(mysql.Open("root:root@(127.0.0.1:33306)/p2m_db?charset=utf8mb4&parseTime=True&loc=Local"))
 	g.UseDB(gormdb) // reuse your gorm db
 
+	ignore := make(map[string]string)
+	ignore["gorm"] = "-"
+
 	// Generate basic type-safe DAO API for struct `model.User` following conventions
 	//g.GenerateModel("test"gen.WithMethod())
 	g.ApplyBasic(
@@ -41,7 +44,8 @@ func main() {
 
 		//
 		// Generate struct `Comments` based on table `comments`
-		g.GenerateModel("comments"),
+		//g.GenerateModel("comments"),
+		g.GenerateModelAs("comments", "Comment", gen.FieldNew("NickName", "string", ignore)),
 
 		//
 		// Generate struct `Histories` based on table `histories`

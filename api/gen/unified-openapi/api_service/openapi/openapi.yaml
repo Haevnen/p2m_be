@@ -1654,6 +1654,7 @@ components:
       type: object
     CommentResponse:
       example:
+        nick_name: nickname
         comment: comment
         id: 1
         ticket_id: 1
@@ -1669,6 +1670,9 @@ components:
           example: 1
           format: int64
           type: integer
+        nick_name:
+          example: nickname
+          type: string
       required:
       - comment
       - id

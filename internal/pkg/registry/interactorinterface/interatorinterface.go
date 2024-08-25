@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
 	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
@@ -37,10 +36,10 @@ type ClientManagementInterface interface {
 type LinkManagementInterface interface{}
 
 type CommentManagementInterface interface {
-	CreateComment(ctx *gin.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error)
-	UpdateComment(ctx *gin.Context, commentID int64, body p2mapi.UpdateCommentBody) error
-	DeleteComment(ctx *gin.Context, commentID int64) error
-	GetAllComment(ctx *gin.Context) ([]*p2mapi.CommentResponse, error)
+	CreateComment(ctx context.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error)
+	UpdateComment(ctx context.Context, commentID int64, body p2mapi.UpdateCommentBody) error
+	DeleteComment(ctx context.Context, commentID int64) error
+	GetAllComment(ctx context.Context, ticketID int64) ([]*p2mapi.CommentResponse, error)
 }
 
 type HistoryManagementInterface interface{}

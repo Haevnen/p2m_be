@@ -54,7 +54,7 @@ func (h commentHandler) InternalRemoveComment(c *gin.Context, commentId int64, p
 // Get all comments
 // (GET /comments/{ticket_id})
 func (h commentHandler) InternalGetComments(c *gin.Context, ticketId int64) {
-	comments, err := h.commentManagementInteractor.GetAllComment(c)
+	comments, err := h.commentManagementInteractor.GetAllComment(c, ticketId)
 	if err != nil {
 		SendError(c, "get all comment error", err)
 		return
