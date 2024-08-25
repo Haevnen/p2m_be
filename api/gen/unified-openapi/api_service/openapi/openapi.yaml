@@ -823,6 +823,7 @@ paths:
         name: comment_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       responses:
@@ -871,6 +872,7 @@ paths:
         name: comment_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       requestBody:

@@ -479,6 +479,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       responses:

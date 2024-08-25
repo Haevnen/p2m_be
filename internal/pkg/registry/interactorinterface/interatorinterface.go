@@ -38,6 +38,9 @@ type LinkManagementInterface interface{}
 
 type CommentManagementInterface interface {
 	CreateComment(ctx *gin.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error)
+	UpdateComment(ctx *gin.Context, commentID int64, body p2mapi.UpdateCommentBody) error
+	DeleteComment(ctx *gin.Context, commentID int64) error
+	GetAllComment(ctx *gin.Context) ([]*p2mapi.CommentResponse, error)
 }
 
 type HistoryManagementInterface interface{}
