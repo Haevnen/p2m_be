@@ -610,6 +610,7 @@ paths:
         name: ticket_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       responses:
@@ -822,6 +823,7 @@ paths:
         name: comment_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       responses:
@@ -870,6 +872,7 @@ paths:
         name: comment_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       requestBody:
@@ -916,6 +919,7 @@ paths:
         name: ticket_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       responses:
@@ -962,6 +966,7 @@ paths:
         name: ticket_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       responses:
@@ -1241,6 +1246,7 @@ paths:
         name: ticket_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       requestBody:
@@ -1606,6 +1612,7 @@ components:
           type: string
         ticket_id:
           example: 1
+          format: int64
           type: integer
       required:
       - id
@@ -1623,6 +1630,7 @@ components:
           type: string
         ticket_id:
           example: 1
+          format: int64
           type: integer
       required:
       - ticket_id
@@ -1630,7 +1638,6 @@ components:
       type: object
     CreateCommentBody:
       example:
-        nick_name: nickname
         comment: comment
         ticket_id: 1
       properties:
@@ -1639,13 +1646,10 @@ components:
           type: string
         ticket_id:
           example: 1
+          format: int64
           type: integer
-        nick_name:
-          example: nickname
-          type: string
       required:
       - comment
-      - nick_name
       - ticket_id
       type: object
     CommentResponse:
@@ -1657,12 +1661,14 @@ components:
       properties:
         id:
           example: 1
+          format: int64
           type: integer
         comment:
           example: comment
           type: string
         ticket_id:
           example: 1
+          format: int64
           type: integer
         nick_name:
           example: nickname
@@ -1670,7 +1676,6 @@ components:
       required:
       - comment
       - id
-      - nick_name
       - ticket_id
       type: object
     UpdateCommentBody:
@@ -1695,6 +1700,7 @@ components:
           type: integer
         ticket_id:
           example: 1
+          format: int64
           type: integer
         nick_name:
           example: nickname
@@ -1716,6 +1722,7 @@ components:
       properties:
         ticket_id:
           example: 1
+          format: int64
           type: integer
         nick_name:
           example: nickname
@@ -1737,6 +1744,7 @@ components:
       properties:
         id:
           example: 1
+          format: int64
           type: integer
         title:
           example: title
@@ -1789,6 +1797,7 @@ components:
       properties:
         id:
           example: 1
+          format: int64
           type: integer
         title:
           example: title
@@ -1888,6 +1897,8 @@ components:
         description:
           example: description
           type: string
+        status:
+          $ref: '#/components/schemas/Status'
       type: object
     UserLoginResponse:
       example:

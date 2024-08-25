@@ -45,7 +45,7 @@ func (h ticketHandler) InternalRemoveTicket(c *gin.Context, ticketId int, params
 
 // Update ticket by id
 // (PUT /tickets/update/{ticket_id})
-func (h ticketHandler) InternalUpdateTicket(c *gin.Context, ticketId int, params p2m_api.InternalUpdateTicketParams) {
+func (h ticketHandler) InternalUpdateTicket(c *gin.Context, ticketId int64, params p2m_api.InternalUpdateTicketParams) {
 	// TODO:
 	// * Need to check Payload to check if user is admin (only admin user can
 	// change status to DONE, update title, description and links)

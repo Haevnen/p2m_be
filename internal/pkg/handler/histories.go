@@ -24,4 +24,4 @@ func (h historyHandler) InternalCreateHistory(c *gin.Context, params p2m_api.Int
 
 // Get all histories of ticket
 // (GET /histories/{ticket_id})
-func (h historyHandler) InternalGetHistories(c *gin.Context, ticketId int) {}
+func (h historyHandler) InternalGetHistories(c *gin.Context, ticketId int64) {}

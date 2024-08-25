@@ -35,7 +35,12 @@ type ClientManagementInterface interface {
 
 type LinkManagementInterface interface{}
 
-type CommentManagementInterface interface{}
+type CommentManagementInterface interface {
+	CreateComment(ctx context.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error)
+	UpdateComment(ctx context.Context, commentID int64, body p2mapi.UpdateCommentBody) error
+	DeleteComment(ctx context.Context, commentID int64) error
+	GetAllComment(ctx context.Context, ticketID int64) ([]*p2mapi.CommentResponse, error)
+}
 
 type HistoryManagementInterface interface{}
 

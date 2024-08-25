@@ -3,18 +3,14 @@ package middleware
 import (
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"github.com/Haevnen/p2m_be/internal/apperror"
 	"github.com/Haevnen/p2m_be/internal/pkg/handler"
+	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 	"github.com/Haevnen/p2m_be/pkg/constants"
-	"github.com/gin-gonic/gin"
-)
-
-const (
-	authorizationHeaderKey  = "authorization"
-	authorizationTypeBearer = "bearer"
-	authorizationPayloadKey = "authorization_payload"
 )
 
 func needsAuthentication(ctx *gin.Context) bool {
@@ -29,7 +25,7 @@ func needsAuthentication(ctx *gin.Context) bool {
 func Authentication(tokenMaker interactorinterface.Maker) p2m_api.MiddlewareFunc {
 	return func(ctx *gin.Context) {
 		if needsAuthentication(ctx) {
-			authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
+			authorizationHeader := ctx.GetHeader(model.AuthorizationHeaderKey)
 			if len(authorizationHeader) == 0 {
 				ctx.Abort()
 				handler.SendError(ctx, "authorization header is not provided", apperror.ErrNotProvidedAuthenticationHeader)
@@ -44,7 +40,7 @@ func Authentication(tokenMaker interactorinterface.Maker) p2m_api.MiddlewareFunc
 			}
 
 			authorizationType := strings.ToLower((fields[0]))
-			if authorizationType != authorizationTypeBearer {
+			if authorizationType != model.AuthorizationTypeBearer {
 				ctx.Abort()
 				handler.SendError(ctx, "unsupported authorization type", apperror.ErrUnsupportedAuthorizationType)
 				return
@@ -58,7 +54,7 @@ func Authentication(tokenMaker interactorinterface.Maker) p2m_api.MiddlewareFunc
 				return
 			}
 
-			ctx.Set(authorizationPayloadKey, payload)
+			ctx.Set(model.AuthorizationPayloadKey, payload)
 		}
 		ctx.Next()
 	}

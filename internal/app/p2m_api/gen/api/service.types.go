@@ -63,10 +63,10 @@ type ClientResponse struct {
 
 // CommentResponse defines model for CommentResponse.
 type CommentResponse struct {
-	Comment  string `json:"comment"`
-	Id       int    `json:"id"`
-	NickName string `json:"nick_name"`
-	TicketId int    `json:"ticket_id"`
+	Comment  string  `json:"comment"`
+	Id       int64   `json:"id"`
+	NickName *string `json:"nick_name,omitempty"`
+	TicketId int64   `json:"ticket_id"`
 }
 
 // ContractType defines model for ContractType.
@@ -75,15 +75,14 @@ type ContractType string
 // CreateCommentBody defines model for CreateCommentBody.
 type CreateCommentBody struct {
 	Comment  string `json:"comment"`
-	NickName string `json:"nick_name"`
-	TicketId int    `json:"ticket_id"`
+	TicketId int64  `json:"ticket_id"`
 }
 
 // CreateHistoryBody defines model for CreateHistoryBody.
 type CreateHistoryBody struct {
 	Action   string `json:"action"`
 	NickName string `json:"nick_name"`
-	TicketId int    `json:"ticket_id"`
+	TicketId int64  `json:"ticket_id"`
 }
 
 // CreateTicketBody defines model for CreateTicketBody.
@@ -121,26 +120,26 @@ type HistoryResponse struct {
 	Action   string `json:"action"`
 	Id       int    `json:"id"`
 	NickName string `json:"nick_name"`
-	TicketId int    `json:"ticket_id"`
+	TicketId int64  `json:"ticket_id"`
 }
 
 // LinkBody defines model for LinkBody.
 type LinkBody struct {
-	TicketId int    `json:"ticket_id"`
+	TicketId int64  `json:"ticket_id"`
 	Url      string `json:"url"`
 }
 
 // LinkResponse defines model for LinkResponse.
 type LinkResponse struct {
 	Id       int    `json:"id"`
-	TicketId int    `json:"ticket_id"`
+	TicketId int64  `json:"ticket_id"`
 	Url      string `json:"url"`
 }
 
 // ListTicket defines model for ListTicket.
 type ListTicket struct {
 	EditorName string   `json:"editor_name"`
-	Id         int      `json:"id"`
+	Id         int64    `json:"id"`
 	Priority   Priority `json:"priority"`
 	QcName     string   `json:"qc_name"`
 	Title      string   `json:"title"`
@@ -180,7 +179,7 @@ type SingleTicketResponse struct {
 	CreatedBy   CreatedBy `json:"created_by"`
 	Description string    `json:"description"`
 	EditorName  string    `json:"editor_name"`
-	Id          int       `json:"id"`
+	Id          int64     `json:"id"`
 	Priority    Priority  `json:"priority"`
 	QcName      string    `json:"qc_name"`
 	Status      Status    `json:"status"`
@@ -209,6 +208,7 @@ type UpdateTicketBody struct {
 	EditorName  *string   `json:"editor_name,omitempty"`
 	Priority    *Priority `json:"priority,omitempty"`
 	QcName      *string   `json:"qc_name,omitempty"`
+	Status      *Status   `json:"status,omitempty"`
 	Title       *string   `json:"title,omitempty"`
 }
 
