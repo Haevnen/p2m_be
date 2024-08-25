@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
 	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
@@ -35,7 +36,9 @@ type ClientManagementInterface interface {
 
 type LinkManagementInterface interface{}
 
-type CommentManagementInterface interface{}
+type CommentManagementInterface interface {
+	CreateComment(ctx *gin.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error)
+}
 
 type HistoryManagementInterface interface{}
 

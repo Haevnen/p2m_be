@@ -5,6 +5,7 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/registry"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type commentHandler struct {
@@ -29,10 +30,23 @@ func (h commentHandler) InternalRemoveComment(c *gin.Context, commentId int, par
 
 // Get all comments
 // (GET /comments/{ticket_id})
-func (h commentHandler) InternalGetComments(c *gin.Context, ticketId int) {
+func (h commentHandler) InternalGetComments(c *gin.Context, ticketId int64) {
 }
 
 // Create new comment
 // (POST /comments)
 func (h commentHandler) InternalCreateComment(c *gin.Context, params p2m_api.InternalCreateCommentParams) {
+	var client p2m_api.CreateCommentBody
+	if err := bindRequestBody(c, &client); err != nil {
+		SendError(c, "bind error", err)
+		return
+	}
+
+	res, err := h.commentManagementInteractor.CreateComment(c, client)
+	if err != nil {
+		SendError(c, "create comment error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
 }

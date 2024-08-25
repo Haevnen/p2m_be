@@ -40,6 +40,7 @@ var (
 	ErrExpiredRefreshToken              = errors.New("ERR_EXPIRED_REFRESH_TOKEN")
 	ErrInvalidRefreshToken              = errors.New("ERR_INVALID_REFRESH_TOKEN")
 	ErrClientHasIDExists                = errors.New("ERR_CLIENT_HAS_ID_EXISTS")
+	ErrUserNotExists                    = errors.New("ERR_USER_NOT_EXISTS")
 )
 
 // New constructor

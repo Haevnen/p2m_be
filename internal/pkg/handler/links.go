@@ -29,7 +29,7 @@ func (h linkHandler) InternalRemoveLink(c *gin.Context, linkId int, params p2m_a
 
 // Get ticket links
 // (GET /links/{ticket_id})
-func (h linkHandler) InternalGetAllLinks(c *gin.Context, ticketId int) {
+func (h linkHandler) InternalGetAllLinks(c *gin.Context, ticketId int64) {
 }
 
 // Create new link

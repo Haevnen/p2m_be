@@ -345,7 +345,7 @@ paths:
 
   /links/{ticket_id}:
     get:
-      tags: 
+      tags:
         - Links
       summary: Get ticket links
       description: Get ticket links
@@ -356,6 +356,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       responses:
@@ -374,7 +375,7 @@ paths:
         '404':
           $ref: "#/components/responses/NotFound"
       operationId: internal_getAllLinks
-  
+
   /links/{link_id}:
     delete:
       tags:
@@ -403,7 +404,7 @@ paths:
         '403':
           $ref: "#/components/responses/Forbidden"
       operationId: internal_removeLink
-  
+
   /links/update/{link_id}:
     put:
       tags:
@@ -442,7 +443,7 @@ paths:
   /comments:
     post:
       tags:
-        - Comments 
+        - Comments
       summary: Create new comment
       description: Create new comment
       parameters:
@@ -505,6 +506,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       requestBody:
@@ -523,7 +525,7 @@ paths:
         '404':
           $ref: "#/components/responses/NotFound"
       operationId: internal_updateComment
-      
+
   /comments/{ticket_id}:
     get:
       tags:
@@ -537,6 +539,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       responses:
@@ -569,6 +572,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       responses:
@@ -635,7 +639,7 @@ paths:
         '401':
           $ref: "#/components/responses/Unauthorized"
       operationId: internal_getTickets
-  
+
   /tickets/{ticket_id}:
     get:
       tags:
@@ -696,7 +700,7 @@ paths:
         '403':
           $ref: "#/components/responses/Forbidden"
       operationId: internal_removeTicket
-  
+
   /tickets/add:
     post:
       tags:
@@ -738,6 +742,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       requestBody:
@@ -1110,6 +1115,7 @@ components:
           format: uri
         ticket_id:
           type: integer
+          format: int64
           example: 1
       required:
         - url
@@ -1124,6 +1130,7 @@ components:
           format: uri
         ticket_id:
           type: integer
+          format: int64
           example: 1
       required:
         - url
@@ -1136,34 +1143,29 @@ components:
           example: "comment"
         ticket_id:
           type: integer
+          format: int64
           example: 1
-        nick_name:
-          type: string
-          example: "nickname"
       required:
         - comment
         - ticket_id
-        - nick_name
     CommentResponse:
       type: object
       properties:
         id:
           type: integer
+          format: int64
           example: 1
         comment:
           type: string
           example: "comment"
         ticket_id:
           type: integer
+          format: int64
           example: 1
-        nick_name:
-          type: string
-          example: "nickname"
       required:
         - id
         - comment
         - ticket_id
-        - nick_name
     UpdateCommentBody:
       type: object
       properties:
@@ -1180,6 +1182,7 @@ components:
           example: 1
         ticket_id:
           type: integer
+          format: int64
           example: 1
         nick_name:
           type: string
@@ -1197,6 +1200,7 @@ components:
       properties:
         ticket_id:
           type: integer
+          format: int64
           example: 1
         nick_name:
           type: string
@@ -1213,6 +1217,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
           example: 1
         title:
           type: string
@@ -1248,6 +1253,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
           example: 1
         title:
           type: string
