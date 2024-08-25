@@ -119,3 +119,17 @@ func (ci *ClientManagement) UpdateClient(ctx context.Context, clientID string, b
 	_, err = c.WithContext(ctx).Where(c.ClientID.Eq(clientID)).Where(c.IsActive.Is(true)).UpdateColumns(&client)
 	return err
 }
+
+func (ci *ClientManagement) GetSingleClient(ctx context.Context, clientID string) (*p2mapi.ClientResponse, error) {
+	c := dal.Q.Client
+
+	client, err := c.WithContext(ctx).Where(c.ClientID.Eq(clientID)).Where(c.IsActive.Is(true)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperror.ErrRecordNotFound
+		}
+		return nil, err
+	}
+
+	return client.FromClient(), nil
+}

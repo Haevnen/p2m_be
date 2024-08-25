@@ -31,9 +31,15 @@ type ClientManagementInterface interface {
 	RemoveClient(ctx context.Context, id string) error
 	GetAllClient(ctx context.Context, includeDeActive *bool) ([]*p2mapi.ClientResponse, error)
 	UpdateClient(ctx context.Context, clientID string, body p2mapi.UpdateClientBody) error
+	GetSingleClient(ctx context.Context, clientID string) (*p2mapi.ClientResponse, error)
 }
 
-type LinkManagementInterface interface{}
+type LinkManagementInterface interface {
+	CreateLink(ctx context.Context, link p2mapi.LinkBody) (*p2mapi.LinkResponse, error)
+	GetAllLink(ctx context.Context, ticketID int64) ([]*p2mapi.LinkResponse, error)
+	RemoveLink(ctx context.Context, linkID int64) error
+	UpdateLink(ctx context.Context, linkID int64, body p2mapi.LinkBody) error
+}
 
 type CommentManagementInterface interface {
 	CreateComment(ctx context.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error)

@@ -83,4 +83,12 @@ func (h clientHandler) InternalUpdateClient(c *gin.Context, clientId string, par
 
 // Get client by id
 // (GET /clients/info/{client_id})
-func (h clientHandler) InternalGetClient(c *gin.Context, clientId string) {}
+func (h clientHandler) InternalGetClient(c *gin.Context, clientId string) {
+	client, err := h.clientManagementInteractor.GetSingleClient(c, clientId)
+	if err != nil {
+		SendError(c, "get client error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, client)
+}
