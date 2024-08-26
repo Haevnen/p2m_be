@@ -390,6 +390,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       responses:
@@ -419,6 +420,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       security:
         - BearerAuth: []
       requestBody:
@@ -1110,6 +1112,7 @@ components:
         id:
           type: integer
           example: 1
+          format: int64
         url:
           type: string
           example: "https://example.com"

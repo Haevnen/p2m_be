@@ -665,6 +665,7 @@ paths:
         name: link_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       responses:
@@ -719,6 +720,7 @@ paths:
         name: link_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       requestBody:
@@ -1605,6 +1607,7 @@ components:
       properties:
         id:
           example: 1
+          format: int64
           type: integer
         url:
           example: https://example.com

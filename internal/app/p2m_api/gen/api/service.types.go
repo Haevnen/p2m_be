@@ -131,7 +131,7 @@ type LinkBody struct {
 
 // LinkResponse defines model for LinkResponse.
 type LinkResponse struct {
-	Id       int    `json:"id"`
+	Id       int64  `json:"id"`
 	TicketId int64  `json:"ticket_id"`
 	Url      string `json:"url"`
 }
