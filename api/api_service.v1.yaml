@@ -94,7 +94,7 @@ paths:
       summary: Get all users
       description: Get all users (only admin)
       parameters:
-        - $ref: "#/components/parameters/including_deactivates"
+        - $ref: "#/components/parameters/including_unassigned"
       security:
         - BearerAuth: []
       responses:
@@ -784,6 +784,11 @@ components:
       required: true
     including_deactivates:
       name: including_deactivates
+      in: query
+      schema:
+        type: boolean
+    including_unassigned:
+      name: including_unassigned
       in: query
       schema:
         type: boolean

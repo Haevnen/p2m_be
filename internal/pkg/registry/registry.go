@@ -36,7 +36,7 @@ func (r *Registry) HistoryManagementInterface() interactorinterface.HistoryManag
 }
 
 func (r *Registry) TicketManagementInterface() interactorinterface.TicketManagementInterface {
-	return interactor.NewTicketManagement()
+	return interactor.NewTicketManagement(r.UserManagementInteractor(), r.ClientManagementInteractor())
 }
 
 func (r *Registry) PasetoMaker() interactorinterface.Maker {

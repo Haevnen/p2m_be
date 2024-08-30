@@ -165,6 +165,7 @@ CREATE TABLE `users` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT (now()),
+  `is_unassigned` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

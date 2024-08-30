@@ -156,7 +156,7 @@ paths:
       parameters:
       - explode: true
         in: query
-        name: including_deactivates
+        name: including_unassigned
         required: false
         schema:
           type: boolean
@@ -1264,6 +1264,14 @@ components:
       explode: true
       in: query
       name: including_deactivates
+      required: false
+      schema:
+        type: boolean
+      style: form
+    including_unassigned:
+      explode: true
+      in: query
+      name: including_unassigned
       required: false
       schema:
         type: boolean

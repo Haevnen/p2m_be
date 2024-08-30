@@ -26,15 +26,15 @@ func NewUserManagement(tokenMaker interactorinterface.Maker) *UserManagement {
 	}
 }
 
-func (ci *UserManagement) GetAllUser(ctx context.Context, includeDeActive *bool) ([]*p2mapi.User, error) {
+func (ci *UserManagement) GetAllUser(ctx context.Context, IncludingUnassigned *bool) ([]*p2mapi.User, error) {
 	u := dal.Q.User
 	var users []*model.User
 	var err error
 
-	if includeDeActive == nil || !(*includeDeActive) {
-		users, err = u.WithContext(ctx).Where(u.IsActive).Order(u.ContractType, u.NickName).Find()
+	if IncludingUnassigned == nil || !(*IncludingUnassigned) {
+		users, err = u.WithContext(ctx).Where(u.IsActive).Where(u.IsUnassigned.Is(false)).Order(u.ContractType, u.NickName).Find()
 	} else {
-		users, err = u.WithContext(ctx).Order(u.ContractType, u.NickName).Find()
+		users, err = u.WithContext(ctx).Where(u.IsActive).Order(u.ContractType, u.NickName).Find()
 	}
 
 	if err != nil {

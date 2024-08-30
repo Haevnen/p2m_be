@@ -331,7 +331,7 @@ type InternalUpdateTicketParams struct {
 
 // InternalGetAllUsersParams defines parameters for InternalGetAllUsers.
 type InternalGetAllUsersParams struct {
-	IncludingDeactivates *bool `form:"including_deactivates,omitempty" json:"including_deactivates,omitempty"`
+	IncludingUnassigned *bool `form:"including_unassigned,omitempty" json:"including_unassigned,omitempty"`
 }
 
 // InternalRegisterUserParams defines parameters for InternalRegisterUser.

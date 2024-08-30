@@ -38,6 +38,7 @@ Table users {
 	contract_type contract_type
 	is_active tinyint(1) [not null, default: `1`]
     is_admin tinyint(1) [not null, default: `0`]
+    is_unassigned tinyint(1) [not null, default: `0`]
 	created_at timestamp [not null, default: `now()`]
 }
 

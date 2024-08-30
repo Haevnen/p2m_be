@@ -79,7 +79,7 @@ func (h userHandler) InternalRefreshToken(c *gin.Context, params p2m_api.Interna
 // Get all users
 // (GET /users)
 func (h userHandler) InternalGetAllUsers(c *gin.Context, params p2m_api.InternalGetAllUsersParams) {
-	user, err := h.userManagementInteractor.GetAllUser(c, params.IncludingDeactivates)
+	user, err := h.userManagementInteractor.GetAllUser(c, params.IncludingUnassigned)
 	if err != nil {
 		SendError(c, "get all user error", err)
 		return
