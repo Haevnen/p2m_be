@@ -7,8 +7,10 @@ import (
 	"github.com/Haevnen/p2m_be/pkg/logger"
 )
 
+type TransactionKeyType string
+
 const (
-	txTransactionKey = "tx-transaction-key"
+	txTransactionKey TransactionKeyType = "tx-transaction-key"
 )
 
 type TxManager struct{}
