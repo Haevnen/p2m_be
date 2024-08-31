@@ -68,12 +68,14 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 
 	// Start transaction to create new ticket and add record to history table
 	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
-		err := dal.Q.Ticket.WithContext(childCtx).Create(&newTicket)
+		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
+
+		err := tx.Ticket.WithContext(childCtx).Create(&newTicket)
 		if err != nil {
 			return err
 		}
 
-		return dal.Q.History.WithContext(childCtx).Create(&model.History{
+		return tx.History.WithContext(childCtx).Create(&model.History{
 			TicketID:    newTicket.ID,
 			Action:      fmt.Sprintf("Ticket is created by %s", string(p2m_api.MANUAL)),
 			PerformedBy: payload.UserID,
