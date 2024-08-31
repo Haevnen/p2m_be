@@ -595,33 +595,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       operationId: internal_getHistories
 
-  /histories:
-    post:
-      tags:
-        - Histories
-      summary: Create new history
-      description: Create new history
-      parameters:
-        - $ref: "#/components/parameters/request_id"
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateHistoryBody"
-      responses:
-        '200':
-          $ref: "#/components/responses/HistoryResponse"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
-        '400':
-          $ref: "#/components/responses/BadRequest"
-        '404':
-          $ref: "#/components/responses/NotFound"
-      operationId: internal_createHistory
-
   /tickets:
     get:
       tags:

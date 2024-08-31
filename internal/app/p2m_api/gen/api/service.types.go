@@ -78,13 +78,6 @@ type CreateCommentBody struct {
 	TicketId int64  `json:"ticket_id"`
 }
 
-// CreateHistoryBody defines model for CreateHistoryBody.
-type CreateHistoryBody struct {
-	Action   string `json:"action"`
-	NickName string `json:"nick_name"`
-	TicketId int64  `json:"ticket_id"`
-}
-
 // CreateTicketBody defines model for CreateTicketBody.
 type CreateTicketBody struct {
 	ClientId    string    `json:"client_id"`
@@ -291,11 +284,6 @@ type InternalRemoveCommentParams struct {
 	XRequestId string `json:"X-Request-Id"`
 }
 
-// InternalCreateHistoryParams defines parameters for InternalCreateHistory.
-type InternalCreateHistoryParams struct {
-	XRequestId string `json:"X-Request-Id"`
-}
-
 // InternalCreateLinkParams defines parameters for InternalCreateLink.
 type InternalCreateLinkParams struct {
 	XRequestId string `json:"X-Request-Id"`
@@ -367,9 +355,6 @@ type InternalCreateCommentJSONRequestBody = CreateCommentBody
 
 // InternalUpdateCommentJSONRequestBody defines body for InternalUpdateComment for application/json ContentType.
 type InternalUpdateCommentJSONRequestBody = UpdateCommentBody
-
-// InternalCreateHistoryJSONRequestBody defines body for InternalCreateHistory for application/json ContentType.
-type InternalCreateHistoryJSONRequestBody = CreateHistoryBody
 
 // InternalCreateLinkJSONRequestBody defines body for InternalCreateLink for application/json ContentType.
 type InternalCreateLinkJSONRequestBody = LinkBody
