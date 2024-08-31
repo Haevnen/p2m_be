@@ -36,7 +36,7 @@ func (r *Registry) HistoryManagementInterface() interactorinterface.HistoryManag
 }
 
 func (r *Registry) TicketManagementInterface() interactorinterface.TicketManagementInterface {
-	return interactor.NewTicketManagement(r.UserManagementInteractor(), r.ClientManagementInteractor())
+	return interactor.NewTicketManagement(r.UserManagementInteractor(), r.ClientManagementInteractor(), r.TxManager())
 }
 
 func (r *Registry) PasetoMaker() interactorinterface.Maker {
@@ -45,4 +45,8 @@ func (r *Registry) PasetoMaker() interactorinterface.Maker {
 		panic(err)
 	}
 	return paseto
+}
+
+func (r *Registry) TxManager() interactorinterface.TxManager {
+	return interactor.NewTxManager()
 }

@@ -55,7 +55,7 @@ type ClientBody struct {
 type ClientResponse struct {
 	ClientId     string  `json:"client_id"`
 	EditingStyle *string `json:"editing_style,omitempty"`
-	Id           *int    `json:"id,omitempty"`
+	Id           int32   `json:"id"`
 	IsActive     bool    `json:"is_active"`
 	Others       *string `json:"others,omitempty"`
 	Requirements *string `json:"requirements,omitempty"`
@@ -87,6 +87,16 @@ type CreateTicketBody struct {
 	Priority    Priority  `json:"priority"`
 	QcName      string    `json:"qc_name"`
 	Title       string    `json:"title"`
+}
+
+// CreateUserBody defines model for CreateUserBody.
+type CreateUserBody struct {
+	ContractType ContractType `json:"contract_type"`
+	Email        string       `json:"email"`
+	IsActive     bool         `json:"is_active"`
+	IsAdmin      bool         `json:"is_admin"`
+	NickName     string       `json:"nick_name"`
+	Password     *string      `json:"password,omitempty"`
 }
 
 // CreatedBy defines model for CreatedBy.
@@ -213,6 +223,7 @@ type User struct {
 	IsAdmin      bool         `json:"is_admin"`
 	NickName     string       `json:"nick_name"`
 	Password     *string      `json:"password,omitempty"`
+	UserId       string       `json:"user_id"`
 }
 
 // UserLoginBody defines model for UserLoginBody.
@@ -378,4 +389,4 @@ type InternalAddTicketJSONRequestBody = CreateTicketBody
 type InternalUpdateTicketJSONRequestBody = UpdateTicketBody
 
 // InternalRegisterUserJSONRequestBody defines body for InternalRegisterUser for application/json ContentType.
-type InternalRegisterUserJSONRequestBody = User
+type InternalRegisterUserJSONRequestBody = CreateUserBody

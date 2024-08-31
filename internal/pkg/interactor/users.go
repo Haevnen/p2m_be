@@ -175,7 +175,7 @@ func (ci *UserManagement) RefreshToken(ctx context.Context, body p2mapi.RefreshT
 	}, nil
 }
 
-func (ci *UserManagement) CreateUser(ctx context.Context, user p2mapi.User) (*p2mapi.User, error) {
+func (ci *UserManagement) CreateUser(ctx context.Context, user p2mapi.CreateUserBody) (*p2mapi.User, error) {
 	u := dal.Q.User
 
 	var userDb model.User

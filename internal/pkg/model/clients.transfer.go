@@ -16,11 +16,11 @@ func (c *Client) ToClient(client p2mapi.ClientBody) error {
 
 func (c *Client) FromClient() *p2mapi.ClientResponse {
 
-	id := int(c.ID)
+	id := c.ID
 	return &p2mapi.ClientResponse{
 		ClientId:     c.ClientID,
 		EditingStyle: &c.EditingStyle,
-		Id:           &id,
+		Id:           id,
 		IsActive:     c.IsActive,
 		Others:       &c.Others,
 		Requirements: &c.Requirements,
