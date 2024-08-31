@@ -110,10 +110,13 @@ type ErrorType string
 
 // HistoryResponse defines model for HistoryResponse.
 type HistoryResponse struct {
-	Action   string `json:"action"`
-	Id       int    `json:"id"`
-	NickName string `json:"nick_name"`
-	TicketId int64  `json:"ticket_id"`
+	Action string `json:"action"`
+
+	// CreatedAt timestamp
+	CreatedAt *string `json:"created_at,omitempty"`
+	Id        int64   `json:"id"`
+	NickName  string  `json:"nick_name"`
+	TicketId  int64   `json:"ticket_id"`
 }
 
 // LinkBody defines model for LinkBody.

@@ -1,8 +1,32 @@
 package interactor
 
+import (
+	"context"
+
+	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
+	"github.com/Haevnen/p2m_be/internal/pkg/dal"
+)
+
 type HistoryManagement struct {
 }
 
 func NewHistoryManagement() *HistoryManagement {
 	return &HistoryManagement{}
+}
+
+func (ci *HistoryManagement) GetAllHistoriesByTicket(ctx context.Context, ticketID int64) ([]*p2mapi.HistoryResponse, error) {
+	c := dal.Q.History
+
+	histories, err := c.WithContext(ctx).Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Find()
+
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*p2mapi.HistoryResponse, 0, len(histories))
+	for _, history := range histories {
+		res = append(res, history.FromHistory())
+	}
+
+	return res, nil
 }

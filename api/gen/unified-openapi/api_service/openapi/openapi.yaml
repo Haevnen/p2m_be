@@ -1645,11 +1645,13 @@ components:
       example:
         nick_name: nickname
         action: action
+        created_at: 2022-01-01T00:00:00Z
         id: 1
         ticket_id: 1
       properties:
         id:
           example: 1
+          format: int64
           type: integer
         ticket_id:
           example: 1
@@ -1660,6 +1662,10 @@ components:
           type: string
         action:
           example: action
+          type: string
+        created_at:
+          description: timestamp
+          example: 2022-01-01T00:00:00Z
           type: string
       required:
       - action
