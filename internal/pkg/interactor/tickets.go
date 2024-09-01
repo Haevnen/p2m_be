@@ -48,6 +48,14 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 		nickNameMapping[user.NickName] = user
 	}
 
+	if _, ok := nickNameMapping[body.QcName]; !ok {
+		return apperror.ErrUserNotExists
+	}
+
+	if _, ok := nickNameMapping[body.EditorName]; !ok {
+		return apperror.ErrUserNotExists
+	}
+
 	// Get client_id from client_name
 	client, err := t.clientManagement.GetSingleClient(ctx, body.ClientId)
 	if err != nil {
@@ -70,11 +78,31 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
 		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
 
+		// Create new ticket
 		err := tx.Ticket.WithContext(childCtx).Create(&newTicket)
 		if err != nil {
 			return err
 		}
 
+		// Create new link
+		if body.Links != nil {
+			var links []*model.Link
+			for _, link := range *body.Links {
+				links = append(links, &model.Link{
+					TicketID: newTicket.ID,
+					Link:     link,
+				})
+			}
+
+			if len(links) > 0 {
+				err = tx.Link.WithContext(childCtx).CreateInBatches(links, 50)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		// Create new history
 		return tx.History.WithContext(childCtx).Create(&model.History{
 			TicketID:    newTicket.ID,
 			Action:      fmt.Sprintf("Ticket is created by %s", string(p2m_api.MANUAL)),
