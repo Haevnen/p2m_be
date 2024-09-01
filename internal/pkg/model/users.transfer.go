@@ -9,7 +9,7 @@ import (
 	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
-func (u *User) ToUser(user p2mapi.User) error {
+func (u *User) ToUser(user p2mapi.CreateUserBody) error {
 	// has password
 	passwordHash, err := util.HashPassword(swag.StringValue(user.Password))
 	if err != nil {
@@ -36,6 +36,7 @@ func (u *User) ToUser(user p2mapi.User) error {
 func (u *User) FromUser() *p2mapi.User {
 
 	return &p2mapi.User{
+		UserId:       u.UserID,
 		NickName:     u.NickName,
 		Email:        u.Email,
 		ContractType: p2mapi.ContractType(u.ContractType),

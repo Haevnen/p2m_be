@@ -156,7 +156,7 @@ paths:
       parameters:
       - explode: true
         in: query
-        name: including_deactivates
+        name: including_unassigned
         required: false
         schema:
           type: boolean
@@ -205,7 +205,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/CreateUserBody'
         required: true
       responses:
         "200":
@@ -1268,6 +1268,14 @@ components:
       schema:
         type: boolean
       style: form
+    including_unassigned:
+      explode: true
+      in: query
+      name: including_unassigned
+      required: false
+      schema:
+        type: boolean
+      style: form
   responses:
     Unauthorized:
       content:
@@ -1412,7 +1420,7 @@ components:
       - is_admin
       - nick_name
       type: object
-    User:
+    CreateUserBody:
       example:
         is_admin: false
         contract_type: FULLTIME
@@ -1444,6 +1452,44 @@ components:
       - is_active
       - is_admin
       - nick_name
+      type: object
+    User:
+      example:
+        is_admin: false
+        contract_type: FULLTIME
+        password: password
+        is_active: true
+        user_id: user_id
+        nick_name: nickname
+        email: email
+      properties:
+        user_id:
+          example: user_id
+          type: string
+        nick_name:
+          example: nickname
+          type: string
+        email:
+          example: email
+          type: string
+        password:
+          example: password
+          type: string
+        contract_type:
+          $ref: '#/components/schemas/ContractType'
+        is_active:
+          example: true
+          type: boolean
+        is_admin:
+          example: false
+          type: boolean
+      required:
+      - contract_type
+      - email
+      - is_active
+      - is_admin
+      - nick_name
+      - user_id
       type: object
     UserLoginBody:
       example:
@@ -1491,6 +1537,7 @@ components:
       properties:
         id:
           example: 1
+          format: int32
           type: integer
         client_id:
           example: GMT
@@ -1509,6 +1556,7 @@ components:
           type: string
       required:
       - client_id
+      - id
       - is_active
       type: object
     ClientBody:

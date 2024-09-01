@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"net/http"
+
 	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
+	"github.com/Haevnen/p2m_be/internal/apperror"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 	"github.com/gin-gonic/gin"
@@ -31,8 +34,20 @@ func (h ticketHandler) InternalGetTickets(c *gin.Context) {
 // Add new ticket
 // (POST /tickets/add)
 func (h ticketHandler) InternalAddTicket(c *gin.Context, params p2m_api.InternalAddTicketParams) {
-	// TODO:
-	// * client will send create new history request or BE will handle it
+	var creatTicketBody p2m_api.CreateTicketBody
+
+	if err := bindRequestBody(c, &creatTicketBody); err != nil {
+		SendError(c, err.Error(), apperror.ErrInvalidRequestInput)
+		return
+	}
+
+	err := h.ticketManagementInteractor.AddTicketManual(c, creatTicketBody)
+	if err != nil {
+		SendError(c, "add ticket error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, "add ticket successfully")
 }
 
 // Remove ticket by id
@@ -46,11 +61,19 @@ func (h ticketHandler) InternalRemoveTicket(c *gin.Context, ticketId int, params
 // Update ticket by id
 // (PUT /tickets/update/{ticket_id})
 func (h ticketHandler) InternalUpdateTicket(c *gin.Context, ticketId int64, params p2m_api.InternalUpdateTicketParams) {
-	// TODO:
-	// * Need to check Payload to check if user is admin (only admin user can
-	// change status to DONE, update title, description and links)
-	// * client will send create new history request or BE will handle it (for
-	// update status)
+	var updateTicketBody p2m_api.UpdateTicketBody
+	if err := bindRequestBody(c, &updateTicketBody); err != nil {
+		SendError(c, err.Error(), apperror.ErrInvalidRequestInput)
+		return
+	}
+
+	err := h.ticketManagementInteractor.UpdateTicket(c, ticketId, updateTicketBody)
+	if err != nil {
+		SendError(c, "update ticket error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, "update ticket successfully")
 }
 
 // Get ticket by id
