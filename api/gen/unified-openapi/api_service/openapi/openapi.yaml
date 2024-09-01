@@ -1669,6 +1669,7 @@ components:
           type: string
       required:
       - action
+      - created_at
       - id
       - nick_name
       - ticket_id

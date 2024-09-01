@@ -6,10 +6,9 @@ import (
 )
 
 func (c *History) FromHistory() *p2mapi.HistoryResponse {
-	createdAt := c.CreatedAt.Format(constants.DateTimeFormat)
 	return &p2mapi.HistoryResponse{
 		Action:    c.Action,
-		CreatedAt: &createdAt,
+		CreatedAt: c.CreatedAt.Format(constants.DateTimeFormat),
 		Id:        c.ID,
 		NickName:  c.PerformedBy,
 		TicketId:  c.TicketID,

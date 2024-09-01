@@ -1180,6 +1180,7 @@ components:
         - ticket_id
         - nick_name
         - action
+        - created_at
     CreateHistoryBody:
       type: object
       properties:
