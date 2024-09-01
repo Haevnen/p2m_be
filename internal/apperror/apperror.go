@@ -42,6 +42,8 @@ var (
 	ErrClientHasIDExists                = errors.New("ERR_CLIENT_HAS_ID_EXISTS")
 	ErrUserNotExists                    = errors.New("ERR_USER_NOT_EXISTS")
 	ErrTicketNotFound                   = errors.New("ERR_TICKET_NOT_FOUND")
+	ErrQCNameNotExists                  = errors.New("ERR_QC_NAME_NOT_EXISTS")
+	ErrEditorNameNotExists              = errors.New("ERR_EDITOR_NAME_NOT_EXISTS")
 )
 
 // New constructor

@@ -51,11 +51,11 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 	}
 
 	if _, ok := nickNameMapping[body.QcName]; !ok {
-		return apperror.ErrUserNotExists
+		return apperror.ErrQCNameNotExists
 	}
 
 	if _, ok := nickNameMapping[body.EditorName]; !ok {
-		return apperror.ErrUserNotExists
+		return apperror.ErrEditorNameNotExists
 	}
 
 	// Get client_id from client_name
@@ -123,7 +123,7 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 	// Only admin can update Title, Description, ClientId and Done Status
 	if body.Title != nil || body.Description != nil || body.ClientId != nil || (body.Status != nil && string(*(body.Status)) == string(p2m_api.DONE)) {
 		if !payload.IsAdmin {
-			return apperror.ErrUserNotExists
+			return apperror.ErrForbidden
 		}
 	}
 
@@ -156,16 +156,18 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 	if body.Title != nil {
 		ticket.Title = *body.Title
 		histories = append(histories, &model.History{
-			TicketID: ticket.ID,
-			Action:   fmt.Sprintf("User %s update ticket title", userIdMapping[payload.UserID].NickName),
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update ticket title", userIdMapping[payload.UserID].NickName),
+			PerformedBy: payload.UserID,
 		})
 	}
 
 	if body.Description != nil {
 		ticket.Description = *body.Description
 		histories = append(histories, &model.History{
-			TicketID: ticket.ID,
-			Action:   fmt.Sprintf("User %s update ticket description. ", userIdMapping[payload.UserID].NickName),
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update ticket description. ", userIdMapping[payload.UserID].NickName),
+			PerformedBy: payload.UserID,
 		})
 	}
 
@@ -176,48 +178,53 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		}
 		ticket.ClientID = client.Id
 		histories = append(histories, &model.History{
-			TicketID: ticket.ID,
-			Action:   fmt.Sprintf("User %s update ticket client. ", userIdMapping[payload.UserID].NickName),
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update ticket client. ", userIdMapping[payload.UserID].NickName),
+			PerformedBy: payload.UserID,
 		})
 	}
 
 	if body.Status != nil {
 		ticket.Status = string(*(body.Status))
 		histories = append(histories, &model.History{
-			TicketID: ticket.ID,
-			Action:   fmt.Sprintf("User %s update ticket status from %s to %s.", userIdMapping[payload.UserID].NickName, string(ticket.Status), string(*(body.Status))),
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update ticket status from %s to %s.", userIdMapping[payload.UserID].NickName, string(ticket.Status), string(*(body.Status))),
+			PerformedBy: payload.UserID,
 		})
 	}
 
 	if body.Priority != nil {
 		ticket.Priority = string(*(body.Priority))
 		histories = append(histories, &model.History{
-			TicketID: ticket.ID,
-			Action:   fmt.Sprintf("User %s update ticket priority from %s to %s.", userIdMapping[payload.UserID].NickName, string(ticket.Priority), string(*(body.Priority))),
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update ticket priority from %s to %s.", userIdMapping[payload.UserID].NickName, string(ticket.Priority), string(*(body.Priority))),
+			PerformedBy: payload.UserID,
 		})
 	}
 
 	if body.QcName != nil {
 		if _, ok := nickNameMapping[*body.QcName]; !ok {
-			return apperror.ErrUserNotExists
+			return apperror.ErrQCNameNotExists
 		}
 
 		ticket.QcID = nickNameMapping[*body.QcName].UserId
 		histories = append(histories, &model.History{
-			TicketID: ticket.ID,
-			Action:   fmt.Sprintf("User %s update QC assignee from %s to %s.", userIdMapping[payload.UserID].NickName, userIdMapping[ticket.QcID].NickName, *body.QcName),
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update QC assignee from %s to %s.", userIdMapping[payload.UserID].NickName, userIdMapping[ticket.QcID].NickName, *body.QcName),
+			PerformedBy: payload.UserID,
 		})
 	}
 
 	if body.EditorName != nil {
 		if _, ok := nickNameMapping[*body.EditorName]; !ok {
-			return apperror.ErrUserNotExists
+			return apperror.ErrEditorNameNotExists
 		}
 
 		ticket.EditorID = nickNameMapping[*body.EditorName].UserId
 		histories = append(histories, &model.History{
-			TicketID: ticket.ID,
-			Action:   fmt.Sprintf("User %s update Editor assignee from %s to %s.", userIdMapping[payload.UserID].NickName, userIdMapping[ticket.EditorID].NickName, *body.EditorName),
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update Editor assignee from %s to %s.", userIdMapping[payload.UserID].NickName, userIdMapping[ticket.EditorID].NickName, *body.EditorName),
+			PerformedBy: payload.UserID,
 		})
 	}
 
