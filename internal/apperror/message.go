@@ -35,6 +35,7 @@ var (
 		ErrUserHasEmailExists:              {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode2001, msg: "The user has the email already exists."},
 		ErrClientHasIDExists:               {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode3000, msg: "The client has the id already exists."},
 		ErrUserNotExists:                   {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode2002, msg: "The user didn't exists."},
+		ErrTicketNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2003, msg: "The ticket is not found. "},
 	}
 )
 
@@ -54,5 +55,6 @@ const (
 	errCode2000     = "ERR_2000"
 	errCode2001     = "ERR_2001"
 	errCode2002     = "ERR_2002"
+	errCode2003     = "ERR_2003"
 	errCode3000     = "ERR_3000"
 )

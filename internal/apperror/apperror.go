@@ -41,6 +41,7 @@ var (
 	ErrInvalidRefreshToken              = errors.New("ERR_INVALID_REFRESH_TOKEN")
 	ErrClientHasIDExists                = errors.New("ERR_CLIENT_HAS_ID_EXISTS")
 	ErrUserNotExists                    = errors.New("ERR_USER_NOT_EXISTS")
+	ErrTicketNotFound                   = errors.New("ERR_TICKET_NOT_FOUND")
 )
 
 // New constructor
