@@ -94,7 +94,7 @@ paths:
       summary: Get all users
       description: Get all users (only admin)
       parameters:
-        - $ref: "#/components/parameters/including_deactivates"
+        - $ref: "#/components/parameters/including_unassigned"
       security:
         - BearerAuth: []
       responses:
@@ -126,7 +126,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/CreateUserBody"
       responses:
         '200':
           description: Successful operation
@@ -787,6 +787,11 @@ components:
       in: query
       schema:
         type: boolean
+    including_unassigned:
+      name: including_unassigned
+      in: query
+      schema:
+        type: boolean
   responses:
     Unauthorized:
       description: Error if API token key is not set or invalid or has already expired
@@ -969,7 +974,7 @@ components:
         - contract_type
         - is_active
         - is_admin
-    User:
+    CreateUserBody:
       type: object
       properties:
         nick_name:
@@ -990,6 +995,36 @@ components:
           type: boolean
           example: false
       required:
+        - nick_name
+        - email
+        - contract_type
+        - is_active
+        - is_admin
+    User:
+      type: object
+      properties:
+        user_id:
+          type : string
+          example: "user_id"
+        nick_name:
+          type: string
+          example: "nickname"
+        email:
+          type: string
+          example: "email"
+        password:
+          type: string
+          example: "password"
+        contract_type:
+          $ref: "#/components/schemas/ContractType"
+        is_active:
+          type: boolean
+          example: true
+        is_admin:
+          type: boolean
+          example: false
+      required:
+        - user_id
         - nick_name
         - email
         - contract_type
@@ -1031,6 +1066,7 @@ components:
       properties:
         id:
           type: integer
+          format: int32
           example: 1
         client_id:
           type: string
@@ -1048,6 +1084,7 @@ components:
           type: string
           example: "others"
       required:
+        - id
         - client_id
         - is_active
     ClientBody:

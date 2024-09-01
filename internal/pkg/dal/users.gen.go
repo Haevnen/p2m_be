@@ -36,6 +36,7 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.IsActive = field.NewBool(tableName, "is_active")
 	_user.IsAdmin = field.NewBool(tableName, "is_admin")
 	_user.CreatedAt = field.NewTime(tableName, "created_at")
+	_user.IsUnassigned = field.NewBool(tableName, "is_unassigned")
 
 	_user.fillFieldMap()
 
@@ -55,6 +56,7 @@ type user struct {
 	IsActive       field.Bool
 	IsAdmin        field.Bool
 	CreatedAt      field.Time
+	IsUnassigned   field.Bool
 
 	fieldMap map[string]field.Expr
 }
@@ -80,6 +82,7 @@ func (u *user) updateTableName(table string) *user {
 	u.IsActive = field.NewBool(table, "is_active")
 	u.IsAdmin = field.NewBool(table, "is_admin")
 	u.CreatedAt = field.NewTime(table, "created_at")
+	u.IsUnassigned = field.NewBool(table, "is_unassigned")
 
 	u.fillFieldMap()
 
@@ -104,7 +107,7 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 9)
+	u.fieldMap = make(map[string]field.Expr, 10)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["user_id"] = u.UserID
 	u.fieldMap["nick_name"] = u.NickName
@@ -114,6 +117,7 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["is_active"] = u.IsActive
 	u.fieldMap["is_admin"] = u.IsAdmin
 	u.fieldMap["created_at"] = u.CreatedAt
+	u.fieldMap["is_unassigned"] = u.IsUnassigned
 }
 
 func (u user) clone(db *gorm.DB) user {

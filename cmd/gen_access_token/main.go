@@ -7,6 +7,7 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/interactor"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 	"github.com/Haevnen/p2m_be/pkg/util"
+	"github.com/google/uuid"
 )
 
 const (
@@ -22,6 +23,9 @@ func decodeToken(maker interactorinterface.Maker, token string) {
 }
 
 func main() {
+	uuid, _ := uuid.NewRandom()
+	fmt.Println("UUID: ", uuid.String())
+
 	pasetoMaker, err := interactor.NewPasetoMaker(secretKey)
 	if err != nil {
 		panic(err)
