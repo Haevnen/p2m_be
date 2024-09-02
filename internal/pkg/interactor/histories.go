@@ -16,8 +16,11 @@ func NewHistoryManagement() *HistoryManagement {
 
 func (ci *HistoryManagement) GetAllHistoriesByTicket(ctx context.Context, ticketID int64) ([]*p2mapi.HistoryResponse, error) {
 	c := dal.Q.History
+	u := dal.Q.User
 
-	histories, err := c.WithContext(ctx).Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Find()
+	histories, err := c.WithContext(ctx).Select(c.ID, c.TicketID, c.Action, c.PerformedBy, c.CreatedAt, u.NickName).
+		Join(u, c.PerformedBy.EqCol(u.UserID)).
+		Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Find()
 
 	if err != nil {
 		return nil, err

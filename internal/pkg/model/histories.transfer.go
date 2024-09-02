@@ -10,7 +10,7 @@ func (c *History) FromHistory() *p2mapi.HistoryResponse {
 		Action:    c.Action,
 		CreatedAt: c.CreatedAt.Format(constants.DateTimeFormat),
 		Id:        c.ID,
-		NickName:  c.PerformedBy,
+		NickName:  c.NickName,
 		TicketId:  c.TicketID,
 	}
 }
