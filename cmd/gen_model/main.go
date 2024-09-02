@@ -49,7 +49,7 @@ func main() {
 
 		//
 		// Generate struct `Histories` based on table `histories`
-		g.GenerateModel("histories"),
+		g.GenerateModelAs("histories", "History", gen.FieldNew("NickName", "string", ignore)),
 	)
 	// Generate the code
 	g.Execute()

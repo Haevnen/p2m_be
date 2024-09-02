@@ -48,7 +48,9 @@ type CommentManagementInterface interface {
 	GetAllComment(ctx context.Context, ticketID int64) ([]*p2mapi.CommentResponse, error)
 }
 
-type HistoryManagementInterface interface{}
+type HistoryManagementInterface interface {
+	GetAllHistoriesByTicket(ctx context.Context, ticketID int64) ([]*p2mapi.HistoryResponse, error)
+}
 
 type TicketManagementInterface interface {
 	AddTicketManual(ctx context.Context, body p2mapi.CreateTicketBody) error

@@ -1196,6 +1196,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
           example: 1
         ticket_id:
           type: integer
@@ -1207,11 +1208,16 @@ components:
         action:
           type: string
           example: "action"
+        created_at:
+          description: timestamp
+          type: string
+          example: "2022-01-01T00:00:00Z"
       required:
         - id
         - ticket_id
         - nick_name
         - action
+        - created_at
     CreateHistoryBody:
       type: object
       properties:

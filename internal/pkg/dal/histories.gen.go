@@ -92,12 +92,13 @@ func (h *history) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (h *history) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 5)
+	h.fieldMap = make(map[string]field.Expr, 6)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["ticket_id"] = h.TicketID
 	h.fieldMap["action"] = h.Action
 	h.fieldMap["performed_by"] = h.PerformedBy
 	h.fieldMap["created_at"] = h.CreatedAt
+
 }
 
 func (h history) clone(db *gorm.DB) history {

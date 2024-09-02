@@ -91,7 +91,7 @@ func (ci *CommentManagement) GetAllComment(ctx context.Context, ticketID int64) 
 
 	var comments []*model.Comment
 	comments, err := c.WithContext(ctx).Select(c.ID, c.TicketID, c.UserID, c.Comment, c.CreatedAt, u.NickName).
-		LeftJoin(u, c.UserID.EqCol(u.UserID)).
+		Join(u, c.UserID.EqCol(u.UserID)).
 		Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Find()
 
 	if err != nil {
