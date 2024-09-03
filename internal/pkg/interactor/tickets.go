@@ -4,14 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
+	"github.com/go-openapi/swag"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"github.com/Haevnen/p2m_be/internal/apperror"
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
-	"github.com/go-openapi/swag"
-	"gorm.io/gorm"
+	"github.com/Haevnen/p2m_be/pkg/gormdb"
+	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 type TicketManagement struct {
@@ -242,4 +247,99 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		_, err = tx.Ticket.WithContext(childCtx).Where(tx.Ticket.ID.Eq(ticketID)).Where(tx.Ticket.IsActive.Is(true)).UpdateColumns(&ticket)
 		return err
 	})
+}
+
+func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*p2m_api.ListTicketItem, error) {
+	ti := dal.Q.Ticket
+	u := dal.Q.User
+
+	// get user to get contract type
+	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
+	if payload == nil {
+		return nil, apperror.ErrUserNotExists
+	}
+
+	user, err := u.WithContext(ctx).Where(u.UserID.Eq(payload.UserID)).Where(u.IsActive.Is(true)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperror.ErrRecordNotFound
+		}
+	}
+
+	if user == nil {
+		return nil, apperror.ErrUserNotExists
+	}
+
+	var ticketsDb []*model.Ticket
+	now := time.Now()
+	// general query
+	// Only return needed fields (title, ticket-number, status, priority)
+	ticketQuery := ti.WithContext(ctx).Select(ti.Title, ti.ID, ti.Status, ti.Priority).
+		// Ignore deleted ticket
+		Where(ti.IsActive.Is(true)).
+		// List all ticket not completed (for all day)
+		Where(ti.WithContext(ctx).Where(ti.Status.Neq(string(p2m_api.DONE))).
+			// Or List all ticket in status DONE (for current day)
+			Or(ti.WithContext(ctx).Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2m_api.DONE)))))
+	// List by priority and updated_at asc
+	ticketQuery.Clauses(gormdb.OrderByCase{
+		Column: clause.Column{Name: "priority"},
+		Values: map[string]int{
+			string(p2m_api.NORMAL): 1,
+			string(p2m_api.HIGH):   2,
+		},
+		Desc: true,
+	}).Order(ti.UpdatedAt.Asc())
+
+	// if contract type is FREELANCE, return only ticket from themselves
+	if user.ContractType == string(p2m_api.FREELANCE) {
+		ticketsDb, err = ticketQuery.Where(ti.EditorID.Eq(user.UserID)).Or(ti.QcID.Eq(user.UserID)).Find()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		ticketsDb, err = ticketQuery.Find()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var tickets []*p2m_api.ListTicketItem
+
+	// convert to api model
+	if len(ticketsDb) > 0 {
+		// Get all users
+		users, err := t.userManagement.GetAllUser(ctx, swag.Bool(true))
+		if err != nil {
+			return nil, err
+		}
+		userIdMapping := make(map[string]*p2m_api.User)
+		for _, userItem := range users {
+			userIdMapping[userItem.UserId] = userItem
+		}
+
+		// Group people by the "Status" property.
+		groupedByStatus := util.GroupByProperty(ticketsDb, func(p *model.Ticket) string {
+			return p.Status
+		})
+
+		// Print the grouped data.
+		for status, group := range groupedByStatus {
+			listTicketItem := &p2m_api.ListTicketItem{
+				Status:  p2m_api.Status(status),
+				Tickets: make([]p2m_api.ListTicket, len(group)),
+			}
+			for _, ticket := range group {
+				listTicketItem.Tickets = append(listTicketItem.Tickets, p2m_api.ListTicket{
+					EditorName: userIdMapping[ticket.EditorID].NickName,
+					Id:         ticket.ID,
+					Priority:   p2m_api.Priority(ticket.Priority),
+					QcName:     userIdMapping[ticket.QcID].NickName,
+					Title:      ticket.Title,
+				})
+			}
+			tickets = append(tickets, listTicketItem)
+		}
+	}
+	return tickets, nil
 }

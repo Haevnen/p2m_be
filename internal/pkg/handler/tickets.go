@@ -23,12 +23,13 @@ func newTicketHandler(registry *registry.Registry) ticketHandler {
 // Get all tickets
 // (GET /tickets)
 func (h ticketHandler) InternalGetTickets(c *gin.Context) {
-	// TODO:
-	// * Need to get payload to check if user is admin (admin user will get all tickets, other member
-	// 	 only get ticket related to that member)
-	// * Ticket will group by status and sort by priority desc and updated_at
-	// desc
-	// * We query today for DONE status, all day for other status
+	tickets, err := h.ticketManagementInteractor.GetAllTicketsByContractType(c)
+	if err != nil {
+		SendError(c, "get all tickets error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, tickets)
 }
 
 // Add new ticket
