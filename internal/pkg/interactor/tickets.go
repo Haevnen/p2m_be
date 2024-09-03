@@ -73,7 +73,7 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 		Status:      string(p2m_api.BACKLOG),
 		QcID:        nickNameMapping[body.QcName].UserId,
 		EditorID:    nickNameMapping[body.EditorName].UserId,
-		Priority:    string(p2m_api.NORMAL),
+		Priority:    string(body.Priority),
 	}
 
 	// Start transaction to create new ticket and add record to history table
@@ -193,8 +193,26 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		})
 	}
 
+	if body.NumOfSingleImage != nil {
+		ticket.NumOfSingleImage = *body.NumOfSingleImage
+		histories = append(histories, &model.History{
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update quantity of single image from %d to %d.", userIdMapping[payload.UserID].NickName, ticket.NumOfSingleImage, *body.NumOfSingleImage),
+			PerformedBy: payload.UserID,
+		})
+	}
+
+	if body.NumOfMultipleImage != nil {
+		ticket.NumOfMultipleImage = *body.NumOfMultipleImage
+		histories = append(histories, &model.History{
+			TicketID:    ticket.ID,
+			Action:      fmt.Sprintf("User %s update quantity of multiple image from %d to %d.", userIdMapping[payload.UserID].NickName, ticket.NumOfMultipleImage, *body.NumOfMultipleImage),
+			PerformedBy: payload.UserID,
+		})
+	}
+
 	if body.Priority != nil {
-		ticket.Priority = string(*(body.Priority))
+		ticket.Priority = string(*body.Priority)
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
 			Action:      fmt.Sprintf("User %s update ticket priority from %s to %s.", userIdMapping[payload.UserID].NickName, string(ticket.Priority), string(*(body.Priority))),

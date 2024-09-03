@@ -181,15 +181,17 @@ type RefreshTokenResponse struct {
 
 // SingleTicketResponse defines model for SingleTicketResponse.
 type SingleTicketResponse struct {
-	ClientId    string    `json:"client_id"`
-	CreatedBy   CreatedBy `json:"created_by"`
-	Description string    `json:"description"`
-	EditorName  string    `json:"editor_name"`
-	Id          int64     `json:"id"`
-	Priority    Priority  `json:"priority"`
-	QcName      string    `json:"qc_name"`
-	Status      Status    `json:"status"`
-	Title       string    `json:"title"`
+	ClientId           string    `json:"client_id"`
+	CreatedBy          CreatedBy `json:"created_by"`
+	Description        string    `json:"description"`
+	EditorName         string    `json:"editor_name"`
+	Id                 int64     `json:"id"`
+	NumOfMultipleImage int32     `json:"num_of_multiple_image"`
+	NumOfSingleImage   int32     `json:"num_of_single_image"`
+	Priority           Priority  `json:"priority"`
+	QcName             string    `json:"qc_name"`
+	Status             Status    `json:"status"`
+	Title              string    `json:"title"`
 }
 
 // Status defines model for Status.
@@ -209,13 +211,15 @@ type UpdateCommentBody struct {
 
 // UpdateTicketBody defines model for UpdateTicketBody.
 type UpdateTicketBody struct {
-	ClientId    *string   `json:"client_id,omitempty"`
-	Description *string   `json:"description,omitempty"`
-	EditorName  *string   `json:"editor_name,omitempty"`
-	Priority    *Priority `json:"priority,omitempty"`
-	QcName      *string   `json:"qc_name,omitempty"`
-	Status      *Status   `json:"status,omitempty"`
-	Title       *string   `json:"title,omitempty"`
+	ClientId           *string   `json:"client_id,omitempty"`
+	Description        *string   `json:"description,omitempty"`
+	EditorName         *string   `json:"editor_name,omitempty"`
+	NumOfMultipleImage *int32    `json:"num_of_multiple_image,omitempty"`
+	NumOfSingleImage   *int32    `json:"num_of_single_image,omitempty"`
+	Priority           *Priority `json:"priority,omitempty"`
+	QcName             *string   `json:"qc_name,omitempty"`
+	Status             *Status   `json:"status,omitempty"`
+	Title              *string   `json:"title,omitempty"`
 }
 
 // User defines model for User.
