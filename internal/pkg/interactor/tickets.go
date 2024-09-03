@@ -8,14 +8,12 @@ import (
 
 	"github.com/go-openapi/swag"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 
 	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"github.com/Haevnen/p2m_be/internal/apperror"
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
-	"github.com/Haevnen/p2m_be/pkg/gormdb"
 	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
@@ -264,6 +262,8 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperror.ErrRecordNotFound
 		}
+
+		return nil, err
 	}
 
 	if user == nil {
@@ -282,14 +282,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 			// Or List all ticket in status DONE (for current day)
 			Or(ti.WithContext(ctx).Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2m_api.DONE)))))
 	// List by priority and updated_at asc
-	ticketQuery.Clauses(gormdb.OrderByCase{
-		Column: clause.Column{Name: "priority"},
-		Values: map[string]int{
-			string(p2m_api.NORMAL): 1,
-			string(p2m_api.HIGH):   2,
-		},
-		Desc: true,
-	}).Order(ti.UpdatedAt.Asc())
+	ticketQuery.Order(ti.Priority.Desc()).Order(ti.UpdatedAt.Desc())
 
 	// if contract type is FREELANCE, return only ticket from themselves
 	if user.ContractType == string(p2m_api.FREELANCE) {
@@ -304,7 +297,12 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		}
 	}
 
-	var tickets []*p2m_api.ListTicketItem
+	tickets := []*p2m_api.ListTicketItem{{Status: p2m_api.BACKLOG, Tickets: make([]p2m_api.ListTicket, 0)},
+		{Status: p2m_api.INPROGRESS, Tickets: make([]p2m_api.ListTicket, 0)},
+		{Status: p2m_api.READYTOQC, Tickets: make([]p2m_api.ListTicket, 0)},
+		{Status: p2m_api.QCVERIFYING, Tickets: make([]p2m_api.ListTicket, 0)},
+		{Status: p2m_api.QCDONE, Tickets: make([]p2m_api.ListTicket, 0)},
+		{Status: p2m_api.DONE, Tickets: make([]p2m_api.ListTicket, 0)}}
 
 	// convert to api model
 	if len(ticketsDb) > 0 {
@@ -318,28 +316,31 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 			userIdMapping[userItem.UserId] = userItem
 		}
 
-		// Group people by the "Status" property.
-		groupedByStatus := util.GroupByProperty(ticketsDb, func(p *model.Ticket) string {
-			return p.Status
-		})
+		for _, ticket := range ticketsDb {
+			ticketItem := p2m_api.ListTicket{
+				EditorName: userIdMapping[ticket.EditorID].NickName,
+				Id:         ticket.ID,
+				Priority:   p2m_api.Priority(ticket.Priority),
+				QcName:     userIdMapping[ticket.QcID].NickName,
+				Title:      ticket.Title,
+			}
 
-		// Print the grouped data.
-		for status, group := range groupedByStatus {
-			listTicketItem := &p2m_api.ListTicketItem{
-				Status:  p2m_api.Status(status),
-				Tickets: make([]p2m_api.ListTicket, len(group)),
+			switch ticket.Status {
+			case string(p2m_api.BACKLOG):
+				tickets[0].Tickets = append(tickets[0].Tickets, ticketItem)
+			case string(p2m_api.INPROGRESS):
+				tickets[1].Tickets = append(tickets[1].Tickets, ticketItem)
+			case string(p2m_api.READYTOQC):
+				tickets[2].Tickets = append(tickets[2].Tickets, ticketItem)
+			case string(p2m_api.QCVERIFYING):
+				tickets[3].Tickets = append(tickets[3].Tickets, ticketItem)
+			case string(p2m_api.QCDONE):
+				tickets[4].Tickets = append(tickets[4].Tickets, ticketItem)
+			case string(p2m_api.DONE):
+				tickets[5].Tickets = append(tickets[5].Tickets, ticketItem)
 			}
-			for _, ticket := range group {
-				listTicketItem.Tickets = append(listTicketItem.Tickets, p2m_api.ListTicket{
-					EditorName: userIdMapping[ticket.EditorID].NickName,
-					Id:         ticket.ID,
-					Priority:   p2m_api.Priority(ticket.Priority),
-					QcName:     userIdMapping[ticket.QcID].NickName,
-					Title:      ticket.Title,
-				})
-			}
-			tickets = append(tickets, listTicketItem)
 		}
 	}
+
 	return tickets, nil
 }
