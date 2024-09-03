@@ -36,6 +36,8 @@ func newTicket(db *gorm.DB, opts ...gen.DOOption) ticket {
 	_ticket.ClientID = field.NewInt32(tableName, "client_id")
 	_ticket.Description = field.NewString(tableName, "description")
 	_ticket.CreatedBy = field.NewString(tableName, "created_by")
+	_ticket.NumOfSingleImage = field.NewInt32(tableName, "num_of_single_image")
+	_ticket.NumOfMultipleImage = field.NewInt32(tableName, "num_of_multiple_image")
 	_ticket.IsActive = field.NewBool(tableName, "is_active")
 	_ticket.CreatedAt = field.NewTime(tableName, "created_at")
 	_ticket.UpdatedAt = field.NewTime(tableName, "updated_at")
@@ -48,19 +50,21 @@ func newTicket(db *gorm.DB, opts ...gen.DOOption) ticket {
 type ticket struct {
 	ticketDo ticketDo
 
-	ALL         field.Asterisk
-	ID          field.Int64
-	Title       field.String
-	Status      field.String
-	QcID        field.String
-	EditorID    field.String
-	Priority    field.String
-	ClientID    field.Int32
-	Description field.String
-	CreatedBy   field.String
-	IsActive    field.Bool
-	CreatedAt   field.Time
-	UpdatedAt   field.Time
+	ALL                field.Asterisk
+	ID                 field.Int64
+	Title              field.String
+	Status             field.String
+	QcID               field.String
+	EditorID           field.String
+	Priority           field.String
+	ClientID           field.Int32
+	Description        field.String
+	CreatedBy          field.String
+	NumOfSingleImage   field.Int32
+	NumOfMultipleImage field.Int32
+	IsActive           field.Bool
+	CreatedAt          field.Time
+	UpdatedAt          field.Time
 
 	fieldMap map[string]field.Expr
 }
@@ -86,6 +90,8 @@ func (t *ticket) updateTableName(table string) *ticket {
 	t.ClientID = field.NewInt32(table, "client_id")
 	t.Description = field.NewString(table, "description")
 	t.CreatedBy = field.NewString(table, "created_by")
+	t.NumOfSingleImage = field.NewInt32(table, "num_of_single_image")
+	t.NumOfMultipleImage = field.NewInt32(table, "num_of_multiple_image")
 	t.IsActive = field.NewBool(table, "is_active")
 	t.CreatedAt = field.NewTime(table, "created_at")
 	t.UpdatedAt = field.NewTime(table, "updated_at")
@@ -113,7 +119,7 @@ func (t *ticket) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (t *ticket) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 12)
+	t.fieldMap = make(map[string]field.Expr, 14)
 	t.fieldMap["id"] = t.ID
 	t.fieldMap["title"] = t.Title
 	t.fieldMap["status"] = t.Status
@@ -123,6 +129,8 @@ func (t *ticket) fillFieldMap() {
 	t.fieldMap["client_id"] = t.ClientID
 	t.fieldMap["description"] = t.Description
 	t.fieldMap["created_by"] = t.CreatedBy
+	t.fieldMap["num_of_single_image"] = t.NumOfSingleImage
+	t.fieldMap["num_of_multiple_image"] = t.NumOfMultipleImage
 	t.fieldMap["is_active"] = t.IsActive
 	t.fieldMap["created_at"] = t.CreatedAt
 	t.fieldMap["updated_at"] = t.UpdatedAt

@@ -72,6 +72,8 @@ Table tickets {
     description text
     is_active tinyint(1) [not null, default: `1`]
     created_by ticket_created_by [not null]
+    num_of_single integer [not null, default: `0`]
+    num_of_multiple integer [not null, default: `0`]
     created_at timestamp [not null, default: `now()`]
     updated_at timestamp [not null, default: `now()`]
 }

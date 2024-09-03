@@ -1299,6 +1299,14 @@ components:
         description:
           type: string
           example: "description"
+        num_of_single_image:
+          type: integer
+          format: int32
+          example: 1
+        num_of_multiple_image:
+          type: integer
+          format: int32
+          example: 1
       required:
         - id
         - title
@@ -1309,6 +1317,8 @@ components:
         - created_by
         - client_id
         - description
+        - num_of_single_image
+        - num_of_multiple_image
     CreateTicketBody:
       type: object
       properties:
@@ -1363,3 +1373,12 @@ components:
           example: "description"
         status:
           $ref: "#/components/schemas/Status"
+        num_of_single_image:
+          type: integer
+          format: int32
+          example: 1
+        num_of_multiple_image:
+          type: integer
+          format: int32
+          example: 1
+

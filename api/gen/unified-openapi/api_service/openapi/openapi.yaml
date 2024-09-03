@@ -1793,7 +1793,9 @@ components:
     SingleTicketResponse:
       example:
         editor_name: editor_name
+        num_of_multiple_image: 1
         qc_name: qc_name
+        num_of_single_image: 1
         description: description
         id: 1
         title: title
@@ -1824,12 +1826,22 @@ components:
         description:
           example: description
           type: string
+        num_of_single_image:
+          example: 1
+          format: int32
+          type: integer
+        num_of_multiple_image:
+          example: 1
+          format: int32
+          type: integer
       required:
       - client_id
       - created_by
       - description
       - editor_name
       - id
+      - num_of_multiple_image
+      - num_of_single_image
       - priority
       - qc_name
       - status
@@ -1879,7 +1891,9 @@ components:
     UpdateTicketBody:
       example:
         editor_name: editor_name
+        num_of_multiple_image: 1
         qc_name: qc_name
+        num_of_single_image: 1
         description: description
         title: title
         client_id: GMT
@@ -1903,6 +1917,14 @@ components:
           type: string
         status:
           $ref: '#/components/schemas/Status'
+        num_of_single_image:
+          example: 1
+          format: int32
+          type: integer
+        num_of_multiple_image:
+          example: 1
+          format: int32
+          type: integer
       type: object
     UserLoginResponse:
       example:
