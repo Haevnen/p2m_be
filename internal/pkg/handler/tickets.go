@@ -83,9 +83,12 @@ func (h ticketHandler) InternalUpdateTicket(c *gin.Context, ticketId int64, para
 
 // Get ticket by id
 // (GET /tickets/{ticket_id})
-func (h ticketHandler) InternalGetTicket(c *gin.Context, ticketId int) {
-	// TODO:
-	// * We not only need to get data from ticket but also the other data like
-	// (comments, links, histories and client_info) -> Does BE handle or FE will
-	// send request?
+func (h ticketHandler) InternalGetTicket(c *gin.Context, ticketId int64) {
+	ticket, err := h.ticketManagementInteractor.GetTicketById(c, ticketId)
+	if err != nil {
+		SendError(c, "get ticket error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, ticket)
 }

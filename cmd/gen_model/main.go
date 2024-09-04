@@ -36,8 +36,10 @@ func main() {
 
 		//
 		// Generate struct `Tickets` based on table `tickets`
-		g.GenerateModel("tickets"),
-
+		g.GenerateModelAs("tickets", "Ticket", gen.FieldNew("EditorName", "string", ignore),
+			gen.FieldNew("QcName", "string", ignore),
+			gen.FieldNew("ClientIdStr", "string", ignore),
+		),
 		//
 		// Generate struct `Links` based on table `links`
 		g.GenerateModel("links"),

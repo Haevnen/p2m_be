@@ -9,7 +9,7 @@ import (
 	"github.com/go-openapi/swag"
 	"gorm.io/gorm"
 
-	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
+	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
 	"github.com/Haevnen/p2m_be/internal/apperror"
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
@@ -35,7 +35,7 @@ func NewTicketManagement(
 	}
 }
 
-func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.CreateTicketBody) error {
+func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2mapi.CreateTicketBody) error {
 	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
 	if payload == nil {
 		return apperror.ErrUserNotExists
@@ -47,7 +47,7 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 		return err
 	}
 
-	nickNameMapping := make(map[string]*p2m_api.User)
+	nickNameMapping := make(map[string]*p2mapi.User)
 
 	for _, user := range users {
 		nickNameMapping[user.NickName] = user
@@ -71,9 +71,9 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 		ClientID:    client.Id,
 		Title:       body.Title,
 		Description: body.Description,
-		CreatedBy:   string(p2m_api.MANUAL),
+		CreatedBy:   string(p2mapi.MANUAL),
 		IsActive:    true,
-		Status:      string(p2m_api.BACKLOG),
+		Status:      string(p2mapi.BACKLOG),
 		QcID:        nickNameMapping[body.QcName].UserId,
 		EditorID:    nickNameMapping[body.EditorName].UserId,
 		Priority:    string(body.Priority),
@@ -110,13 +110,13 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2m_api.Cre
 		// Create new history
 		return tx.History.WithContext(childCtx).Create(&model.History{
 			TicketID:    newTicket.ID,
-			Action:      fmt.Sprintf("Ticket is created by %s", string(p2m_api.MANUAL)),
+			Action:      fmt.Sprintf("Ticket is created by %s", string(p2mapi.MANUAL)),
 			PerformedBy: payload.UserID,
 		})
 	})
 }
 
-func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, body p2m_api.UpdateTicketBody) error {
+func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, body p2mapi.UpdateTicketBody) error {
 	// Get payload to check if user is admin
 	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
 	if payload == nil {
@@ -124,7 +124,7 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 	}
 
 	// Only admin can update Title, Description, ClientId and Done Status
-	if body.Title != nil || body.Description != nil || body.ClientId != nil || (body.Status != nil && string(*(body.Status)) == string(p2m_api.DONE)) {
+	if body.Title != nil || body.Description != nil || body.ClientId != nil || (body.Status != nil && string(*(body.Status)) == string(p2mapi.DONE)) {
 		if !payload.IsAdmin {
 			return apperror.ErrForbidden
 		}
@@ -146,8 +146,8 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		return err
 	}
 
-	nickNameMapping := make(map[string]*p2m_api.User)
-	userIdMapping := make(map[string]*p2m_api.User)
+	nickNameMapping := make(map[string]*p2mapi.User)
+	userIdMapping := make(map[string]*p2mapi.User)
 
 	for _, user := range users {
 		nickNameMapping[user.NickName] = user
@@ -191,7 +191,7 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		ticket.Status = string(*(body.Status))
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
-			Action:      fmt.Sprintf("User %s update ticket status from %s to %s.", userIdMapping[payload.UserID].NickName, string(ticket.Status), string(*(body.Status))),
+			Action:      fmt.Sprintf("User %s update ticket status from %s to %s.", userIdMapping[payload.UserID].NickName, ticket.Status, string(*(body.Status))),
 			PerformedBy: payload.UserID,
 		})
 	}
@@ -218,7 +218,7 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		ticket.Priority = string(*body.Priority)
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
-			Action:      fmt.Sprintf("User %s update ticket priority from %s to %s.", userIdMapping[payload.UserID].NickName, string(ticket.Priority), string(*(body.Priority))),
+			Action:      fmt.Sprintf("User %s update ticket priority from %s to %s.", userIdMapping[payload.UserID].NickName, ticket.Priority, string(*(body.Priority))),
 			PerformedBy: payload.UserID,
 		})
 	}
@@ -265,7 +265,7 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 	})
 }
 
-func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*p2m_api.ListTicketItem, error) {
+func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*p2mapi.ListTicketItem, error) {
 	ti := dal.Q.Ticket
 	tid := ti.WithContext(ctx)
 	u := dal.Q.User
@@ -297,14 +297,14 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		// Ignore deleted ticket
 		Where(ti.IsActive.Is(true)).
 		// List all ticket not completed (for all day)
-		Where(tid.Where(ti.Status.Neq(string(p2m_api.DONE))).
+		Where(tid.Where(ti.Status.Neq(string(p2mapi.DONE))).
 			// Or List all ticket in status DONE (for current day)
-			Or(tid.Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2m_api.DONE)))))
+			Or(tid.Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2mapi.DONE)))))
 	// List by priority and updated_at asc
 	ticketQuery.Order(ti.Priority.Desc()).Order(ti.UpdatedAt.Desc())
 
 	// if contract type is FREELANCE, return only ticket from themselves
-	if user.ContractType == string(p2m_api.FREELANCE) {
+	if user.ContractType == string(p2mapi.FREELANCE) {
 		ticketsDb, err = ticketQuery.Where(tid.Where(ti.EditorID.Eq(user.UserID)).Or(ti.QcID.Eq(user.UserID))).Find()
 		if err != nil {
 			return nil, err
@@ -316,12 +316,12 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		}
 	}
 
-	tickets := []*p2m_api.ListTicketItem{{Status: p2m_api.BACKLOG, Tickets: make([]p2m_api.ListTicket, 0)},
-		{Status: p2m_api.INPROGRESS, Tickets: make([]p2m_api.ListTicket, 0)},
-		{Status: p2m_api.READYTOQC, Tickets: make([]p2m_api.ListTicket, 0)},
-		{Status: p2m_api.QCVERIFYING, Tickets: make([]p2m_api.ListTicket, 0)},
-		{Status: p2m_api.QCDONE, Tickets: make([]p2m_api.ListTicket, 0)},
-		{Status: p2m_api.DONE, Tickets: make([]p2m_api.ListTicket, 0)}}
+	tickets := []*p2mapi.ListTicketItem{{Status: p2mapi.BACKLOG, Tickets: make([]p2mapi.ListTicket, 0)},
+		{Status: p2mapi.INPROGRESS, Tickets: make([]p2mapi.ListTicket, 0)},
+		{Status: p2mapi.READYTOQC, Tickets: make([]p2mapi.ListTicket, 0)},
+		{Status: p2mapi.QCVERIFYING, Tickets: make([]p2mapi.ListTicket, 0)},
+		{Status: p2mapi.QCDONE, Tickets: make([]p2mapi.ListTicket, 0)},
+		{Status: p2mapi.DONE, Tickets: make([]p2mapi.ListTicket, 0)}}
 
 	// convert to api model
 	if len(ticketsDb) > 0 {
@@ -330,38 +330,60 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		if err != nil {
 			return nil, err
 		}
-		userIdMapping := make(map[string]*p2m_api.User)
+		userIdMapping := make(map[string]*p2mapi.User)
 		for _, userItem := range users {
 			userIdMapping[userItem.UserId] = userItem
 		}
 
 		for _, ticket := range ticketsDb {
-			ticketItem := p2m_api.ListTicket{
+			ticketItem := p2mapi.ListTicket{
 				EditorName: userIdMapping[ticket.EditorID].NickName,
 				Id:         ticket.ID,
-				Priority:   p2m_api.Priority(ticket.Priority),
+				Priority:   p2mapi.Priority(ticket.Priority),
 				QcName:     userIdMapping[ticket.QcID].NickName,
 				Title:      ticket.Title,
 			}
 
 			switch ticket.Status {
-			case string(p2m_api.BACKLOG):
+			case string(p2mapi.BACKLOG):
 				tickets[0].Tickets = append(tickets[0].Tickets, ticketItem)
-			case string(p2m_api.INPROGRESS):
+			case string(p2mapi.INPROGRESS):
 				tickets[1].Tickets = append(tickets[1].Tickets, ticketItem)
-			case string(p2m_api.READYTOQC):
+			case string(p2mapi.READYTOQC):
 				tickets[2].Tickets = append(tickets[2].Tickets, ticketItem)
-			case string(p2m_api.QCVERIFYING):
+			case string(p2mapi.QCVERIFYING):
 				tickets[3].Tickets = append(tickets[3].Tickets, ticketItem)
-			case string(p2m_api.QCDONE):
+			case string(p2mapi.QCDONE):
 				tickets[4].Tickets = append(tickets[4].Tickets, ticketItem)
-			case string(p2m_api.DONE):
+			case string(p2mapi.DONE):
 				tickets[5].Tickets = append(tickets[5].Tickets, ticketItem)
 			}
 		}
 	}
 
 	return tickets, nil
+}
+
+func (t *TicketManagement) GetTicketById(ctx context.Context, ticketId int64) (*p2mapi.SingleTicketResponse, error) {
+	ti := dal.Q.Ticket
+	tid := ti.WithContext(ctx)
+	ue := dal.Q.User.As("ue")
+	uc := dal.Q.User.As("uc")
+	ci := dal.Q.Client.As("ci")
+
+	var ticketDb *model.Ticket
+	ticketDb, err := tid.Select(ci.ClientID, ti.CreatedBy, ti.Description, ue.NickName.As("editor_name"), ti.ID, ti.NumOfMultipleImage,
+		ti.NumOfSingleImage, ti.Priority, uc.NickName.As("qc_name"), ti.Status, ti.Title).
+		Join(ci, ti.ClientID.EqCol(ci.ID)).
+		Join(ue, ti.EditorID.EqCol(ue.UserID)).
+		Join(uc, ti.QcID.EqCol(uc.UserID)).
+		Where(ti.ID.Eq(ticketId)).First()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ticketDb.FromTicket(), err
 }
 
 func (t *TicketManagement) DeleteTicket(ctx context.Context, ticketID int64) error {

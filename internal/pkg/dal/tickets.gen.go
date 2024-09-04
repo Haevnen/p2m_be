@@ -119,7 +119,7 @@ func (t *ticket) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (t *ticket) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 14)
+	t.fieldMap = make(map[string]field.Expr, 17)
 	t.fieldMap["id"] = t.ID
 	t.fieldMap["title"] = t.Title
 	t.fieldMap["status"] = t.Status
@@ -134,6 +134,7 @@ func (t *ticket) fillFieldMap() {
 	t.fieldMap["is_active"] = t.IsActive
 	t.fieldMap["created_at"] = t.CreatedAt
 	t.fieldMap["updated_at"] = t.UpdatedAt
+
 }
 
 func (t ticket) clone(db *gorm.DB) ticket {
