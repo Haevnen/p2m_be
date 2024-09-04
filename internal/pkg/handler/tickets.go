@@ -53,10 +53,14 @@ func (h ticketHandler) InternalAddTicket(c *gin.Context, params p2m_api.Internal
 
 // Remove ticket by id
 // (DELETE /tickets/remove/{ticket_id})
-func (h ticketHandler) InternalRemoveTicket(c *gin.Context, ticketId int, params p2m_api.InternalRemoveTicketParams) {
-	// TODO:
-	// * Soft delete
-	// * Remove all related links, histories and comments
+func (h ticketHandler) InternalRemoveTicket(c *gin.Context, ticketId int64, params p2m_api.InternalRemoveTicketParams) {
+	err := h.ticketManagementInteractor.DeleteTicket(c, ticketId)
+	if err != nil {
+		SendError(c, "delete ticket error", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, "delete ticket successfully")
 }
 
 // Update ticket by id

@@ -385,3 +385,40 @@ func (t *TicketManagement) GetTicketById(ctx context.Context, ticketId int64) (*
 
 	return ticketDb.FromTicket(), err
 }
+
+func (t *TicketManagement) DeleteTicket(ctx context.Context, ticketID int64) error {
+	u := dal.Q.Ticket
+
+	_, err := u.WithContext(ctx).Where(u.ID.Eq(ticketID)).Where(u.IsActive.Is(true)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return apperror.ErrTicketNotFound
+		}
+		return err
+	}
+	
+	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
+		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
+
+		// Delete links
+		_, err = tx.Link.WithContext(childCtx).Where(tx.Link.TicketID.Eq(ticketID)).Delete()
+		if err != nil {
+			return err
+		}
+
+		// Delete histories
+		_, err = tx.History.WithContext(childCtx).Where(tx.History.TicketID.Eq(ticketID)).Delete()
+		if err != nil {
+			return err
+		}
+
+		// Delete comments
+		_, err = tx.Comment.WithContext(childCtx).Where(tx.Comment.TicketID.Eq(ticketID)).Delete()
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.Ticket.WithContext(childCtx).Where(tx.Ticket.ID.Eq(ticketID)).UpdateSimple(tx.Ticket.IsActive.Value(false))
+		return err
+	})
+}

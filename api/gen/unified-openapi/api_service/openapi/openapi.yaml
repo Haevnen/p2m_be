@@ -1099,6 +1099,7 @@ paths:
         name: ticket_id
         required: true
         schema:
+          format: int64
           type: integer
         style: simple
       responses:

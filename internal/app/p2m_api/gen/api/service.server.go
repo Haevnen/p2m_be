@@ -82,7 +82,7 @@ type ServerInterface interface {
 	InternalAddTicket(c *gin.Context, params InternalAddTicketParams)
 	// Remove ticket by id
 	// (DELETE /tickets/remove/{ticket_id})
-	InternalRemoveTicket(c *gin.Context, ticketId int, params InternalRemoveTicketParams)
+	InternalRemoveTicket(c *gin.Context, ticketId int64, params InternalRemoveTicketParams)
 	// Update ticket by id
 	// (PUT /tickets/update/{ticket_id})
 	InternalUpdateTicket(c *gin.Context, ticketId int64, params InternalUpdateTicketParams)
@@ -897,7 +897,7 @@ func (siw *ServerInterfaceWrapper) InternalRemoveTicket(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "ticket_id" -------------
-	var ticketId int
+	var ticketId int64
 
 	err = runtime.BindStyledParameterWithOptions("simple", "ticket_id", c.Param("ticket_id"), &ticketId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
@@ -1255,13 +1255,13 @@ var swaggerSpec = []string{
 	"huFHchpeY/lRwpTpNxozL2xbrLl0FOXLT3h/xO1a2ialqdiMUp80qlykvMGdInYpz2l4NaYQJ6NaRBUj",
 	"5hCDPHhbFdfvpIdlVL1KJ4eEwnCxWzMvzIyrQ9SahgjrSZ5Wr8QY4A2T6JzGFmPTFQrRNyd3Wonwnkx8",
 	"VBCEcXRy7bKvTlczi7pJk6xjZpI763orzjFYZTUxU5tWvtZSTv096PvVjHvo+2JpQnn/SwXjDn3/Rs+T",
-	"t2kHvXEKZRe07xb96jCah1UjRIkIbxdjX1UxdBkM15BtHUXfVOy66wrJdaHzLnT+NuJyFqQ3coneQ5Dn",
-	"krpdBIXi67YObD13bNrbOp1P0vHYm9lI0IrHWi4ENp55VkVdP+wyYO2R5raPrHSrfh03fNe1x3piSKj6",
-	"PkZtMEukanMyqIyYPe9c0CSElOJJKL4aumHHgoqvDnSHgW70YaCJskFbFFc8a3sMYbsDCIWJbFcsL/2w",
-	"duc1d0cQbsMRhInEeDXDPHFEL7N3V2zuuZ87bWKOm8kwpaiBWHQ3zpNfwv1XKbtTuTq6+TH26Wp4608q",
-	"FAlDFEkeNYbl17afphFlix6Mce9xD7jgERIM7wNp0NPUX9Ff5p8yFg96vSDyYMCfDt791P9pz/hCf0UC",
-	"Xv1d2iYbeqn68oBCp2x1GehqZpFPrKcb5eTqSLJ8cn1OWTn5R0in9xEkfj5DeruyQY7YbZnPJTdgVubQ",
-	"L34X2qZfB6/Ml75tms+YvYS6uFv8JwAA//9Si8D3qI0AAA==",
+	"t2kHvXEKZRe07xb96jCah1UjRIkIbxdjX1UxdBkM15BtHUXfVOy6by8k14G7i6WvNVBngX4juehNBXly",
+	"qdtWUCi+bi9BRyYb9vpO56R0PPZmdha04rGWK4ONh6BVUdcPuy5Ye8a57asr3TJgxw3fdTGynhgSqj6Y",
+	"URvdEqnaHBUqQ2jPOyg0CSGleBKKz4hu2Dmh4jME3emgG306aKJs0BbWFc/ankvY7kRCYSLbFdxLv7Td",
+	"ec3dmYTbcCZhIjFezTBPHNHLbOYVu33u506bIORmMkwpaiBW4Y0D5pdw/1XK7piujm5+jI27Gt76GwtF",
+	"whBFkkeNYfn57adpRNmiB2Pce9wDLniEBMP7QBr0NPVX9Kf6p4zFg14viDwY8KeDdz/1f9ozPtlfkYBX",
+	"f5e2yYZeqj5FoNApW10GuppZ5BPr6UY5uTqjLJ9cH1xWTv4R0ul9BImfz5DermyQI7Zf5nPJHZmVOfSb",
+	"4IW26ffDK/Olr5/mM2ZvpS7uFv8JAAD//y4qVhm5jQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
