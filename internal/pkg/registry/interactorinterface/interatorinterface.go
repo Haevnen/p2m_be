@@ -56,6 +56,7 @@ type TicketManagementInterface interface {
 	AddTicketManual(ctx context.Context, body p2mapi.CreateTicketBody) error
 	UpdateTicket(ctx context.Context, ticketID int64, body p2mapi.UpdateTicketBody) error
 	GetAllTicketsByContractType(ctx context.Context) ([]*p2mapi.ListTicketItem, error)
+	DeleteTicket(ctx context.Context, ticketID int64) error
 }
 type Maker interface {
 	// Return token, payload and error
