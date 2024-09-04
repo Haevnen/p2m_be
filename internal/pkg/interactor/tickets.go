@@ -249,6 +249,7 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 
 func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*p2m_api.ListTicketItem, error) {
 	ti := dal.Q.Ticket
+	tid := ti.WithContext(ctx)
 	u := dal.Q.User
 
 	// get user to get contract type
@@ -274,19 +275,19 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 	now := time.Now()
 	// general query
 	// Only return needed fields (title, ticket-number, status, priority)
-	ticketQuery := ti.WithContext(ctx).Select(ti.Title, ti.ID, ti.Status, ti.Priority).
+	ticketQuery := tid.Select(ti.Title, ti.ID, ti.Status, ti.Priority).
 		// Ignore deleted ticket
 		Where(ti.IsActive.Is(true)).
 		// List all ticket not completed (for all day)
 		Where(ti.WithContext(ctx).Where(ti.Status.Neq(string(p2m_api.DONE))).
 			// Or List all ticket in status DONE (for current day)
-			Or(ti.WithContext(ctx).Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2m_api.DONE)))))
+			Or(tid.Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2m_api.DONE)))))
 	// List by priority and updated_at asc
 	ticketQuery.Order(ti.Priority.Desc()).Order(ti.UpdatedAt.Desc())
 
 	// if contract type is FREELANCE, return only ticket from themselves
 	if user.ContractType == string(p2m_api.FREELANCE) {
-		ticketsDb, err = ticketQuery.Where(ti.EditorID.Eq(user.UserID)).Or(ti.QcID.Eq(user.UserID)).Find()
+		ticketsDb, err = ticketQuery.Where(tid.Where(ti.EditorID.Eq(user.UserID)).Or(ti.QcID.Eq(user.UserID))).Find()
 		if err != nil {
 			return nil, err
 		}
