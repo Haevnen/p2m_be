@@ -279,7 +279,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		// Ignore deleted ticket
 		Where(ti.IsActive.Is(true)).
 		// List all ticket not completed (for all day)
-		Where(ti.WithContext(ctx).Where(ti.Status.Neq(string(p2m_api.DONE))).
+		Where(tid.Where(ti.Status.Neq(string(p2m_api.DONE))).
 			// Or List all ticket in status DONE (for current day)
 			Or(tid.Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2m_api.DONE)))))
 	// List by priority and updated_at asc
