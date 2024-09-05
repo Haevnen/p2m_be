@@ -3,7 +3,6 @@ package interactor
 import (
 	"context"
 	"errors"
-	"github.com/Haevnen/p2m_be/pkg/logger"
 
 	"gorm.io/gorm"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
+	"github.com/Haevnen/p2m_be/pkg/logger"
 )
 
 type CommentManagement struct {
@@ -50,9 +50,8 @@ func (ci *CommentManagement) CreateComment(ctx context.Context, client p2mapi.Cr
 	} else {
 		logger.Error("find user when create comment has error: user is nil")
 	}
-	commentDb.NickName = nickName
 
-	return commentDb.FromComment(), nil
+	return commentDb.FromComment(nickName).FromCommentWithName(), nil
 }
 
 func (ci *CommentManagement) UpdateComment(ctx context.Context, commentID int64, body p2mapi.UpdateCommentBody) error {
@@ -89,10 +88,10 @@ func (ci *CommentManagement) GetAllComment(ctx context.Context, ticketID int64) 
 	c := dal.Q.Comment
 	u := dal.Q.User
 
-	var comments []*model.Comment
-	comments, err := c.WithContext(ctx).Select(c.ID, c.TicketID, c.UserID, c.Comment, c.CreatedAt, u.NickName).
+	var comments []*model.CommentWithName
+	err := c.WithContext(ctx).Select(c.ID, c.TicketID, c.UserID, c.Comment, c.CreatedAt, u.NickName).
 		Join(u, c.UserID.EqCol(u.UserID)).
-		Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Find()
+		Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Scan(comments)
 
 	if err != nil {
 		return nil, err
@@ -100,7 +99,7 @@ func (ci *CommentManagement) GetAllComment(ctx context.Context, ticketID int64) 
 
 	res := make([]*p2mapi.CommentResponse, 0, len(comments))
 	for _, client := range comments {
-		res = append(res, client.FromComment())
+		res = append(res, client.FromCommentWithName())
 	}
 
 	return res, nil

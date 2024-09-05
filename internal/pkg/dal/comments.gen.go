@@ -92,13 +92,12 @@ func (c *comment) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *comment) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 6)
+	c.fieldMap = make(map[string]field.Expr, 5)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["ticket_id"] = c.TicketID
 	c.fieldMap["user_id"] = c.UserID
 	c.fieldMap["comment"] = c.Comment
 	c.fieldMap["created_at"] = c.CreatedAt
-
 }
 
 func (c comment) clone(db *gorm.DB) comment {

@@ -26,33 +26,25 @@ func main() {
 		// Generate struct `User` based on table `users`
 		g.GenerateModel("users"),
 
-		//
 		// Generate struct `Sessions` based on table `sessions`
 		g.GenerateModel("sessions"),
 
-		//
 		// Generate struct `Clients` based on table `clients`
 		g.GenerateModel("clients"),
 
-		//
 		// Generate struct `Tickets` based on table `tickets`
-		g.GenerateModelAs("tickets", "Ticket", gen.FieldNew("EditorName", "string", ignore),
-			gen.FieldNew("QcName", "string", ignore),
-			gen.FieldNew("ClientIdStr", "string", ignore),
-		),
-		//
+		g.GenerateModel("tickets"),
+
 		// Generate struct `Links` based on table `links`
 		g.GenerateModel("links"),
 
-		//
 		// Generate struct `Comments` based on table `comments`
-		//g.GenerateModel("comments"),
-		g.GenerateModelAs("comments", "Comment", gen.FieldNew("NickName", "string", ignore)),
+		g.GenerateModel("comments"),
 
-		//
 		// Generate struct `Histories` based on table `histories`
-		g.GenerateModelAs("histories", "History", gen.FieldNew("NickName", "string", ignore)),
+		g.GenerateModel("histories"),
 	)
+
 	// Generate the code
 	g.Execute()
 }

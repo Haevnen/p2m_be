@@ -17,7 +17,6 @@ type Comment struct {
 	UserID    string    `gorm:"column:user_id;not null" json:"user_id"`
 	Comment   string    `gorm:"column:comment;not null" json:"comment"`
 	CreatedAt time.Time `gorm:"column:created_at;not null;default:now()" json:"created_at"`
-	NickName  string    `gorm:"-"`
 }
 
 // TableName Comment's table name
