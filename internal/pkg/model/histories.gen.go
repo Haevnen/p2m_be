@@ -17,7 +17,6 @@ type History struct {
 	Action      string    `gorm:"column:action" json:"action"`
 	PerformedBy string    `gorm:"column:performed_by;not null" json:"performed_by"`
 	CreatedAt   time.Time `gorm:"column:created_at;not null;default:now()" json:"created_at"`
-	NickName    string    `gorm:"-"`
 }
 
 // TableName History's table name

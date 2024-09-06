@@ -5,7 +5,12 @@ import (
 	"github.com/Haevnen/p2m_be/pkg/constants"
 )
 
-func (c *History) FromHistory() *p2mapi.HistoryResponse {
+type HistoryWithName struct {
+	History
+	NickName string `gorm:"column:nick_name"`
+}
+
+func (c *HistoryWithName) FromHistory() *p2mapi.HistoryResponse {
 	return &p2mapi.HistoryResponse{
 		Action:    c.Action,
 		CreatedAt: c.CreatedAt.Format(constants.DateTimeFormat),

@@ -293,7 +293,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 	now := time.Now()
 	// general query
 	// Only return needed fields (title, ticket-number, status, priority)
-	ticketQuery := tid.Select(ti.Title, ti.ID, ti.Status, ti.Priority).
+	ticketQuery := tid.Select(ti.Title, ti.ID, ti.Status, ti.Priority, ti.QcID, ti.EditorID).
 		// Ignore deleted ticket
 		Where(ti.IsActive.Is(true)).
 		// List all ticket not completed (for all day)
@@ -371,13 +371,13 @@ func (t *TicketManagement) GetTicketById(ctx context.Context, ticketId int64) (*
 	uc := dal.Q.User.As("uc")
 	ci := dal.Q.Client.As("ci")
 
-	var ticketDb *model.Ticket
-	ticketDb, err := tid.Select(ci.ClientID, ti.CreatedBy, ti.Description, ue.NickName.As("editor_name"), ti.ID, ti.NumOfMultipleImage,
+	var ticketDb *model.TicketSingle
+	err := tid.Select(ci.ClientID.As("client_id_str"), ti.CreatedBy, ti.Description, ue.NickName.As("editor_name"), ti.ID, ti.NumOfMultipleImage,
 		ti.NumOfSingleImage, ti.Priority, uc.NickName.As("qc_name"), ti.Status, ti.Title).
 		Join(ci, ti.ClientID.EqCol(ci.ID)).
 		Join(ue, ti.EditorID.EqCol(ue.UserID)).
 		Join(uc, ti.QcID.EqCol(uc.UserID)).
-		Where(ti.ID.Eq(ticketId)).First()
+		Where(ti.ID.Eq(ticketId)).Scan(&ticketDb)
 
 	if err != nil {
 		return nil, err
@@ -396,7 +396,7 @@ func (t *TicketManagement) DeleteTicket(ctx context.Context, ticketID int64) err
 		}
 		return err
 	}
-	
+
 	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
 		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
 
