@@ -22,7 +22,7 @@ func (ci *HistoryManagement) GetAllHistoriesByTicket(ctx context.Context, ticket
 	var histories []*model.HistoryWithName
 	err := c.WithContext(ctx).Select(c.ID, c.TicketID, c.Action, c.PerformedBy, c.CreatedAt, u.NickName).
 		Join(u, c.PerformedBy.EqCol(u.UserID)).
-		Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Scan(histories)
+		Where(c.TicketID.Eq(ticketID)).Order(c.CreatedAt.Desc()).Scan(&histories)
 
 	if err != nil {
 		return nil, err
