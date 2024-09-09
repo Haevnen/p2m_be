@@ -189,39 +189,39 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 	}
 
 	if body.Status != nil {
-		ticket.Status = string(*(body.Status))
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
 			Action:      fmt.Sprintf("User %s update ticket status from %s to %s.", userIdMapping[payload.UserID].NickName, ticket.Status, string(*(body.Status))),
 			PerformedBy: payload.UserID,
 		})
+		ticket.Status = string(*(body.Status))
 	}
 
 	if body.NumOfSingleImage != nil {
-		ticket.NumOfSingleImage = *body.NumOfSingleImage
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
 			Action:      fmt.Sprintf("User %s update quantity of single image from %d to %d.", userIdMapping[payload.UserID].NickName, ticket.NumOfSingleImage, *body.NumOfSingleImage),
 			PerformedBy: payload.UserID,
 		})
+		ticket.NumOfSingleImage = *body.NumOfSingleImage
 	}
 
 	if body.NumOfMultipleImage != nil {
-		ticket.NumOfMultipleImage = *body.NumOfMultipleImage
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
 			Action:      fmt.Sprintf("User %s update quantity of multiple image from %d to %d.", userIdMapping[payload.UserID].NickName, ticket.NumOfMultipleImage, *body.NumOfMultipleImage),
 			PerformedBy: payload.UserID,
 		})
+		ticket.NumOfMultipleImage = *body.NumOfMultipleImage
 	}
 
 	if body.Priority != nil {
-		ticket.Priority = string(*body.Priority)
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
 			Action:      fmt.Sprintf("User %s update ticket priority from %s to %s.", userIdMapping[payload.UserID].NickName, ticket.Priority, string(*(body.Priority))),
 			PerformedBy: payload.UserID,
 		})
+		ticket.Priority = string(*body.Priority)
 	}
 
 	if body.QcName != nil {
@@ -229,12 +229,12 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 			return apperror.ErrQCNameNotExists
 		}
 
-		ticket.QcID = nickNameMapping[*body.QcName].UserId
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
 			Action:      fmt.Sprintf("User %s update QC assignee from %s to %s.", userIdMapping[payload.UserID].NickName, userIdMapping[ticket.QcID].NickName, *body.QcName),
 			PerformedBy: payload.UserID,
 		})
+		ticket.QcID = nickNameMapping[*body.QcName].UserId
 	}
 
 	if body.EditorName != nil {
@@ -242,12 +242,12 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 			return apperror.ErrEditorNameNotExists
 		}
 
-		ticket.EditorID = nickNameMapping[*body.EditorName].UserId
 		histories = append(histories, &model.History{
 			TicketID:    ticket.ID,
 			Action:      fmt.Sprintf("User %s update Editor assignee from %s to %s.", userIdMapping[payload.UserID].NickName, userIdMapping[ticket.EditorID].NickName, *body.EditorName),
 			PerformedBy: payload.UserID,
 		})
+		ticket.EditorID = nickNameMapping[*body.EditorName].UserId
 	}
 
 	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
