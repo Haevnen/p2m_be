@@ -141,7 +141,8 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		return err
 	}
 
-	if body.Status != nil && string(*(body.Status)) == string(p2mapi.DONE) {
+	// Only admin user can update status from DONE to another
+	if body.Status != nil && ticket.Status == string(p2mapi.DONE) {
 		if !payload.IsAdmin {
 			return apperror.ErrForbidden
 		}
@@ -306,7 +307,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		// List all ticket not completed (for all day)
 		Where(tid.Where(ti.Status.Neq(string(p2mapi.DONE))).
 			// Or List all ticket in status DONE (for current day)
-			Or(tid.Where(ti.CreatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2mapi.DONE)))))
+			Or(tid.Where(ti.UpdatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2mapi.DONE)))))
 	// List by priority and updated_at asc
 	ticketQuery.Order(ti.Priority.Desc()).Order(ti.UpdatedAt.Desc())
 
