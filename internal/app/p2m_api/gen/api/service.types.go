@@ -149,6 +149,9 @@ type ListTicket struct {
 	Priority   Priority `json:"priority"`
 	QcName     string   `json:"qc_name"`
 	Title      string   `json:"title"`
+
+	// UpdatedAt timestamp
+	UpdatedAt string `json:"updated_at"`
 }
 
 // ListTicketItem defines model for ListTicketItem.

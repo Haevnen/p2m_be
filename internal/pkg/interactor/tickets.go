@@ -14,6 +14,7 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
+	"github.com/Haevnen/p2m_be/pkg/constants"
 	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
@@ -293,7 +294,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 	now := time.Now()
 	// general query
 	// Only return needed fields (title, ticket-number, status, priority)
-	ticketQuery := tid.Select(ti.Title, ti.ID, ti.Status, ti.Priority, ti.QcID, ti.EditorID).
+	ticketQuery := tid.Select(ti.Title, ti.ID, ti.Status, ti.Priority, ti.QcID, ti.EditorID, ti.UpdatedAt).
 		// Ignore deleted ticket
 		Where(ti.IsActive.Is(true)).
 		// List all ticket not completed (for all day)
@@ -342,6 +343,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 				Priority:   p2mapi.Priority(ticket.Priority),
 				QcName:     userIdMapping[ticket.QcID].NickName,
 				Title:      ticket.Title,
+				UpdatedAt:  ticket.UpdatedAt.Format(constants.DateTimeFormat),
 			}
 
 			switch ticket.Status {

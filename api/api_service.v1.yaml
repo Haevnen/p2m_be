@@ -1255,12 +1255,17 @@ components:
           example: "editor_name"
         priority:
           $ref: "#/components/schemas/Priority"
+        updated_at:
+          description: timestamp
+          type: string
+          example: "2022-01-01T00:00:00Z"
       required:
         - id
         - title
         - qc_name
         - editor_name
         - priority
+        - updated_at
     ListTicketItem:
       type: object
       properties:
