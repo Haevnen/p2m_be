@@ -141,6 +141,12 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 		return err
 	}
 
+	if body.Status != nil && string(*(body.Status)) == string(p2mapi.DONE) {
+		if !payload.IsAdmin {
+			return apperror.ErrForbidden
+		}
+	}
+
 	// Get all users
 	users, err := t.userManagement.GetAllUser(ctx, swag.Bool(true))
 	if err != nil {
