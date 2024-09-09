@@ -261,7 +261,7 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 			}
 		}
 
-		_, err = tx.Ticket.WithContext(childCtx).Where(tx.Ticket.ID.Eq(ticketID)).Where(tx.Ticket.IsActive.Is(true)).UpdateColumns(&ticket)
+		_, err = tx.Ticket.WithContext(childCtx).Where(tx.Ticket.ID.Eq(ticketID)).Where(tx.Ticket.IsActive.Is(true)).Omit(tx.Ticket.UpdatedAt).Updates(&ticket)
 		return err
 	})
 }
