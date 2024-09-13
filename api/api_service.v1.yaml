@@ -1181,10 +1181,14 @@ components:
         nick_name:
           type: string
           example: "nickname"
+        created_at:
+          description: timestamp
+          type: string
       required:
         - id
         - comment
         - ticket_id
+        - created_at
     UpdateCommentBody:
       type: object
       properties:

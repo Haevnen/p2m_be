@@ -38,6 +38,7 @@ var (
 		ErrTicketNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2003, msg: "The ticket is not found. "},
 		ErrQCNameNotExists:                 {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2004, msg: "The QC name is not found. "},
 		ErrEditorNameNotExists:             {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2005, msg: "The editor name is not found. "},
+		ErrPermissionDenied:                {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode2006, msg: "The user is not allowed to update or remove resource "},
 	}
 )
 
@@ -60,5 +61,6 @@ const (
 	errCode2003     = "ERR_2003"
 	errCode2004     = "ERR_2004"
 	errCode2005     = "ERR_2005"
+	errCode2006     = "ERR_2006"
 	errCode3000     = "ERR_3000"
 )

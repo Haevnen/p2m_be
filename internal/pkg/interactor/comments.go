@@ -34,7 +34,7 @@ func (ci *CommentManagement) CreateComment(ctx context.Context, client p2mapi.Cr
 	}
 	commentDb.UserID = payload.UserID
 
-	err := c.WithContext(ctx).Save(&commentDb)
+	err := c.WithContext(ctx).Create(&commentDb)
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +65,15 @@ func (ci *CommentManagement) UpdateComment(ctx context.Context, commentID int64,
 		return err
 	}
 
+	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
+	if payload == nil {
+		return apperror.ErrUserNotExists
+	}
+
+	if payload.UserID != comment.UserID {
+		return apperror.ErrPermissionDenied
+	}
+
 	comment.Comment = body.Comment
 
 	_, err = c.WithContext(ctx).Where(c.ID.Eq(commentID)).UpdateColumns(comment)
@@ -78,6 +87,15 @@ func (ci *CommentManagement) DeleteComment(ctx context.Context, commentID int64)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return apperror.ErrRecordNotFound
 		}
+	}
+
+	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
+	if payload == nil {
+		return apperror.ErrUserNotExists
+	}
+
+	if payload.UserID != comment.UserID {
+		return apperror.ErrPermissionDenied
 	}
 
 	_, err = c.WithContext(ctx).Where(c.ID.Eq(commentID)).Delete(comment)

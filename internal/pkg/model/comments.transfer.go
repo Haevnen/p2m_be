@@ -1,7 +1,10 @@
 package model
 
 import (
+	"time"
+
 	p2mapi "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
+	"github.com/Haevnen/p2m_be/pkg/constants"
 )
 
 type CommentWithName struct {
@@ -12,6 +15,7 @@ type CommentWithName struct {
 func (c *Comment) ToComment(comment p2mapi.CreateCommentBody) {
 	c.Comment = comment.Comment
 	c.TicketID = comment.TicketId
+	c.CreatedAt = time.Now()
 }
 
 func (c *Comment) FromComment(nickName string) *CommentWithName {
@@ -23,9 +27,10 @@ func (c *Comment) FromComment(nickName string) *CommentWithName {
 
 func (cn *CommentWithName) FromCommentWithName() *p2mapi.CommentResponse {
 	return &p2mapi.CommentResponse{
-		Comment:  cn.Comment.Comment,
-		TicketId: cn.TicketID,
-		Id:       cn.ID,
-		NickName: &cn.NickName,
+		Comment:   cn.Comment.Comment,
+		TicketId:  cn.TicketID,
+		Id:        cn.ID,
+		NickName:  &cn.NickName,
+		CreatedAt: cn.Comment.CreatedAt.Format(constants.DateTimeFormat),
 	}
 }

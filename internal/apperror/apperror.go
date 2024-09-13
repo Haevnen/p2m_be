@@ -44,6 +44,7 @@ var (
 	ErrTicketNotFound                   = errors.New("ERR_TICKET_NOT_FOUND")
 	ErrQCNameNotExists                  = errors.New("ERR_QC_NAME_NOT_EXISTS")
 	ErrEditorNameNotExists              = errors.New("ERR_EDITOR_NAME_NOT_EXISTS")
+	ErrPermissionDenied                 = errors.New("ERR_PERMISSION_DENIED")
 )
 
 // New constructor

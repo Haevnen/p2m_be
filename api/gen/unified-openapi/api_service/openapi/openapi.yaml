@@ -1658,6 +1658,7 @@ components:
     CommentResponse:
       example:
         nick_name: nickname
+        created_at: created_at
         comment: comment
         id: 1
         ticket_id: 1
@@ -1676,8 +1677,12 @@ components:
         nick_name:
           example: nickname
           type: string
+        created_at:
+          description: timestamp
+          type: string
       required:
       - comment
+      - created_at
       - id
       - ticket_id
       type: object

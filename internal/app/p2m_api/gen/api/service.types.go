@@ -63,10 +63,13 @@ type ClientResponse struct {
 
 // CommentResponse defines model for CommentResponse.
 type CommentResponse struct {
-	Comment  string  `json:"comment"`
-	Id       int64   `json:"id"`
-	NickName *string `json:"nick_name,omitempty"`
-	TicketId int64   `json:"ticket_id"`
+	Comment string `json:"comment"`
+
+	// CreatedAt timestamp
+	CreatedAt string  `json:"created_at"`
+	Id        int64   `json:"id"`
+	NickName  *string `json:"nick_name,omitempty"`
+	TicketId  int64   `json:"ticket_id"`
 }
 
 // ContractType defines model for ContractType.
