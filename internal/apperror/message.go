@@ -36,9 +36,11 @@ var (
 		ErrClientHasIDExists:               {httpStatus: http.StatusConflict, resType: string(api.ValidationFailed), errCode: errCode3000, msg: "The client has the id already exists."},
 		ErrUserNotExists:                   {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode2002, msg: "The user didn't exists."},
 		ErrTicketNotFound:                  {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2003, msg: "The ticket is not found. "},
+		ErrTicketHasBeenDeleted:            {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2008, msg: "The ticket has been deleted. "},
 		ErrQCNameNotExists:                 {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2004, msg: "The QC name is not found. "},
 		ErrEditorNameNotExists:             {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2005, msg: "The editor name is not found. "},
 		ErrPermissionDenied:                {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode2006, msg: "The user is not allowed to update or remove resource "},
+		ErrViewPermissionDenied:            {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode2007, msg: "The user is not allowed to view resource "},
 	}
 )
 
@@ -62,5 +64,8 @@ const (
 	errCode2004     = "ERR_2004"
 	errCode2005     = "ERR_2005"
 	errCode2006     = "ERR_2006"
-	errCode3000     = "ERR_3000"
+	errCode2007     = "ERR_2007"
+	errCode2008     = "ERR_2008"
+
+	errCode3000 = "ERR_3000"
 )

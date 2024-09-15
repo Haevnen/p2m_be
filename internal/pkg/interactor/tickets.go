@@ -389,7 +389,32 @@ func (t *TicketManagement) GetTicketById(ctx context.Context, ticketId int64) (*
 		Where(ti.ID.Eq(ticketId)).Scan(&ticketDb)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperror.ErrTicketNotFound
+		}
 		return nil, err
+	}
+
+	if !ticketDb.IsActive {
+		return nil, apperror.ErrTicketHasBeenDeleted
+	}
+
+	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
+	if payload == nil {
+		return nil, apperror.ErrUserNotExists
+	}
+
+	// get user type
+	user, err := ue.WithContext(ctx).Where(ue.UserID.Eq(payload.UserID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperror.ErrUserNotExists
+		}
+		return nil, err
+	}
+
+	if user.ContractType == string(p2mapi.FREELANCE) && payload.UserID != ticketDb.EditorID && payload.UserID != ticketDb.QcID {
+		return nil, apperror.ErrViewPermissionDenied
 	}
 
 	return ticketDb.FromTicket(), err
