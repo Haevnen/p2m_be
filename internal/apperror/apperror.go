@@ -45,6 +45,8 @@ var (
 	ErrQCNameNotExists                  = errors.New("ERR_QC_NAME_NOT_EXISTS")
 	ErrEditorNameNotExists              = errors.New("ERR_EDITOR_NAME_NOT_EXISTS")
 	ErrPermissionDenied                 = errors.New("ERR_PERMISSION_DENIED")
+	ErrViewPermissionDenied             = errors.New("ERR_VIEW_PERMISSION_DENIED")
+	ErrTicketHasBeenDeleted             = errors.New("ERR_TICKET_HAS_BEEN_DELETED")
 )
 
 // New constructor
