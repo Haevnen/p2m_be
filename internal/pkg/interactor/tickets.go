@@ -383,7 +383,7 @@ func (t *TicketManagement) GetTicketById(ctx context.Context, ticketId int64) (*
 
 	var ticketDb *model.TicketSingle
 	err := tid.Select(ci.ClientID.As("client_id_str"), ti.CreatedBy, ti.Description, ue.NickName.As("editor_name"), ti.ID, ti.NumOfMultipleImage,
-		ti.NumOfSingleImage, ti.Priority, uc.NickName.As("qc_name"), ti.Status, ti.Title, ti.IsActive).
+		ti.NumOfSingleImage, ti.Priority, uc.NickName.As("qc_name"), ti.Status, ti.Title, ti.IsActive, ti.EditorID, ti.QcID).
 		Join(ci, ti.ClientID.EqCol(ci.ID)).
 		Join(ue, ti.EditorID.EqCol(ue.UserID)).
 		Join(uc, ti.QcID.EqCol(uc.UserID)).
