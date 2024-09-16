@@ -379,6 +379,7 @@ func (t *TicketManagement) GetTicketById(ctx context.Context, ticketId int64) (*
 	ue := dal.Q.User.As("ue")
 	uc := dal.Q.User.As("uc")
 	ci := dal.Q.Client.As("ci")
+	u := dal.Q.User
 
 	var ticketDb *model.TicketSingle
 	err := tid.Select(ci.ClientID.As("client_id_str"), ti.CreatedBy, ti.Description, ue.NickName.As("editor_name"), ti.ID, ti.NumOfMultipleImage,
@@ -405,7 +406,7 @@ func (t *TicketManagement) GetTicketById(ctx context.Context, ticketId int64) (*
 	}
 
 	// get user type
-	user, err := ue.WithContext(ctx).Where(ue.UserID.Eq(payload.UserID)).First()
+	user, err := u.WithContext(ctx).Where(u.UserID.Eq(payload.UserID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperror.ErrUserNotExists
