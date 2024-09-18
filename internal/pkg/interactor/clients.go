@@ -35,7 +35,7 @@ func (ci *ClientManagement) CreateClient(ctx context.Context, client p2mapi.Clie
 		return nil, err
 	}
 	if clientCheck != nil {
-		return nil, apperror.ErrClientHasIDExists
+		return clientCheck.FromClient(), apperror.ErrClientHasIDExists
 	}
 
 	err = c.WithContext(ctx).Save(&clientDb)

@@ -58,6 +58,7 @@ type TicketManagementInterface interface {
 	GetAllTicketsByContractType(ctx context.Context) ([]*p2mapi.ListTicketItem, error)
 	GetTicketById(ctx context.Context, ticketId int64) (*p2mapi.SingleTicketResponse, error)
 	DeleteTicket(ctx context.Context, ticketID int64) error
+	AddTicketAuto(ctx context.Context, body p2mapi.CreateTicketAutoBody) error
 }
 type Maker interface {
 	// Return token, payload and error

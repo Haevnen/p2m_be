@@ -5,6 +5,11 @@ enum contract_type {
 	freelancer
 }
 
+enum request_status {
+    failed
+    done
+}
+
 enum ticket_status {
     backlog
     in_progress
@@ -98,5 +103,14 @@ Table histories {
     ticket_id bigint [not null, ref: > tickets.id]
     action text 
     performed_by char(36) [not null, ref: > users.user_id]
+    created_at timestamp [not null, default: `now()`]
+}
+
+Table nas_requests {
+    id bigint [increment, primary key]
+    nas_id integer [not null]
+    payload text [not null]
+    status request_status [not null]
+    error text
     created_at timestamp [not null, default: `now()`]
 }

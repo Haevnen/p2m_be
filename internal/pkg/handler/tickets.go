@@ -92,3 +92,18 @@ func (h ticketHandler) InternalGetTicket(c *gin.Context, ticketId int64) {
 
 	c.JSON(http.StatusOK, ticket)
 }
+
+func (h ticketHandler) InternalAddicketAuto(c *gin.Context) {
+	var addTicketAutoBody p2m_api.CreateTicketAutoBody
+	if err := bindRequestBody(c, &addTicketAutoBody); err != nil {
+		SendError(c, err.Error(), apperror.ErrInvalidRequestInput)
+		return
+	}
+
+	err := h.ticketManagementInteractor.AddTicketAuto(c, addTicketAutoBody)
+	if err != nil {
+		SendError(c, "add ticket auto error", err)
+	}
+
+	c.JSON(http.StatusOK, "add ticket auto successfully")
+}
