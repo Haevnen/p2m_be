@@ -460,21 +460,21 @@ func (t *TicketManagement) DeleteTicket(ctx context.Context, ticketID int64) err
 }
 
 func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.CreateTicketAutoBody) error {
-	// Parse folders in payload
-	newTickets := make([]*model.Ticket, 0)
-
+	// Get unassigned user to create ticket later
 	u := dal.Q.User
 	unassignedUser, err := u.WithContext(ctx).Where(u.NickName.Eq("unassigned")).First()
 	if err != nil {
 		return err
 	}
 
+	// Parse folders in body
+	newTickets := make([]*model.Ticket, 0)
 	for _, folder := range body.Folders {
 		// parse the folder's path to get title and client_id
 		// i.e., /volume5/FOR DEVELOPER/CLIENTS/SAW/UPLOAD/2024/7/21/LIBERTY BELL/LIBERTY BELL.zip
 
 		parts := strings.Split(folder, "/")
-		// We may need to update this logic when apply in PROD
+		// TODO: We may need to update this logic when apply in PROD
 		if len(parts) < 10 {
 			continue
 		}
@@ -519,17 +519,17 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 			if err != nil {
 				return err
 			}
-		}
 
-		// Create history
-		for _, ticket := range newTickets {
-			err := tx.History.WithContext(childCtx).Create(&model.History{
-				TicketID:    ticket.ID,
-				Action:      fmt.Sprintf("Ticket is created by %s", string(p2mapi.AUTO)),
-				PerformedBy: unassignedUser.UserID,
-			})
-			if err != nil {
-				return err
+			// Create history
+			for _, ticket := range newTickets {
+				err := tx.History.WithContext(childCtx).Create(&model.History{
+					TicketID:    ticket.ID,
+					Action:      fmt.Sprintf("Ticket is created by %s", string(p2mapi.AUTO)),
+					PerformedBy: unassignedUser.UserID,
+				})
+				if err != nil {
+					return err
+				}
 			}
 		}
 
