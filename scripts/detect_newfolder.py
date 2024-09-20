@@ -110,4 +110,4 @@ def main():
     logging.info("Script execution finished.")
 
 if __name__ == "__main__":
-    main()"
+    main()
