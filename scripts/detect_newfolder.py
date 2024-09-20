@@ -10,11 +10,11 @@ from logging.handlers import RotatingFileHandler
 
 # Configuration
 # TODO: Update env to each NAS device
-FOLDER_TO_WATCH = "/volume5/FOR DEVELOPER/CLIENTS"
+FOLDER_TO_WATCH = "/Users/phan.van.thanh/Desktop/CLIENTS"
 WEBHOOK_URL = "http://localhost:38081/api/v1/tickets/add_auto"
-LAST_RUN_FILE = "/volume5/FOR DEVELOPER/scripts/last_run.txt"
+LAST_RUN_FILE = "/Users/phan.van.thanh/Desktop/scripts/last_run.txt"
 NAS_ID = 1
-LOG_FILE = "/volume5/FOR DEVELOPER/scripts/watch_folders.log"
+LOG_FILE = "/Users/phan.van.thanh/Desktop/scripts/watch_folders.log"
 
 # Set the request headers
 headers = {
