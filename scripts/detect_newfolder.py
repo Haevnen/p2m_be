@@ -10,11 +10,11 @@ from logging.handlers import RotatingFileHandler
 
 # Configuration
 # TODO: Update env to each NAS device
-FOLDER_TO_WATCH = "/Users/phan.van.thanh/Desktop/CLIENTS"
+FOLDER_TO_WATCH = "/volume5/FOR DEVELOPER/CLIENTS"
 WEBHOOK_URL = "http://localhost:38081/api/v1/tickets/add_auto"
-LAST_RUN_FILE = "/Users/phan.van.thanh/Desktop/scripts/last_run.txt"
+LAST_RUN_FILE = "/volume5/FOR DEVELOPER/scripts/last_run.txt"
 NAS_ID = 1
-LOG_FILE = "/Users/phan.van.thanh/Desktop/scripts/watch_folders.log"
+LOG_FILE = "/volume5/FOR DEVELOPER/scripts/watch_folders.log"
 
 # Set the request headers
 headers = {
@@ -31,7 +31,7 @@ log_handler = RotatingFileHandler(
 
 logging.basicConfig(
     handlers=[log_handler],
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s [%(levelname)s] %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
@@ -58,11 +58,14 @@ def save_current_time(timestamp):
 
 def find_new_folders(folder, last_run):
     new_folders = []
+    logging.info("Scanning for new folders...")
     for root, directories, _ in os.walk(folder):
+        logging.info(f"root: {root}")
+        logging.info(f"directories: {directories}")
         for directory_name in directories:
             directory_path = os.path.join(root, directory_name)
             try:
-                if os.path.getmtime(directory_path) > last_run_time:
+                if os.path.getmtime(directory_path) > last_run:
                     new_folders.append(directory_path)
                     logging.debug(f"New folder detected: {directory_path}")
             except FileNotFoundError:
@@ -104,7 +107,7 @@ def main():
 
     if new_folders and not is_first_run:
         logging.info(f"Detected {len(new_folders)} new folder(s). Sending webhook.")
-        send_webhook(new_folders)
+        # send_webhook(new_folders)
 
     save_current_time(current_time)
     logging.info("Script execution finished.")
