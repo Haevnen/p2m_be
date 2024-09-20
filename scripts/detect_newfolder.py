@@ -60,8 +60,6 @@ def find_new_folders(folder, last_run):
     new_folders = []
     logging.info("Scanning for new folders...")
     for root, directories, _ in os.walk(folder):
-        logging.info(f"root: {root}")
-        logging.info(f"directories: {directories}")
         for directory_name in directories:
             directory_path = os.path.join(root, directory_name)
             try:
@@ -101,7 +99,7 @@ def main():
     last_run = get_last_run_time()
 
     # To prevent send a lot of existing dir in the first run
-    is_first_run = last_run == 0
+    is_first_run = last_run == 0 or (current_time - last_run) > 1200
 
     new_folders = find_new_folders(FOLDER_TO_WATCH, last_run)
 
