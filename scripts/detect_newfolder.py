@@ -77,13 +77,14 @@ def send_webhook(new_folders):
         "nas_id": NAS_ID,
         "folders": new_folders
     }
+    curl_command = log_curl_request(WEBHOOK_URL, headers, payload)
     try:
         response = requests.post(WEBHOOK_URL, headers=headers, json=payload, timeout=10)
         response.raise_for_status()
         logging.info(f"Webhook sent successfully. Status code: {response.status_code}. Payload: {payload}")
     except requests.RequestException as e:
         logging.error(f"Failed to send webhook. Error: {e}. Payload: {payload}")
-        log_curl_request(WEBHOOK_URL, headers, payload)
+        send_telegram_topic_message(curl_command, str(e))
 
 def log_curl_request(url, headers, payload):
     # Construct cURL command equivalent
@@ -91,7 +92,21 @@ def log_curl_request(url, headers, payload):
     for key, value in headers.items():
         curl_command += f"-H '{key}: {value}' "
     curl_command += f"-d '{json.dumps(payload)}'"
-    logging.error(f"Equivalent cURL command for failed request: {curl_command}")
+    logging.info(f"Request: {curl_command})
+    return curl_command
+
+def send_telegram_topic_message(curl_command, error):
+    bot_token = 'xxxx'
+    chat_id = 'yyyy'
+    message_thread_id = 'zzzz'
+
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': f"{curl_command}\n{error}",
+        'message_thread_id': message_thread_id
+    }
+    requests.post(url, data=payload, timeout=10)
 
 def main():
     logging.info("Script execution started.")
