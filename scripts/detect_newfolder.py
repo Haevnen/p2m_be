@@ -57,20 +57,20 @@ def save_current_time(timestamp):
 
 
 def find_new_folders(folder, last_run):
-    new_folders = []
+    new_folders = set()
     logging.info("Scanning for new folders...")
     for root, directories, _ in os.walk(folder):
         for directory_name in directories:
             directory_path = os.path.join(root, directory_name)
             try:
                 if os.path.getmtime(directory_path) > last_run:
-                    new_folders.append(directory_path)
+                    new_folders.add(directory_path)
                     logging.debug(f"New folder detected: {directory_path}")
             except FileNotFoundError:
                 logging.warning(f"Directory {directory_path} was not found.")
             except Exception as e:
                 logging.error(f"Error accessing {directory_path}: {e}")
-    return new_folders
+    return list(new_folders)
 
 def send_webhook(new_folders):
     payload = {
@@ -92,7 +92,7 @@ def log_curl_request(url, headers, payload):
     for key, value in headers.items():
         curl_command += f"-H '{key}: {value}' "
     curl_command += f"-d '{json.dumps(payload)}'"
-    logging.info(f"Request: {curl_command})
+    logging.info(f"Request: {curl_command}")
     return curl_command
 
 def send_telegram_topic_message(curl_command, error):
@@ -120,7 +120,7 @@ def main():
 
     if new_folders and not is_first_run:
         logging.info(f"Detected {len(new_folders)} new folder(s). Sending webhook.")
-        # send_webhook(new_folders)
+        send_webhook(new_folders)
 
     save_current_time(current_time)
     logging.info("Script execution finished.")
