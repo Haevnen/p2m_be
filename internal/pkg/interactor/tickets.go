@@ -491,7 +491,7 @@ func (t *TicketManagement) createOrGetClient(ctx context.Context, clientID strin
 // Check if a ticket already exists for the given title and client ID
 func ticketExists(ctx context.Context, title string, ID int32) (bool, error) {
 	ti := dal.Q.Ticket
-	ticket, err := ti.WithContext(ctx).Where(ti.Title.Eq(title)).Where(ti.ClientID.Eq(ID)).First()
+	ticket, err := ti.WithContext(ctx).Where(ti.Title.Eq(title)).Where(ti.ClientID.Eq(ID)).Where(ti.IsActive.Is(true)).First()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
 	}
