@@ -81,6 +81,12 @@ type CreateCommentBody struct {
 	TicketId int64  `json:"ticket_id"`
 }
 
+// CreateTicketAutoBody defines model for CreateTicketAutoBody.
+type CreateTicketAutoBody struct {
+	Folders []string `json:"folders"`
+	NasId   int32    `json:"nas_id"`
+}
+
 // CreateTicketBody defines model for CreateTicketBody.
 type CreateTicketBody struct {
 	ClientId    string    `json:"client_id"`
@@ -397,6 +403,9 @@ type InternalRefreshTokenJSONRequestBody = RefreshTokenBody
 
 // InternalAddTicketJSONRequestBody defines body for InternalAddTicket for application/json ContentType.
 type InternalAddTicketJSONRequestBody = CreateTicketBody
+
+// InternalAddicketAutoJSONRequestBody defines body for InternalAddicketAuto for application/json ContentType.
+type InternalAddicketAutoJSONRequestBody = CreateTicketAutoBody
 
 // InternalUpdateTicketJSONRequestBody defines body for InternalUpdateTicket for application/json ContentType.
 type InternalUpdateTicketJSONRequestBody = UpdateTicketBody

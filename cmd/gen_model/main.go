@@ -43,6 +43,9 @@ func main() {
 
 		// Generate struct `Histories` based on table `histories`
 		g.GenerateModel("histories"),
+
+		// Generate struct `NasRequests` based on table `nas_requests`
+		g.GenerateModel("nas_requests"),
 	)
 
 	// Generate the code

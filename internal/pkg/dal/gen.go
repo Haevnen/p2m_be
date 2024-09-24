@@ -16,14 +16,15 @@ import (
 )
 
 var (
-	Q       = new(Query)
-	Client  *client
-	Comment *comment
-	History *history
-	Link    *link
-	Session *session
-	Ticket  *ticket
-	User    *user
+	Q          = new(Query)
+	Client     *client
+	Comment    *comment
+	History    *history
+	Link       *link
+	NasRequest *nasRequest
+	Session    *session
+	Ticket     *ticket
+	User       *user
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -32,6 +33,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Comment = &Q.Comment
 	History = &Q.History
 	Link = &Q.Link
+	NasRequest = &Q.NasRequest
 	Session = &Q.Session
 	Ticket = &Q.Ticket
 	User = &Q.User
@@ -39,41 +41,44 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:      db,
-		Client:  newClient(db, opts...),
-		Comment: newComment(db, opts...),
-		History: newHistory(db, opts...),
-		Link:    newLink(db, opts...),
-		Session: newSession(db, opts...),
-		Ticket:  newTicket(db, opts...),
-		User:    newUser(db, opts...),
+		db:         db,
+		Client:     newClient(db, opts...),
+		Comment:    newComment(db, opts...),
+		History:    newHistory(db, opts...),
+		Link:       newLink(db, opts...),
+		NasRequest: newNasRequest(db, opts...),
+		Session:    newSession(db, opts...),
+		Ticket:     newTicket(db, opts...),
+		User:       newUser(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Client  client
-	Comment comment
-	History history
-	Link    link
-	Session session
-	Ticket  ticket
-	User    user
+	Client     client
+	Comment    comment
+	History    history
+	Link       link
+	NasRequest nasRequest
+	Session    session
+	Ticket     ticket
+	User       user
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:      db,
-		Client:  q.Client.clone(db),
-		Comment: q.Comment.clone(db),
-		History: q.History.clone(db),
-		Link:    q.Link.clone(db),
-		Session: q.Session.clone(db),
-		Ticket:  q.Ticket.clone(db),
-		User:    q.User.clone(db),
+		db:         db,
+		Client:     q.Client.clone(db),
+		Comment:    q.Comment.clone(db),
+		History:    q.History.clone(db),
+		Link:       q.Link.clone(db),
+		NasRequest: q.NasRequest.clone(db),
+		Session:    q.Session.clone(db),
+		Ticket:     q.Ticket.clone(db),
+		User:       q.User.clone(db),
 	}
 }
 
@@ -87,36 +92,39 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:      db,
-		Client:  q.Client.replaceDB(db),
-		Comment: q.Comment.replaceDB(db),
-		History: q.History.replaceDB(db),
-		Link:    q.Link.replaceDB(db),
-		Session: q.Session.replaceDB(db),
-		Ticket:  q.Ticket.replaceDB(db),
-		User:    q.User.replaceDB(db),
+		db:         db,
+		Client:     q.Client.replaceDB(db),
+		Comment:    q.Comment.replaceDB(db),
+		History:    q.History.replaceDB(db),
+		Link:       q.Link.replaceDB(db),
+		NasRequest: q.NasRequest.replaceDB(db),
+		Session:    q.Session.replaceDB(db),
+		Ticket:     q.Ticket.replaceDB(db),
+		User:       q.User.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Client  *clientDo
-	Comment *commentDo
-	History *historyDo
-	Link    *linkDo
-	Session *sessionDo
-	Ticket  *ticketDo
-	User    *userDo
+	Client     *clientDo
+	Comment    *commentDo
+	History    *historyDo
+	Link       *linkDo
+	NasRequest *nasRequestDo
+	Session    *sessionDo
+	Ticket     *ticketDo
+	User       *userDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Client:  q.Client.WithContext(ctx),
-		Comment: q.Comment.WithContext(ctx),
-		History: q.History.WithContext(ctx),
-		Link:    q.Link.WithContext(ctx),
-		Session: q.Session.WithContext(ctx),
-		Ticket:  q.Ticket.WithContext(ctx),
-		User:    q.User.WithContext(ctx),
+		Client:     q.Client.WithContext(ctx),
+		Comment:    q.Comment.WithContext(ctx),
+		History:    q.History.WithContext(ctx),
+		Link:       q.Link.WithContext(ctx),
+		NasRequest: q.NasRequest.WithContext(ctx),
+		Session:    q.Session.WithContext(ctx),
+		Ticket:     q.Ticket.WithContext(ctx),
+		User:       q.User.WithContext(ctx),
 	}
 }
 

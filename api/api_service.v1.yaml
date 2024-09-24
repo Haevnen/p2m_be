@@ -678,6 +678,25 @@ paths:
         '403':
           $ref: "#/components/responses/Forbidden"
       operationId: internal_removeTicket
+  
+  /tickets/add_auto:
+    post:
+      tags:
+        - Tickets
+      summary: Add new ticket automatically
+      description: Add new ticket automatically
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTicketAutoBody"
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          $ref: "#/components/responses/BadRequest"
+      operationId: internal_addicketAuto
 
   /tickets/add:
     post:
@@ -1362,6 +1381,21 @@ components:
         - priority
         - client_id
         - description
+    CreateTicketAutoBody:
+      type: object
+      properties:
+        nas_id:
+          type: integer
+          format: int32
+          example: 1
+        folders:
+          type: array
+          items:
+            type: string
+            example: "folder1"
+      required:
+        - nas_id
+        - folders
     UpdateTicketBody:
       type: object
       properties:

@@ -1135,6 +1135,28 @@ paths:
       summary: Remove ticket by id
       tags:
       - Tickets
+  /tickets/add_auto:
+    post:
+      description: Add new ticket automatically
+      operationId: internal_addicketAuto
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicketAutoBody'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+      summary: Add new ticket automatically
+      tags:
+      - Tickets
   /tickets/add:
     post:
       description: Add new ticket (only admin)
@@ -1902,6 +1924,26 @@ components:
       - priority
       - qc_name
       - title
+      type: object
+    CreateTicketAutoBody:
+      example:
+        folders:
+        - folder1
+        - folder1
+        nas_id: 1
+      properties:
+        nas_id:
+          example: 1
+          format: int32
+          type: integer
+        folders:
+          items:
+            example: folder1
+            type: string
+          type: array
+      required:
+      - folders
+      - nas_id
       type: object
     UpdateTicketBody:
       example:

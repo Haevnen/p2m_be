@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-openapi/swag"
@@ -456,4 +457,140 @@ func (t *TicketManagement) DeleteTicket(ctx context.Context, ticketID int64) err
 		_, err = tx.Ticket.WithContext(childCtx).Where(tx.Ticket.ID.Eq(ticketID)).UpdateSimple(tx.Ticket.IsActive.Value(false))
 		return err
 	})
+}
+
+// Get unassigned user to create ticket later
+func (t *TicketManagement) getUnassignedUser(ctx context.Context) (*model.User, error) {
+	u := dal.Q.User
+	unassignedUser, err := u.WithContext(ctx).Where(u.NickName.Eq("unassigned")).First()
+	if err != nil {
+		return nil, err
+	}
+	return unassignedUser, nil
+}
+
+// Parse folder path to extract client ID and title
+func (t *TicketManagement) parseFolderPath(folder string) (string, string, error) {
+	parts := strings.Split(folder, "/")
+	// TODO: Ensure there are enough parts in the path
+	if len(parts) < 10 {
+		return "", "", fmt.Errorf("invalid folder path: %s", folder)
+	}
+	return parts[4], parts[9], nil // Client ID and Title
+}
+
+// Create or get client based on client ID and return its ID
+func (t *TicketManagement) createOrGetClient(ctx context.Context, clientID string) (int32, error) {
+	client, err := t.clientManagement.CreateClient(ctx, p2mapi.ClientBody{ClientId: clientID})
+	if err != nil && !errors.Is(err, apperror.ErrClientHasIDExists) {
+		return 0, err
+	}
+	return client.Id, nil
+}
+
+// Check if a ticket already exists for the given title and client ID
+func ticketExists(ctx context.Context, title string, ID int32) (bool, error) {
+	ti := dal.Q.Ticket
+	ticket, err := ti.WithContext(ctx).Where(ti.Title.Eq(title)).Where(ti.ClientID.Eq(ID)).Where(ti.IsActive.Is(true)).First()
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, err
+	}
+	return ticket != nil, nil
+}
+
+func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.CreateTicketAutoBody) error {
+	unassignedUser, err := t.getUnassignedUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	newTickets := make([]*model.Ticket, 0)
+	visitedTitles := make(map[string]bool)
+	for _, folder := range body.Folders {
+		clientID, title, err := t.parseFolderPath(folder)
+		if err != nil {
+			continue // Skip invalid folders
+		}
+
+		if visitedTitles[title] {
+			continue // Skip if title already exists
+		}
+
+		id, err := t.createOrGetClient(ctx, clientID)
+		if err != nil {
+			return err
+		}
+
+		exists, err := ticketExists(ctx, title, id)
+		if err != nil {
+			return err // Handle error checking for existing tickets
+		}
+
+		if exists {
+			continue // Skip if ticket already exists
+		}
+
+		newTickets = append(newTickets, &model.Ticket{
+			ClientID:  id,
+			Title:     title,
+			CreatedBy: string(p2mapi.AUTO),
+			IsActive:  true,
+			Status:    string(p2mapi.BACKLOG),
+			QcID:      unassignedUser.UserID,
+			EditorID:  unassignedUser.UserID,
+			Priority:  string(p2mapi.NORMAL),
+		})
+
+		visitedTitles[title] = true
+	}
+
+	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
+		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
+
+		// Save request to nas_requests table
+		err := tx.NasRequest.WithContext(childCtx).Create(&model.NasRequest{
+			NasID:   body.NasId,
+			Payload: strings.Join(body.Folders, "\n"),
+			Status:  "DONE",
+		})
+
+		if err != nil {
+			return err
+		}
+
+		// Create ticket
+		if len(newTickets) > 0 {
+			err = tx.Ticket.WithContext(childCtx).CreateInBatches(newTickets, 50)
+			if err != nil {
+				return err
+			}
+
+			// Create history
+			for _, ticket := range newTickets {
+				err := tx.History.WithContext(childCtx).Create(&model.History{
+					TicketID:    ticket.ID,
+					Action:      fmt.Sprintf("Ticket is created by %s", string(p2mapi.AUTO)),
+					PerformedBy: unassignedUser.UserID,
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+}
+
+func (t *TicketManagement) AddTicketAuto(ctx context.Context, body p2mapi.CreateTicketAutoBody) error {
+	err := t.AddTicketAutoHelper(ctx, body)
+	if err != nil {
+		dal.Q.NasRequest.WithContext(ctx).Create(&model.NasRequest{
+			NasID:   body.NasId,
+			Payload: strings.Join(body.Folders, "\n"),
+			Status:  "FAILED",
+			Error:   err.Error(),
+		})
+	}
+	return err
 }

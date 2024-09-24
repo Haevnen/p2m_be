@@ -19,7 +19,7 @@ func needsAuthentication(ctx *gin.Context) bool {
 	// 2. Refresh token
 
 	relativePath := strings.TrimPrefix(ctx.FullPath(), constants.BaseURL)
-	return !(relativePath == "/login" || relativePath == "/refresh-token")
+	return !(relativePath == "/login" || relativePath == "/refresh-token" || relativePath == "/tickets/add_auto")
 }
 
 func Authentication(tokenMaker interactorinterface.Maker) p2m_api.MiddlewareFunc {
