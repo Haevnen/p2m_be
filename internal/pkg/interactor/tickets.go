@@ -19,6 +19,8 @@ import (
 	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
+const defaultDescription = `<p class="editor-paragraph"><br></p>`
+
 type TicketManagement struct {
 	userManagement   interactorinterface.UserManagementInterface
 	clientManagement interactorinterface.ClientManagementInterface
@@ -543,14 +545,15 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		}
 
 		newTickets = append(newTickets, &model.Ticket{
-			ClientID:     id,
-			Title:        title,
-			CreatedBy:    string(p2mapi.AUTO),
-			IsActive:     true,
-			Status:       string(p2mapi.BACKLOG),
-			QcID:         unassignedUser.UserID,
-			EditorID:     unassignedUser.UserID,
-			Priority:     string(p2mapi.NORMAL),
+			ClientID:    id,
+			Title:       title,
+			CreatedBy:   string(p2mapi.AUTO),
+			IsActive:    true,
+			Status:      string(p2mapi.BACKLOG),
+			QcID:        unassignedUser.UserID,
+			EditorID:    unassignedUser.UserID,
+			Priority:    string(p2mapi.NORMAL),
+			Description: defaultDescription,
 			OriginalPath: folder,
 		})
 
