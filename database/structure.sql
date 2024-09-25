@@ -113,6 +113,24 @@ CREATE TABLE `nas_requests` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `nas_servers`
+--
+
+DROP TABLE IF EXISTS `nas_servers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `nas_servers` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `nas_id` int NOT NULL,
+  `name` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL,
+  `root_path` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL,
+  `internal_path` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT (now()),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `sessions`
 --
 

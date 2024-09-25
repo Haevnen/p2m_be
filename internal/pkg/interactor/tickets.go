@@ -479,6 +479,15 @@ func (t *TicketManagement) parseFolderPath(folder string) (string, string, error
 	return parts[4], parts[9], nil // Client ID and Title
 }
 
+// Parse folder path to get internal path
+func (t *TicketManagement) parseFolderPathToGetInternalLink(root, folder string) (string, error) {
+	indexOfRoot := strings.Index(folder, root)
+	if indexOfRoot == -1 {
+		return "", fmt.Errorf("invalid folder path: %s", folder)
+	}
+	return folder[indexOfRoot+len(root):], nil
+}
+
 // Create or get client based on client ID and return its ID
 func (t *TicketManagement) createOrGetClient(ctx context.Context, clientID string) (int32, error) {
 	client, err := t.clientManagement.CreateClient(ctx, p2mapi.ClientBody{ClientId: clientID})
@@ -491,6 +500,7 @@ func (t *TicketManagement) createOrGetClient(ctx context.Context, clientID strin
 // Check if a ticket already exists for the given title and client ID
 func ticketExists(ctx context.Context, title string, ID int32) (bool, error) {
 	ti := dal.Q.Ticket
+
 	ticket, err := ti.WithContext(ctx).Where(ti.Title.Eq(title)).Where(ti.ClientID.Eq(ID)).Where(ti.IsActive.Is(true)).First()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
@@ -499,6 +509,8 @@ func ticketExists(ctx context.Context, title string, ID int32) (bool, error) {
 }
 
 func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.CreateTicketAutoBody) error {
+	na := dal.Q.NasServer
+
 	unassignedUser, err := t.getUnassignedUser(ctx)
 	if err != nil {
 		return err
@@ -531,17 +543,23 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		}
 
 		newTickets = append(newTickets, &model.Ticket{
-			ClientID:  id,
-			Title:     title,
-			CreatedBy: string(p2mapi.AUTO),
-			IsActive:  true,
-			Status:    string(p2mapi.BACKLOG),
-			QcID:      unassignedUser.UserID,
-			EditorID:  unassignedUser.UserID,
-			Priority:  string(p2mapi.NORMAL),
+			ClientID:     id,
+			Title:        title,
+			CreatedBy:    string(p2mapi.AUTO),
+			IsActive:     true,
+			Status:       string(p2mapi.BACKLOG),
+			QcID:         unassignedUser.UserID,
+			EditorID:     unassignedUser.UserID,
+			Priority:     string(p2mapi.NORMAL),
+			OriginalPath: folder,
 		})
 
 		visitedTitles[title] = true
+	}
+
+	nasServer, err := na.WithContext(ctx).Where(na.NasID.Eq(body.NasId)).First()
+	if err != nil {
+		return err
 	}
 
 	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
@@ -565,12 +583,25 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 				return err
 			}
 
-			// Create history
+			// Create history and link
 			for _, ticket := range newTickets {
+				// history
 				err := tx.History.WithContext(childCtx).Create(&model.History{
 					TicketID:    ticket.ID,
 					Action:      fmt.Sprintf("Ticket is created by %s", string(p2mapi.AUTO)),
 					PerformedBy: unassignedUser.UserID,
+				})
+				if err != nil {
+					return err
+				}
+				// link
+				path, err := t.parseFolderPathToGetInternalLink(nasServer.RootPath, ticket.OriginalPath)
+				if err != nil {
+					return err
+				}
+				err = tx.Link.WithContext(childCtx).Create(&model.Link{
+					TicketID: ticket.ID,
+					Link:     nasServer.InternalPath + path,
 				})
 				if err != nil {
 					return err

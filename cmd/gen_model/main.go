@@ -33,7 +33,7 @@ func main() {
 		g.GenerateModel("clients"),
 
 		// Generate struct `Tickets` based on table `tickets`
-		g.GenerateModel("tickets"),
+		g.GenerateModelAs("tickets", "Ticket", gen.FieldNew("OriginalPath", "string", ignore)),
 
 		// Generate struct `Links` based on table `links`
 		g.GenerateModel("links"),
@@ -46,6 +46,9 @@ func main() {
 
 		// Generate struct `NasRequests` based on table `nas_requests`
 		g.GenerateModel("nas_requests"),
+
+		// Generate struct `NasRequests` based on table `nas_servers`
+		g.GenerateModel("nas_servers"),
 	)
 
 	// Generate the code
