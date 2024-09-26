@@ -46,13 +46,13 @@ func TestTicketManagement_parseFolderPathToGetInternalLink(t1 *testing.T) {
 				clientManagement: tt.fields.clientManagement,
 				txManager:        tt.fields.txManager,
 			}
-			got, err := t.parseFolderPathToGetInternalLink(tt.args.root, tt.args.folder)
+			got, err := t.parseFolderPathToGetTicketMetadata(tt.args.root, tt.args.folder)
 			if (err != nil) != tt.wantErr {
-				t1.Errorf("parseFolderPathToGetInternalLink() error = %v, wantErr %v", err, tt.wantErr)
+				t1.Errorf("parseFolderPathToGetTicketMetadata() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t1.Errorf("parseFolderPathToGetInternalLink() got = %v, want %v", got, tt.want)
+				t1.Errorf("parseFolderPathToGetTicketMetadata() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

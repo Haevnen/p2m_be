@@ -471,23 +471,21 @@ func (t *TicketManagement) getUnassignedUser(ctx context.Context) (*model.User, 
 	return unassignedUser, nil
 }
 
-// Parse folder path to extract client ID and title
-func (t *TicketManagement) parseFolderPath(folder string) (string, string, error) {
-	parts := strings.Split(folder, "/")
-	// TODO: Ensure there are enough parts in the path
-	if len(parts) < 10 {
-		return "", "", fmt.Errorf("invalid folder path: %s", folder)
-	}
-	return parts[4], parts[9], nil // Client ID and Title
-}
-
 // Parse folder path to get internal path
-func (t *TicketManagement) parseFolderPathToGetInternalLink(root, folder string) (string, error) {
+func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder string) (string, string, string, error) {
 	indexOfRoot := strings.Index(folder, root)
 	if indexOfRoot == -1 {
-		return "", fmt.Errorf("invalid folder path: %s", folder)
+		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 	}
-	return folder[indexOfRoot+len(root):], nil
+
+	parts := strings.Split(folder, "/")
+	// E.g., /CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
+	if len(parts) < 8 {
+		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+	}
+
+	// ClientID, Title, InternalLink
+	return parts[2], parts[7], folder[indexOfRoot+len(root):], nil
 }
 
 // Create or get client based on client ID and return its ID
@@ -518,12 +516,17 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		return err
 	}
 
+	nasServer, err := na.WithContext(ctx).Where(na.NasID.Eq(body.NasId)).First()
+	if err != nil {
+		return err
+	}
+
 	newTickets := make([]*model.Ticket, 0)
 	visitedTitles := make(map[string]bool)
 	for _, folder := range body.Folders {
-		clientID, title, err := t.parseFolderPath(folder)
+		clientID, title, internalLink, err := t.parseFolderPathToGetTicketMetadata(nasServer.RootPath, folder)
 		if err != nil {
-			continue // Skip invalid folders
+			continue // Skip invalid folders path
 		}
 
 		if visitedTitles[title] {
@@ -554,15 +557,10 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 			EditorID:     unassignedUser.UserID,
 			Priority:     string(p2mapi.NORMAL),
 			Description:  defaultDescription,
-			OriginalPath: folder,
+			InternalLink: internalLink,
 		})
 
 		visitedTitles[title] = true
-	}
-
-	nasServer, err := na.WithContext(ctx).Where(na.NasID.Eq(body.NasId)).First()
-	if err != nil {
-		return err
 	}
 
 	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
@@ -604,7 +602,7 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 				}
 				err = tx.Link.WithContext(childCtx).Create(&model.Link{
 					TicketID: ticket.ID,
-					Link:     "files://" + nasServer.InternalPath + path,
+					Link:     "files://" + nasServer.InternalPath + ticket.InternalLink,
 				})
 				if err != nil {
 					return err
