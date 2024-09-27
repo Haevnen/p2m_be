@@ -16,6 +16,7 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 	"github.com/Haevnen/p2m_be/pkg/constants"
+	"github.com/Haevnen/p2m_be/pkg/logger"
 	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
@@ -479,13 +480,13 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 	}
 
 	parts := strings.Split(folder, "/")
-	// E.g., /CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
-	if len(parts) < 8 {
+	// E.g., /volume5/CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
+	if len(parts) < 9 {
 		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 	}
 
 	// ClientID, Title, InternalLink
-	return parts[2], parts[7], folder[indexOfRoot+len(root):], nil
+	return parts[3], parts[8], folder[indexOfRoot+len(root):], nil
 }
 
 // Create or get client based on client ID and return its ID
@@ -525,25 +526,31 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 	visitedTitles := make(map[string]bool)
 	for _, folder := range body.Folders {
 		clientID, title, internalLink, err := t.parseFolderPathToGetTicketMetadata(nasServer.RootPath, folder)
+		logger.Info("clientID: %s, title: %s, internalLink: %s", clientID, title, internalLink)
 		if err != nil {
+			logger.Error(err.Error())
 			continue // Skip invalid folders path
 		}
 
 		if visitedTitles[title] {
+			logger.Info("Duplicate title: %s", title)
 			continue // Skip if title already exists
 		}
 
 		id, err := t.createOrGetClient(ctx, clientID)
 		if err != nil {
+			logger.Errorf("Failed to create or get client: %s", clientID)
 			return err
 		}
 
 		exists, err := ticketExists(ctx, title, id)
 		if err != nil {
+			logger.Errorf("Failed to check if ticket exists: %s", title)
 			return err // Handle error checking for existing tickets
 		}
 
 		if exists {
+			logger.Info("Ticket already exists: %s", title)
 			continue // Skip if ticket already exists
 		}
 
