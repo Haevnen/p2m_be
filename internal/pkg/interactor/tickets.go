@@ -596,10 +596,6 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 					return err
 				}
 				// link
-				path, err := t.parseFolderPathToGetInternalLink(nasServer.RootPath, ticket.OriginalPath)
-				if err != nil {
-					return err
-				}
 				err = tx.Link.WithContext(childCtx).Create(&model.Link{
 					TicketID: ticket.ID,
 					Link:     "files://" + nasServer.InternalPath + ticket.InternalLink,
