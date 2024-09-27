@@ -30,6 +30,7 @@ func newNasServer(db *gorm.DB, opts ...gen.DOOption) nasServer {
 	_nasServer.ID = field.NewInt64(tableName, "id")
 	_nasServer.NasID = field.NewInt32(tableName, "nas_id")
 	_nasServer.Name = field.NewString(tableName, "name")
+	_nasServer.IPAddress = field.NewString(tableName, "ip_address")
 	_nasServer.RootPath = field.NewString(tableName, "root_path")
 	_nasServer.InternalPath = field.NewString(tableName, "internal_path")
 	_nasServer.CreatedAt = field.NewTime(tableName, "created_at")
@@ -46,6 +47,7 @@ type nasServer struct {
 	ID           field.Int64
 	NasID        field.Int32
 	Name         field.String
+	IPAddress    field.String
 	RootPath     field.String
 	InternalPath field.String
 	CreatedAt    field.Time
@@ -68,6 +70,7 @@ func (n *nasServer) updateTableName(table string) *nasServer {
 	n.ID = field.NewInt64(table, "id")
 	n.NasID = field.NewInt32(table, "nas_id")
 	n.Name = field.NewString(table, "name")
+	n.IPAddress = field.NewString(table, "ip_address")
 	n.RootPath = field.NewString(table, "root_path")
 	n.InternalPath = field.NewString(table, "internal_path")
 	n.CreatedAt = field.NewTime(table, "created_at")
@@ -97,10 +100,11 @@ func (n *nasServer) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (n *nasServer) fillFieldMap() {
-	n.fieldMap = make(map[string]field.Expr, 6)
+	n.fieldMap = make(map[string]field.Expr, 7)
 	n.fieldMap["id"] = n.ID
 	n.fieldMap["nas_id"] = n.NasID
 	n.fieldMap["name"] = n.Name
+	n.fieldMap["ip_address"] = n.IPAddress
 	n.fieldMap["root_path"] = n.RootPath
 	n.fieldMap["internal_path"] = n.InternalPath
 	n.fieldMap["created_at"] = n.CreatedAt
