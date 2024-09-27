@@ -480,13 +480,13 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 	}
 
 	parts := strings.Split(folder, "/")
-	// E.g., /volume5/CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
-	if len(parts) < 9 {
+	// E.g., /volume5/FOR DEVELOPER/CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
+	if len(parts) < 10 {
 		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 	}
 
 	// ClientID, Title, InternalLink
-	return parts[3], parts[8], folder[indexOfRoot+len(root):], nil
+	return parts[4], parts[9], folder[indexOfRoot+len(root):], nil
 }
 
 // Create or get client based on client ID and return its ID
