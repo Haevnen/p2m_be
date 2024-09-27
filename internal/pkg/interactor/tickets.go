@@ -471,14 +471,21 @@ func (t *TicketManagement) getUnassignedUser(ctx context.Context) (*model.User, 
 	return unassignedUser, nil
 }
 
-// Parse folder path to extract client ID and title
-func (t *TicketManagement) parseFolderPath(folder string) (string, string, error) {
-	parts := strings.Split(folder, "/")
-	// TODO: Ensure there are enough parts in the path
-	if len(parts) < 10 {
-		return "", "", fmt.Errorf("invalid folder path: %s", folder)
+// Parse folder path to get internal path
+func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder string) (string, string, string, error) {
+	indexOfRoot := strings.Index(folder, root)
+	if indexOfRoot == -1 {
+		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 	}
-	return parts[4], parts[9], nil // Client ID and Title
+
+	parts := strings.Split(folder, "/")
+	// E.g., /CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
+	if len(parts) < 8 {
+		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+	}
+
+	// ClientID, Title, InternalLink
+	return parts[2], parts[7], folder[indexOfRoot+len(root):], nil
 }
 
 // Create or get client based on client ID and return its ID
@@ -493,6 +500,7 @@ func (t *TicketManagement) createOrGetClient(ctx context.Context, clientID strin
 // Check if a ticket already exists for the given title and client ID
 func ticketExists(ctx context.Context, title string, ID int32) (bool, error) {
 	ti := dal.Q.Ticket
+
 	ticket, err := ti.WithContext(ctx).Where(ti.Title.Eq(title)).Where(ti.ClientID.Eq(ID)).Where(ti.IsActive.Is(true)).First()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
@@ -501,7 +509,14 @@ func ticketExists(ctx context.Context, title string, ID int32) (bool, error) {
 }
 
 func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.CreateTicketAutoBody) error {
+	na := dal.Q.NasServer
+
 	unassignedUser, err := t.getUnassignedUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	nasServer, err := na.WithContext(ctx).Where(na.NasID.Eq(body.NasId)).First()
 	if err != nil {
 		return err
 	}
@@ -509,9 +524,9 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 	newTickets := make([]*model.Ticket, 0)
 	visitedTitles := make(map[string]bool)
 	for _, folder := range body.Folders {
-		clientID, title, err := t.parseFolderPath(folder)
+		clientID, title, internalLink, err := t.parseFolderPathToGetTicketMetadata(nasServer.RootPath, folder)
 		if err != nil {
-			continue // Skip invalid folders
+			continue // Skip invalid folders path
 		}
 
 		if visitedTitles[title] {
@@ -533,15 +548,16 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		}
 
 		newTickets = append(newTickets, &model.Ticket{
-			ClientID:    id,
-			Title:       title,
-			CreatedBy:   string(p2mapi.AUTO),
-			IsActive:    true,
-			Status:      string(p2mapi.BACKLOG),
-			QcID:        unassignedUser.UserID,
-			EditorID:    unassignedUser.UserID,
-			Priority:    string(p2mapi.NORMAL),
-			Description: defaultDescription,
+			ClientID:     id,
+			Title:        title,
+			CreatedBy:    string(p2mapi.AUTO),
+			IsActive:     true,
+			Status:       string(p2mapi.BACKLOG),
+			QcID:         unassignedUser.UserID,
+			EditorID:     unassignedUser.UserID,
+			Priority:     string(p2mapi.NORMAL),
+			Description:  defaultDescription,
+			InternalLink: internalLink,
 		})
 
 		visitedTitles[title] = true
@@ -568,12 +584,21 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 				return err
 			}
 
-			// Create history
+			// Create history and link
 			for _, ticket := range newTickets {
+				// history
 				err := tx.History.WithContext(childCtx).Create(&model.History{
 					TicketID:    ticket.ID,
 					Action:      fmt.Sprintf("Ticket is created by %s", string(p2mapi.AUTO)),
 					PerformedBy: unassignedUser.UserID,
+				})
+				if err != nil {
+					return err
+				}
+				// link
+				err = tx.Link.WithContext(childCtx).Create(&model.Link{
+					TicketID: ticket.ID,
+					Link:     "files://" + nasServer.InternalPath + ticket.InternalLink,
 				})
 				if err != nil {
 					return err

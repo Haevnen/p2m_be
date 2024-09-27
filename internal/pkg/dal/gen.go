@@ -22,6 +22,7 @@ var (
 	History    *history
 	Link       *link
 	NasRequest *nasRequest
+	NasServer  *nasServer
 	Session    *session
 	Ticket     *ticket
 	User       *user
@@ -34,6 +35,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	History = &Q.History
 	Link = &Q.Link
 	NasRequest = &Q.NasRequest
+	NasServer = &Q.NasServer
 	Session = &Q.Session
 	Ticket = &Q.Ticket
 	User = &Q.User
@@ -47,6 +49,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		History:    newHistory(db, opts...),
 		Link:       newLink(db, opts...),
 		NasRequest: newNasRequest(db, opts...),
+		NasServer:  newNasServer(db, opts...),
 		Session:    newSession(db, opts...),
 		Ticket:     newTicket(db, opts...),
 		User:       newUser(db, opts...),
@@ -61,6 +64,7 @@ type Query struct {
 	History    history
 	Link       link
 	NasRequest nasRequest
+	NasServer  nasServer
 	Session    session
 	Ticket     ticket
 	User       user
@@ -76,6 +80,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		History:    q.History.clone(db),
 		Link:       q.Link.clone(db),
 		NasRequest: q.NasRequest.clone(db),
+		NasServer:  q.NasServer.clone(db),
 		Session:    q.Session.clone(db),
 		Ticket:     q.Ticket.clone(db),
 		User:       q.User.clone(db),
@@ -98,6 +103,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		History:    q.History.replaceDB(db),
 		Link:       q.Link.replaceDB(db),
 		NasRequest: q.NasRequest.replaceDB(db),
+		NasServer:  q.NasServer.replaceDB(db),
 		Session:    q.Session.replaceDB(db),
 		Ticket:     q.Ticket.replaceDB(db),
 		User:       q.User.replaceDB(db),
@@ -110,6 +116,7 @@ type queryCtx struct {
 	History    *historyDo
 	Link       *linkDo
 	NasRequest *nasRequestDo
+	NasServer  *nasServerDo
 	Session    *sessionDo
 	Ticket     *ticketDo
 	User       *userDo
@@ -122,6 +129,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		History:    q.History.WithContext(ctx),
 		Link:       q.Link.WithContext(ctx),
 		NasRequest: q.NasRequest.WithContext(ctx),
+		NasServer:  q.NasServer.WithContext(ctx),
 		Session:    q.Session.WithContext(ctx),
 		Ticket:     q.Ticket.WithContext(ctx),
 		User:       q.User.WithContext(ctx),

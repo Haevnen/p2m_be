@@ -26,6 +26,7 @@ type Ticket struct {
 	IsActive           bool      `gorm:"column:is_active;not null;default:1" json:"is_active"`
 	CreatedAt          time.Time `gorm:"column:created_at;not null;default:now()" json:"created_at"`
 	UpdatedAt          time.Time `gorm:"column:updated_at;not null;default:now()" json:"updated_at"`
+	InternalLink       string    `gorm:"-"`
 }
 
 // TableName Ticket's table name
