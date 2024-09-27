@@ -598,7 +598,7 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 				// link
 				err = tx.Link.WithContext(childCtx).Create(&model.Link{
 					TicketID: ticket.ID,
-					Link:     "files://" + nasServer.InternalPath + ticket.InternalLink,
+					Link:     "file://" + nasServer.InternalPath + ticket.InternalLink,
 				})
 				if err != nil {
 					return err
