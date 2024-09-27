@@ -15,6 +15,7 @@ type NasServer struct {
 	ID           int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
 	NasID        int32     `gorm:"column:nas_id;not null" json:"nas_id"`
 	Name         string    `gorm:"column:name" json:"name"`
+	IPAddress    string    `gorm:"column:ip_address" json:"ip_address"`
 	RootPath     string    `gorm:"column:root_path" json:"root_path"`
 	InternalPath string    `gorm:"column:internal_path" json:"internal_path"`
 	CreatedAt    time.Time `gorm:"column:created_at;not null;default:now()" json:"created_at"`
