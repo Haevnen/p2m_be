@@ -307,7 +307,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 	// general query
 	// Only return needed fields (title, ticket-number, status, priority)
 	ticketQuery := tid.Join(ci, ti.ClientID.EqCol(ci.ID)).
-		Select(ti.Title, ti.ID, ti.Status, ti.Priority, ti.QcID, ti.EditorID, ti.UpdatedAt).
+		Select(ti.Title, ti.ID, ti.Status, ti.Priority, ti.QcID, ti.EditorID, ti.UpdatedAt, ti.ClientID, ti.CreatedAt).
 		// Ignore deleted ticket
 		Where(ti.IsActive.Is(true)).
 		// List all ticket not completed (for all day)
@@ -369,6 +369,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 				Title:      ticket.Title,
 				UpdatedAt:  ticket.UpdatedAt.Format(constants.DateTimeFormat),
 				ClientId:   clientIdMapping[ticket.ClientID].ClientId,
+				CreatedAt:  ticket.CreatedAt.Format(constants.DateTimeFormat),
 			}
 
 			switch ticket.Status {

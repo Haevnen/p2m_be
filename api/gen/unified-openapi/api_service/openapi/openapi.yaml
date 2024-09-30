@@ -1773,6 +1773,7 @@ components:
         editor_name: editor_name
         updated_at: 2022-01-01T00:00:00Z
         qc_name: qc_name
+        created_at: 2022-01-01T00:00:00Z
         id: 1
         title: title
         client_id: client_id
@@ -1799,8 +1800,13 @@ components:
         client_id:
           example: client_id
           type: string
+        created_at:
+          description: timestamp
+          example: 2022-01-01T00:00:00Z
+          type: string
       required:
       - client_id
+      - created_at
       - editor_name
       - id
       - priority
@@ -1814,12 +1820,14 @@ components:
         - editor_name: editor_name
           updated_at: 2022-01-01T00:00:00Z
           qc_name: qc_name
+          created_at: 2022-01-01T00:00:00Z
           id: 1
           title: title
           client_id: client_id
         - editor_name: editor_name
           updated_at: 2022-01-01T00:00:00Z
           qc_name: qc_name
+          created_at: 2022-01-01T00:00:00Z
           id: 1
           title: title
           client_id: client_id
