@@ -1775,6 +1775,7 @@ components:
         qc_name: qc_name
         id: 1
         title: title
+        client_id: client_id
       properties:
         id:
           example: 1
@@ -1795,7 +1796,11 @@ components:
           description: timestamp
           example: 2022-01-01T00:00:00Z
           type: string
+        client_id:
+          example: client_id
+          type: string
       required:
+      - client_id
       - editor_name
       - id
       - priority
@@ -1811,11 +1816,13 @@ components:
           qc_name: qc_name
           id: 1
           title: title
+          client_id: client_id
         - editor_name: editor_name
           updated_at: 2022-01-01T00:00:00Z
           qc_name: qc_name
           id: 1
           title: title
+          client_id: client_id
       properties:
         status:
           $ref: '#/components/schemas/Status'
