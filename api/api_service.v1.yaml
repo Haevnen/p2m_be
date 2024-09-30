@@ -678,7 +678,7 @@ paths:
         '403':
           $ref: "#/components/responses/Forbidden"
       operationId: internal_removeTicket
-  
+
   /tickets/add_auto:
     post:
       tags:
@@ -1282,6 +1282,9 @@ components:
           description: timestamp
           type: string
           example: "2022-01-01T00:00:00Z"
+        client_id:
+          type: string
+          example: "client_id"
       required:
         - id
         - title
@@ -1289,6 +1292,7 @@ components:
         - editor_name
         - priority
         - updated_at
+        - client_id
     ListTicketItem:
       type: object
       properties:

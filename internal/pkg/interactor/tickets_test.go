@@ -46,7 +46,7 @@ func TestTicketManagement_parseFolderPathToGetInternalLink(t1 *testing.T) {
 				clientManagement: tt.fields.clientManagement,
 				txManager:        tt.fields.txManager,
 			}
-			got, err := t.parseFolderPathToGetTicketMetadata(tt.args.root, tt.args.folder)
+			_, _, got, err := t.parseFolderPathToGetTicketMetadata(tt.args.root, tt.args.folder)
 			if (err != nil) != tt.wantErr {
 				t1.Errorf("parseFolderPathToGetTicketMetadata() error = %v, wantErr %v", err, tt.wantErr)
 				return

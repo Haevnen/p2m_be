@@ -281,6 +281,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 	ti := dal.Q.Ticket
 	tid := ti.WithContext(ctx)
 	u := dal.Q.User
+	ci := dal.Q.Client.As("ci")
 
 	// get user to get contract type
 	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
@@ -305,7 +306,8 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 	now := time.Now()
 	// general query
 	// Only return needed fields (title, ticket-number, status, priority)
-	ticketQuery := tid.Select(ti.Title, ti.ID, ti.Status, ti.Priority, ti.QcID, ti.EditorID, ti.UpdatedAt).
+	ticketQuery := tid.Join(ci, ti.ClientID.EqCol(ci.ID)).
+		Select(ti.Title, ti.ID, ti.Status, ti.Priority, ti.QcID, ti.EditorID, ti.UpdatedAt).
 		// Ignore deleted ticket
 		Where(ti.IsActive.Is(true)).
 		// List all ticket not completed (for all day)
@@ -313,7 +315,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 			// Or List all ticket in status DONE (for current day)
 			Or(tid.Where(ti.UpdatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2mapi.DONE)))))
 	// List by priority and updated_at asc
-	ticketQuery.Order(ti.Priority.Desc()).Order(ti.UpdatedAt.Desc())
+	ticketQuery.Order(ci.ClientID).Order(ti.CreatedAt.Asc()).Order(ti.Priority.Desc())
 
 	// if contract type is FREELANCE, return only ticket from themselves
 	if user.ContractType == string(p2mapi.FREELANCE) {
@@ -347,7 +349,18 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 			userIdMapping[userItem.UserId] = userItem
 		}
 
+		// Get all clients
+		clients, err := t.clientManagement.GetAllClient(ctx, swag.Bool(true))
+		if err != nil {
+			return nil, err
+		}
+		clientIdMapping := make(map[int32]*p2mapi.ClientResponse)
+		for _, client := range clients {
+			clientIdMapping[client.Id] = client
+		}
+
 		for _, ticket := range ticketsDb {
+
 			ticketItem := p2mapi.ListTicket{
 				EditorName: userIdMapping[ticket.EditorID].NickName,
 				Id:         ticket.ID,
@@ -355,6 +368,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 				QcName:     userIdMapping[ticket.QcID].NickName,
 				Title:      ticket.Title,
 				UpdatedAt:  ticket.UpdatedAt.Format(constants.DateTimeFormat),
+				ClientId:   clientIdMapping[ticket.ClientID].ClientId,
 			}
 
 			switch ticket.Status {
