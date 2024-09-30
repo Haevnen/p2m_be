@@ -611,13 +611,13 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 					return err
 				}
 				// browser link
-				err = tx.Link.WithContext(childCtx).Create(&model.Link{
-					TicketID: ticket.ID,
-					Link:     "file://" + nasServer.IPAddress + ticket.InternalLink,
-				})
-				if err != nil {
-					return err
-				}
+				// err = tx.Link.WithContext(childCtx).Create(&model.Link{
+				// 	TicketID: ticket.ID,
+				// 	Link:     "file://" + nasServer.IPAddress + ticket.InternalLink,
+				// })
+				// if err != nil {
+				// 	return err
+				// }
 			}
 		}
 
