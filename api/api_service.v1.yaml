@@ -1285,6 +1285,10 @@ components:
         client_id:
           type: string
           example: "client_id"
+        created_at:
+          description: timestamp
+          type: string
+          example: "2022-01-01T00:00:00Z"
       required:
         - id
         - title
@@ -1293,6 +1297,7 @@ components:
         - priority
         - updated_at
         - client_id
+        - created_at
     ListTicketItem:
       type: object
       properties:

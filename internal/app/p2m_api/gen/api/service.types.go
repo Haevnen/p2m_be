@@ -153,7 +153,10 @@ type LinkResponse struct {
 
 // ListTicket defines model for ListTicket.
 type ListTicket struct {
-	ClientId   string   `json:"client_id"`
+	ClientId string `json:"client_id"`
+
+	// CreatedAt timestamp
+	CreatedAt  string   `json:"created_at"`
 	EditorName string   `json:"editor_name"`
 	Id         int64    `json:"id"`
 	Priority   Priority `json:"priority"`
