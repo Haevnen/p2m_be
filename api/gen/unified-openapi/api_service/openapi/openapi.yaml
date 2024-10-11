@@ -1264,6 +1264,112 @@ paths:
       summary: Update ticket by id
       tags:
       - Tickets
+  /dashboards/daily:
+    get:
+      description: Get daily dashboard
+      operationId: internal_getDailyDashboard
+      parameters:
+      - description: date
+        explode: true
+        in: query
+        name: date
+        required: true
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DashboardResponse'
+                type: array
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Get daily dashboard
+      tags:
+      - Dashboard
+  /dashboards/export:
+    get:
+      description: Get timerange dashboard
+      operationId: internal_exportDashboard
+      parameters:
+      - description: date
+        explode: true
+        in: query
+        name: start_time
+        required: true
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: date
+        explode: true
+        in: query
+        name: end_time
+        required: true
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            text/csv: {}
+          description: Successful operation
+          headers:
+            Content-Disposition:
+              explode: false
+              schema:
+                example: attachment; filename="dashboard_yyyymmdd_hhmm.csv"
+                type: string
+              style: simple
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error if API token key is not set or invalid or has already
+            expired
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Resource not found
+      security:
+      - BearerAuth: []
+      summary: Get timerange dashboard
+      tags:
+      - Dashboard
 components:
   parameters:
     session_id:
@@ -1364,6 +1470,17 @@ components:
           schema:
             $ref: '#/components/schemas/HistoryResponse'
       description: Successful operation
+    CsvOutputResponse:
+      content:
+        text/csv: {}
+      description: Successful operation
+      headers:
+        Content-Disposition:
+          explode: false
+          schema:
+            example: attachment; filename="dashboard_yyyymmdd_hhmm.csv"
+            type: string
+          style: simple
   schemas:
     Error:
       properties:
@@ -1997,6 +2114,62 @@ components:
           example: 1
           format: int32
           type: integer
+      type: object
+    DashboardResponse:
+      example:
+        date: 2022-01-01T00:00:00.000+0000
+        editor_name: editor_name
+        num_of_multiple_image: 1
+        qc_name: qc_name
+        num_of_single_image: 1
+        ticket_id: 1
+        title: title
+        editing_style: Brighten
+        client_id: GMT
+      properties:
+        date:
+          example: 2022-01-01
+          format: date
+          type: string
+        client_id:
+          example: GMT
+          type: string
+        ticket_id:
+          example: 1
+          format: int64
+          type: integer
+        title:
+          example: title
+          type: string
+        editing_style:
+          example: Brighten
+          type: string
+        status:
+          $ref: '#/components/schemas/Status'
+        qc_name:
+          example: qc_name
+          type: string
+        editor_name:
+          example: editor_name
+          type: string
+        num_of_single_image:
+          example: 1
+          format: int32
+          type: integer
+        num_of_multiple_image:
+          example: 1
+          format: int32
+          type: integer
+      required:
+      - client_id
+      - editing_style
+      - editor_name
+      - num_of_multiple_image
+      - num_of_single_image
+      - qc_name
+      - status
+      - ticket_id
+      - title
       type: object
     UserLoginResponse:
       example:

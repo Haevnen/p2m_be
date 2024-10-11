@@ -16,6 +16,7 @@ type Handler struct {
 	commentHandler
 	historyHandler
 	ticketHandler
+	dashboardHandler
 }
 
 func New(reg *registry.Registry) Handler {
@@ -26,6 +27,7 @@ func New(reg *registry.Registry) Handler {
 	h.commentHandler = newCommentHandler(reg)
 	h.historyHandler = newHistoryHandler(reg)
 	h.ticketHandler = newTicketHandler(reg)
+	h.dashboardHandler = newDashboardHandler(reg)
 	return h
 }
 
