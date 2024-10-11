@@ -1514,10 +1514,6 @@ components:
     DashboardResponse:
       type: object
       properties:
-        date:
-          type: string
-          format: date
-          example: "2022-01-01"
         client_id:
           type: string
           example: "GMT"
@@ -1531,14 +1527,6 @@ components:
         editing_style:
           type: string
           example: "Brighten"
-        status:
-          $ref: "#/components/schemas/Status"
-        qc_name:
-          type: string
-          example: "qc_name"
-        editor_name:
-          type: string
-          example: "editor_name"
         num_of_single_image:
           type: integer
           format: int32

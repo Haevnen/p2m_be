@@ -2117,20 +2117,13 @@ components:
       type: object
     DashboardResponse:
       example:
-        date: 2022-01-01T00:00:00.000+0000
-        editor_name: editor_name
         num_of_multiple_image: 1
-        qc_name: qc_name
         num_of_single_image: 1
         ticket_id: 1
         title: title
         editing_style: Brighten
         client_id: GMT
       properties:
-        date:
-          example: 2022-01-01
-          format: date
-          type: string
         client_id:
           example: GMT
           type: string
@@ -2143,14 +2136,6 @@ components:
           type: string
         editing_style:
           example: Brighten
-          type: string
-        status:
-          $ref: '#/components/schemas/Status'
-        qc_name:
-          example: qc_name
-          type: string
-        editor_name:
-          example: editor_name
           type: string
         num_of_single_image:
           example: 1
