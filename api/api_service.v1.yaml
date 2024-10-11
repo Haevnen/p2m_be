@@ -761,6 +761,29 @@ paths:
           $ref: "#/components/responses/Forbidden"
       operationId: internal_updateTicket
 
+  /dashboards/daily:
+    get:
+      tags:
+        - Dashboard
+      summary: Get daily dashboard
+      description: Get daily dashboard
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyDashboardResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_getDailyDashboard
+
 tags:
   - name: Users
     description: Users API
@@ -1435,4 +1458,8 @@ components:
           type: integer
           format: int32
           example: 1
+    DailyDashboardResponse:
+      type: object
+      properties:
+      
 
