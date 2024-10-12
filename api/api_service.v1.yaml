@@ -1514,6 +1514,9 @@ components:
     DashboardResponse:
       type: object
       properties:
+        date:
+          type: string
+          example: "2024-09-18T17:23:52Z"
         client_id:
           type: string
           example: "GMT"
@@ -1521,6 +1524,12 @@ components:
           type: integer
           format: int64
           example: 1
+        qc_name:
+          type: string
+          example: "qc_name"
+        editor_name:
+          type: string
+          example: "editor_name"
         title:
           type: string
           example: "title"
@@ -1536,13 +1545,13 @@ components:
           format: int32
           example: 1
       required:
+        - date
         - client_id
         - ticket_id
         - title
-        - status
-        - qc_name
-        - editor_name
         - editing_style
         - num_of_single_image
         - num_of_multiple_image
+        - editor_name
+        - qc_name
 
