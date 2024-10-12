@@ -1527,9 +1527,13 @@ components:
         qc_name:
           type: string
           example: "qc_name"
+        qc_contract_type:
+          $ref: "#/components/schemas/ContractType"
         editor_name:
           type: string
           example: "editor_name"
+        editor_contract_type:
+          $ref: "#/components/schemas/ContractType"
         title:
           type: string
           example: "title"
@@ -1553,5 +1557,6 @@ components:
         - num_of_single_image
         - num_of_multiple_image
         - editor_name
+        - editor_contract_type
         - qc_name
-
+        - qc_contract_type

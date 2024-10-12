@@ -46,6 +46,38 @@ func (t *TicketDashboard) FromTicket() *p2m_api.DashboardResponse {
 		Date:               t.CreatedAt.Format(constants.DateTimeFormat),
 		TicketId:           t.ID,
 		QcName:             t.QcName,
+		QcContractType:     p2m_api.ContractType(t.QcContractType),
 		EditorName:         t.EditorName,
+		EditorContractType: p2m_api.ContractType(t.EditorContractType),
+	}
+}
+
+type TicketExport struct {
+	ClientId           string `csv:"client_id"`
+	TicketId           int64  `csv:"task"`
+	Title              string `csv:"title"`
+	EditingStyle       string `csv:"editing_style"`
+	NumOfSingleImage   int32  `csv:"num_of_single_image"`
+	NumOfMultipleImage int32  `csv:"num_of_multiple_image"`
+	QcName             string `csv:"qc_name"`
+	QcContractType     string `csv:"qc_contract_type"`
+	EditorName         string `csv:"editor_name"`
+	EditorContractType string `csv:"editor_contract_type"`
+}
+
+type DashboardResponse p2m_api.DashboardResponse
+
+func (t DashboardResponse) FromDashboardResponse() *TicketExport {
+	return &TicketExport{
+		ClientId:           t.ClientId,
+		TicketId:           t.TicketId,
+		Title:              t.Title,
+		EditingStyle:       t.EditingStyle,
+		NumOfMultipleImage: t.NumOfMultipleImage,
+		NumOfSingleImage:   t.NumOfSingleImage,
+		QcName:             t.QcName,
+		QcContractType:     string(t.QcContractType),
+		EditorName:         t.EditorName,
+		EditorContractType: string(t.EditorContractType),
 	}
 }
