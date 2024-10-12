@@ -47,6 +47,7 @@ var (
 	ErrPermissionDenied                 = errors.New("ERR_PERMISSION_DENIED")
 	ErrViewPermissionDenied             = errors.New("ERR_VIEW_PERMISSION_DENIED")
 	ErrTicketHasBeenDeleted             = errors.New("ERR_TICKET_HAS_BEEN_DELETED")
+	ErrExportTimeOverRange              = errors.New("ERR_EXPORT_TIME_OVER_RANGE")
 )
 
 // New constructor
