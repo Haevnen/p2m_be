@@ -69,3 +69,6 @@ type Maker interface {
 type TxManager interface {
 	TransactionExec(ctx context.Context, fn func(context.Context) error) error
 }
+
+type DashboardInterface interface {
+}

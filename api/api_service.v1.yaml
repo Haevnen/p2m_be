@@ -761,6 +761,73 @@ paths:
           $ref: "#/components/responses/Forbidden"
       operationId: internal_updateTicket
 
+  /dashboards/daily:
+    get:
+      tags:
+        - Dashboard
+      summary: Get daily dashboard
+      description: Get daily dashboard
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+          required: true
+          description: date
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DashboardResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_getDailyDashboard
+
+  /dashboards/export:
+    get:
+      tags:
+        - Dashboard
+      summary: Get timerange dashboard
+      description: Get timerange dashboard
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: start_time
+          schema:
+            type: string
+            format: date-time
+          required: true
+          description: date
+        - in: query
+          name: end_time
+          schema:
+            type: string
+            format: date-time
+          required: true
+          description: date
+      responses:
+        '200':
+          $ref: "#/components/responses/CsvOutputResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+      operationId: internal_exportDashboard
+
 tags:
   - name: Users
     description: Users API
@@ -921,6 +988,15 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/HistoryResponse"
+    CsvOutputResponse:
+      description: Successful operation
+      content:
+        text/csv: { }
+      headers:
+        Content-Disposition:
+          schema:
+            type: string
+            example: attachment; filename="dashboard_yyyymmdd_hhmm.csv"
   schemas:
     Error:
       type: object
@@ -1435,4 +1511,38 @@ components:
           type: integer
           format: int32
           example: 1
+    DashboardResponse:
+      type: object
+      properties:
+        client_id:
+          type: string
+          example: "GMT"
+        ticket_id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: "title"
+        editing_style:
+          type: string
+          example: "Brighten"
+        num_of_single_image:
+          type: integer
+          format: int32
+          example: 1
+        num_of_multiple_image:
+          type: integer
+          format: int32
+          example: 1
+      required:
+        - client_id
+        - ticket_id
+        - title
+        - status
+        - qc_name
+        - editor_name
+        - editing_style
+        - num_of_single_image
+        - num_of_multiple_image
 

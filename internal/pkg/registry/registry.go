@@ -15,6 +15,10 @@ func New(key string) *Registry {
 	}
 }
 
+func (r *Registry) DashboardInterface() interactorinterface.DashboardInterface {
+	return interactor.NewDashboardManagement()
+}
+
 func (r *Registry) UserManagementInteractor() interactorinterface.UserManagementInterface {
 	return interactor.NewUserManagement(r.PasetoMaker())
 }
