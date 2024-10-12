@@ -71,5 +71,5 @@ type TxManager interface {
 }
 
 type DashboardInterface interface {
-	GetDailyDashboard(ctx context.Context, date time.Time) ([]*p2mapi.DashboardResponse, error)
+	GetDailyDashboard(ctx context.Context, from, to time.Time) ([]*p2mapi.DashboardResponse, error)
 }

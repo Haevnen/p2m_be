@@ -19,7 +19,7 @@ func NewDashboardManagement() *DashboardManagement {
 	return &DashboardManagement{}
 }
 
-func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, date time.Time) ([]*p2m_api.DashboardResponse, error) {
+func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to time.Time) ([]*p2m_api.DashboardResponse, error) {
 	// Get payload to check if user is admin
 	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
 	if payload == nil {
@@ -36,7 +36,9 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, date time.T
 		ci.ClientID.As("client_id_str"),
 		ci.EditingStyle.As("editing_style"),
 		ue.NickName.As("editor_name"),
+		ue.ContractType.As("editor_contract_type"),
 		uc.NickName.As("qc_name"),
+		uc.ContractType.As("qc_contract_type"),
 		ti.CreatedAt,
 		ti.NumOfMultipleImage,
 		ti.NumOfSingleImage,
@@ -45,7 +47,7 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, date time.T
 		Join(ci, ti.ClientID.EqCol(ci.ID)).
 		Join(ue, ti.EditorID.EqCol(ue.UserID)).
 		Join(uc, ti.QcID.EqCol(uc.UserID)).
-		Where(ti.IsActive.Is(true), ti.CreatedAt.Between(util.Begin(date), util.End(date))).
+		Where(ti.IsActive.Is(true), ti.CreatedAt.Between(util.Begin(from), util.End(to))).
 		Order(ci.ClientID.Asc(), ti.CreatedAt.Asc(), ti.Priority.Desc())
 
 	var ticketDashboard []*model.TicketDashboard

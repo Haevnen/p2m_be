@@ -31,7 +31,9 @@ func (t *TicketSingle) FromTicket() *p2m_api.SingleTicketResponse {
 
 type TicketDashboard struct {
 	TicketSingle
-	EditingStyle string `gorm:"column:editing_style"`
+	EditingStyle       string `gorm:"column:editing_style"`
+	EditorContractType string `gorm:"column:editor_contract_type"`
+	QcContractType     string `gorm:"column:qc_contract_type"`
 }
 
 func (t *TicketDashboard) FromTicket() *p2m_api.DashboardResponse {
