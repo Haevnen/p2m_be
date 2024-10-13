@@ -15,6 +15,7 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
+	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 type dashboardHandler struct {
@@ -29,7 +30,7 @@ func newDashboardHandler(registry *registry.Registry) dashboardHandler {
 
 // InternalGetDailyDashboard (GET /dashboards/daily)
 func (h dashboardHandler) InternalGetDailyDashboard(c *gin.Context, params p2mapi.InternalGetDailyDashboardParams) {
-	dailyDashboard, err := h.dashboardInteractor.GetDailyDashboard(c, params.Date.Time, params.Date.Time)
+	dailyDashboard, err := h.dashboardInteractor.GetDailyDashboard(c, util.Begin(params.Date.Time), util.End(params.Date.Time))
 	if err != nil {
 		SendError(c, "get daily dashboard error", err)
 		return

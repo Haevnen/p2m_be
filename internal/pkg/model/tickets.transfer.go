@@ -53,16 +53,17 @@ func (t *TicketDashboard) FromTicket() *p2m_api.DashboardResponse {
 }
 
 type TicketExport struct {
-	ClientId           string `csv:"client_id"`
-	TicketId           int64  `csv:"task"`
-	Title              string `csv:"title"`
-	EditingStyle       string `csv:"editing_style"`
-	NumOfSingleImage   int32  `csv:"num_of_single_image"`
-	NumOfMultipleImage int32  `csv:"num_of_multiple_image"`
-	QcName             string `csv:"qc_name"`
-	QcContractType     string `csv:"qc_contract_type"`
-	EditorName         string `csv:"editor_name"`
-	EditorContractType string `csv:"editor_contract_type"`
+	ClientId           string `csv:"Client"`
+	TicketId           int64  `csv:"Task"`
+	Title              string `csv:"Title of ticket"`
+	EditingStyle       string `csv:"Editing style"`
+	NumOfSingleImage   int32  `csv:"Quantity single"`
+	NumOfMultipleImage int32  `csv:"Quantity multiple"`
+	QcName             string `csv:"QC"`
+	QcContractType     string `csv:"QC contract type"`
+	EditorName         string `csv:"Editor"`
+	EditorContractType string `csv:"Editor contract type"`
+	Date               string `csv:"Date"`
 }
 
 type DashboardResponse p2m_api.DashboardResponse
@@ -79,5 +80,6 @@ func (t DashboardResponse) FromDashboardResponse() *TicketExport {
 		QcContractType:     string(t.QcContractType),
 		EditorName:         t.EditorName,
 		EditorContractType: string(t.EditorContractType),
+		Date:               t.Date,
 	}
 }

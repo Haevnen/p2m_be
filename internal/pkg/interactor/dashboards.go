@@ -9,7 +9,6 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
-	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 type DashboardManagement struct {
@@ -47,7 +46,7 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 		Join(ci, ti.ClientID.EqCol(ci.ID)).
 		Join(ue, ti.EditorID.EqCol(ue.UserID)).
 		Join(uc, ti.QcID.EqCol(uc.UserID)).
-		Where(ti.IsActive.Is(true), ti.CreatedAt.Between(util.Begin(from), util.End(to))).
+		Where(ti.IsActive.Is(true), ti.CreatedAt.Between(from, to)).
 		Order(ci.ClientID.Asc(), ti.CreatedAt.Asc(), ti.Priority.Desc())
 
 	var ticketDashboard []*model.TicketDashboard
