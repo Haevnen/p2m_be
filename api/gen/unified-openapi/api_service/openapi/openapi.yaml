@@ -2117,13 +2117,21 @@ components:
       type: object
     DashboardResponse:
       example:
+        date: 2024-09-18T17:23:52Z
+        editor_name: editor_name
         num_of_multiple_image: 1
+        qc_name: qc_name
         num_of_single_image: 1
+        qc_contract_type: FULLTIME
+        editor_contract_type: FULLTIME
         ticket_id: 1
         title: title
         editing_style: Brighten
         client_id: GMT
       properties:
+        date:
+          example: 2024-09-18T17:23:52Z
+          type: string
         client_id:
           example: GMT
           type: string
@@ -2131,6 +2139,16 @@ components:
           example: 1
           format: int64
           type: integer
+        qc_name:
+          example: qc_name
+          type: string
+        qc_contract_type:
+          $ref: '#/components/schemas/ContractType'
+        editor_name:
+          example: editor_name
+          type: string
+        editor_contract_type:
+          $ref: '#/components/schemas/ContractType'
         title:
           example: title
           type: string
@@ -2147,12 +2165,14 @@ components:
           type: integer
       required:
       - client_id
+      - date
       - editing_style
+      - editor_contract_type
       - editor_name
       - num_of_multiple_image
       - num_of_single_image
+      - qc_contract_type
       - qc_name
-      - status
       - ticket_id
       - title
       type: object

@@ -41,6 +41,7 @@ var (
 		ErrEditorNameNotExists:             {httpStatus: http.StatusNotFound, resType: string(api.RequestNotFound), errCode: errCode2005, msg: "The editor name is not found. "},
 		ErrPermissionDenied:                {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode2006, msg: "The user is not allowed to update or remove resource "},
 		ErrViewPermissionDenied:            {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode2007, msg: "The user is not allowed to view resource "},
+		ErrExportTimeOverRange:             {httpStatus: http.StatusBadRequest, resType: string(api.ValidationFailed), errCode: errCode4000, msg: "The range over 60 days."},
 	}
 )
 
@@ -68,4 +69,6 @@ const (
 	errCode2008     = "ERR_2008"
 
 	errCode3000 = "ERR_3000"
+
+	errCode4000 = "ERR_4000"
 )

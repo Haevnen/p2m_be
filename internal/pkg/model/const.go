@@ -5,3 +5,5 @@ const (
 	AuthorizationTypeBearer = "bearer"
 	AuthorizationPayloadKey = "authorization_payload"
 )
+
+const MaxExportRangeInDay = 60

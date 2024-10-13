@@ -119,12 +119,17 @@ type CreatedBy string
 
 // DashboardResponse defines model for DashboardResponse.
 type DashboardResponse struct {
-	ClientId           string `json:"client_id"`
-	EditingStyle       string `json:"editing_style"`
-	NumOfMultipleImage int32  `json:"num_of_multiple_image"`
-	NumOfSingleImage   int32  `json:"num_of_single_image"`
-	TicketId           int64  `json:"ticket_id"`
-	Title              string `json:"title"`
+	ClientId           string       `json:"client_id"`
+	Date               string       `json:"date"`
+	EditingStyle       string       `json:"editing_style"`
+	EditorContractType ContractType `json:"editor_contract_type"`
+	EditorName         string       `json:"editor_name"`
+	NumOfMultipleImage int32        `json:"num_of_multiple_image"`
+	NumOfSingleImage   int32        `json:"num_of_single_image"`
+	QcContractType     ContractType `json:"qc_contract_type"`
+	QcName             string       `json:"qc_name"`
+	TicketId           int64        `json:"ticket_id"`
+	Title              string       `json:"title"`
 }
 
 // Error defines model for Error.
