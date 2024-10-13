@@ -53,6 +53,7 @@ func (t *TicketDashboard) FromTicket() *p2m_api.DashboardResponse {
 }
 
 type TicketExport struct {
+	Date               string `csv:"Date"`
 	ClientId           string `csv:"Client"`
 	TicketId           int64  `csv:"Task"`
 	Title              string `csv:"Title of ticket"`
@@ -63,7 +64,6 @@ type TicketExport struct {
 	QcContractType     string `csv:"QC contract type"`
 	EditorName         string `csv:"Editor"`
 	EditorContractType string `csv:"Editor contract type"`
-	Date               string `csv:"Date"`
 }
 
 type DashboardResponse p2m_api.DashboardResponse
