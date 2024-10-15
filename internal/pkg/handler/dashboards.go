@@ -64,6 +64,7 @@ func (h dashboardHandler) InternalExportDashboard(c *gin.Context, params p2mapi.
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
 	c.Header("Content-Type", "text/csv")
+	c.Header("Access-Control-Expose-Headers", "Content-Disposition") // Expose the Content-Disposition header
 
 	// Create a CSV writer
 	writer := csv.NewWriter(c.Writer)
