@@ -41,7 +41,7 @@ func (h dashboardHandler) InternalGetDailyDashboard(c *gin.Context, params p2map
 
 // InternalExportDashboard (GET /dashboards/export)
 func (h dashboardHandler) InternalExportDashboard(c *gin.Context, params p2mapi.InternalExportDashboardParams) {
-	difference := params.StartTime.Sub(params.EndTime)
+	difference := params.EndTime.Sub(params.StartTime)
 	if int64(difference.Hours()/24) > model.MaxExportRangeInDay {
 		SendError(c, "export select time over range", apperror.ErrExportTimeOverRange)
 		return
