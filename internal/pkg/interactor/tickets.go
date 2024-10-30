@@ -560,7 +560,7 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		}
 
 		client, err := t.clientManagement.GetSingleClient(ctx, clientID)
-		if err != nil {
+		if err != nil && !errors.Is(err, apperror.ErrRecordNotFound) {
 			logger.Errorf("Failed to get client: %s", clientID)
 			return err
 		}
