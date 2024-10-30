@@ -541,14 +541,14 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 	visitedTitles := make(map[string]bool)
 	for _, folder := range body.Folders {
 		clientID, title, internalLink, err := t.parseFolderPathToGetTicketMetadata(nasServer.RootPath, folder)
-		logger.Info("clientID: %s, title: %s, internalLink: %s", clientID, title, internalLink)
+		logger.Infof("clientID: %s, title: %s, internalLink: %s", clientID, title, internalLink)
 		if err != nil {
 			logger.Error(err.Error())
 			continue // Skip invalid folders path
 		}
 
 		if visitedTitles[title] {
-			logger.Info("Duplicate title: %s", title)
+			logger.Infof("Duplicate title: %s", title)
 			continue // Skip if title already exists
 		}
 		visitedTitles[title] = true
@@ -576,7 +576,7 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		}
 
 		if exists {
-			logger.Info("Ticket already exists: %s", title)
+			logger.Infof("Ticket already exists: %s", title)
 			continue // Skip if ticket already exists
 		}
 
