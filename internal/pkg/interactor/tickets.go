@@ -551,14 +551,25 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 			logger.Info("Duplicate title: %s", title)
 			continue // Skip if title already exists
 		}
+		visitedTitles[title] = true
 
-		id, err := t.createOrGetClient(ctx, clientID)
-		if err != nil {
-			logger.Errorf("Failed to create or get client: %s", clientID)
-			return err
+		// Only create ticket if client exist
+		if clientID == "" {
+			logger.Errorf("Client not found: %s", clientID)
+			continue
 		}
 
-		exists, err := ticketExists(ctx, title, id)
+		client, err := t.clientManagement.GetSingleClient(ctx, clientID)
+		if err != nil {
+			logger.Errorf("Failed to get client: %s", clientID)
+			return err
+		}
+		if client == nil {
+			logger.Errorf("Client not found: %s", clientID)
+			continue
+		}
+
+		exists, err := ticketExists(ctx, title, client.Id)
 		if err != nil {
 			logger.Errorf("Failed to check if ticket exists: %s", title)
 			return err // Handle error checking for existing tickets
@@ -570,7 +581,7 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		}
 
 		newTickets = append(newTickets, &model.Ticket{
-			ClientID:     id,
+			ClientID:     client.Id,
 			Title:        title,
 			CreatedBy:    string(p2mapi.AUTO),
 			IsActive:     true,
@@ -581,8 +592,6 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 			Description:  defaultDescription,
 			InternalLink: internalLink,
 		})
-
-		visitedTitles[title] = true
 	}
 
 	return t.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
@@ -625,14 +634,6 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 				if err != nil {
 					return err
 				}
-				// browser link
-				// err = tx.Link.WithContext(childCtx).Create(&model.Link{
-				// 	TicketID: ticket.ID,
-				// 	Link:     "file://" + nasServer.IPAddress + ticket.InternalLink,
-				// })
-				// if err != nil {
-				// 	return err
-				// }
 			}
 		}
 
