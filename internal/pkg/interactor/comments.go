@@ -3,6 +3,7 @@ package interactor
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -15,14 +16,16 @@ import (
 )
 
 type CommentManagement struct {
+	txManager interactorinterface.TxManager
 }
 
-func NewCommentManagement() *CommentManagement {
-	return &CommentManagement{}
+func NewCommentManagement(
+	txManager interactorinterface.TxManager,
+) *CommentManagement {
+	return &CommentManagement{txManager: txManager}
 }
 
 func (ci *CommentManagement) CreateComment(ctx context.Context, client p2mapi.CreateCommentBody) (*p2mapi.CommentResponse, error) {
-	c := dal.Q.Comment
 	u := dal.Q.User
 
 	var commentDb model.Comment
@@ -33,11 +36,6 @@ func (ci *CommentManagement) CreateComment(ctx context.Context, client p2mapi.Cr
 		return nil, apperror.ErrUserNotExists
 	}
 	commentDb.UserID = payload.UserID
-
-	err := c.WithContext(ctx).Create(&commentDb)
-	if err != nil {
-		return nil, err
-	}
 
 	// get nick-name from userID
 	nickName := ""
@@ -51,10 +49,32 @@ func (ci *CommentManagement) CreateComment(ctx context.Context, client p2mapi.Cr
 		logger.Error("find user when create comment has error: user is nil")
 	}
 
+	err = ci.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
+		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
+
+		// Create new comment
+		err := tx.Comment.WithContext(childCtx).Create(&commentDb)
+		if err != nil {
+			return err
+		}
+
+		// Create new history
+		return tx.History.WithContext(childCtx).Create(&model.History{
+			TicketID:    commentDb.TicketID,
+			Action:      fmt.Sprintf("User %s create comment for ticket: %v", nickName, commentDb.TicketID),
+			PerformedBy: payload.UserID,
+		})
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
 	return commentDb.FromComment(nickName).FromCommentWithName(), nil
 }
 
 func (ci *CommentManagement) UpdateComment(ctx context.Context, commentID int64, body p2mapi.UpdateCommentBody) error {
+	u := dal.Q.User
 	c := dal.Q.Comment
 
 	comment, err := c.WithContext(ctx).Where(c.ID.Eq(commentID)).First()
@@ -74,13 +94,39 @@ func (ci *CommentManagement) UpdateComment(ctx context.Context, commentID int64,
 		return apperror.ErrPermissionDenied
 	}
 
+	// get nick-name from userID
+	nickName := ""
+	user, err := u.WithContext(ctx).Where(u.UserID.Eq(payload.UserID)).First()
+	if err != nil {
+		logger.Errorf("find user when create comment has error: %v", err)
+	}
+	if user != nil {
+		nickName = user.NickName
+	} else {
+		logger.Error("find user when create comment has error: user is nil")
+	}
+
 	comment.Comment = body.Comment
 
-	_, err = c.WithContext(ctx).Where(c.ID.Eq(commentID)).UpdateColumns(comment)
-	return err
+	return ci.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
+		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
+
+		_, err = tx.Comment.WithContext(childCtx).Where(c.ID.Eq(commentID)).UpdateColumns(comment)
+		if err != nil {
+			return err
+		}
+
+		// Create new history
+		return tx.History.WithContext(childCtx).Create(&model.History{
+			TicketID:    comment.TicketID,
+			Action:      fmt.Sprintf("User %s update comment for ticket: %v", nickName, comment.TicketID),
+			PerformedBy: payload.UserID,
+		})
+	})
 }
 
 func (ci *CommentManagement) DeleteComment(ctx context.Context, commentID int64) error {
+	u := dal.Q.User
 	c := dal.Q.Comment
 	comment, err := c.WithContext(ctx).Where(c.ID.Eq(commentID)).First()
 	if err != nil {
@@ -98,8 +144,33 @@ func (ci *CommentManagement) DeleteComment(ctx context.Context, commentID int64)
 		return apperror.ErrPermissionDenied
 	}
 
-	_, err = c.WithContext(ctx).Where(c.ID.Eq(commentID)).Delete(comment)
-	return err
+	// get nick-name from userID
+	nickName := ""
+	user, err := u.WithContext(ctx).Where(u.UserID.Eq(payload.UserID)).First()
+	if err != nil {
+		logger.Errorf("find user when create comment has error: %v", err)
+	}
+	if user != nil {
+		nickName = user.NickName
+	} else {
+		logger.Error("find user when create comment has error: user is nil")
+	}
+
+	return ci.txManager.TransactionExec(ctx, func(childCtx context.Context) error {
+		tx := childCtx.Value(txTransactionKey).(*dal.QueryTx)
+
+		_, err = tx.Comment.WithContext(childCtx).Where(c.ID.Eq(commentID)).Delete(comment)
+		if err != nil {
+			return err
+		}
+
+		// Create new history
+		return tx.History.WithContext(childCtx).Create(&model.History{
+			TicketID:    comment.TicketID,
+			Action:      fmt.Sprintf("User %s delete comment for ticket: %v", nickName, comment.TicketID),
+			PerformedBy: payload.UserID,
+		})
+	})
 }
 
 func (ci *CommentManagement) GetAllComment(ctx context.Context, ticketID int64) ([]*p2mapi.CommentResponse, error) {

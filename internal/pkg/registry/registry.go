@@ -32,7 +32,7 @@ func (r *Registry) LinkManagementInterface() interactorinterface.LinkManagementI
 }
 
 func (r *Registry) CommentManagementInterface() interactorinterface.CommentManagementInterface {
-	return interactor.NewCommentManagement()
+	return interactor.NewCommentManagement(r.TxManager())
 }
 
 func (r *Registry) HistoryManagementInterface() interactorinterface.HistoryManagementInterface {
