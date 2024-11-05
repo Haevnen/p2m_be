@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -20,7 +21,15 @@ import (
 	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
-const defaultDescription = `<p class="editor-paragraph"><br></p>`
+const (
+	defaultDescription = `<p class="editor-paragraph"><br></p>`
+)
+
+var exceptionClientID = map[string]bool{
+	"COR": true,
+	"DAB": true,
+	"BRH": true,
+}
 
 type TicketManagement struct {
 	userManagement   interactorinterface.UserManagementInterface
@@ -493,23 +502,37 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 	}
 
-	parts := strings.Split(folder, "/")
-	// E.g., /volume5/FOR DEVELOPER/CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
-	if len(parts) < 10 {
+	// This regex looks for any characters between / and /UPLOAD/
+	re := regexp.MustCompile(`/([^/]+)/UPLOAD/`)
+	matches := re.FindStringSubmatch(folder)
+
+	var clientID = ""
+	if len(matches) >= 2 {
+		clientID = matches[1]
+	}
+
+	if clientID == "" {
 		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 	}
 
-	// ClientID, Title, InternalLink
-	return parts[4], parts[9], folder[indexOfRoot+len(root):], nil
-}
-
-// Create or get client based on client ID and return its ID
-func (t *TicketManagement) createOrGetClient(ctx context.Context, clientID string) (int32, error) {
-	client, err := t.clientManagement.CreateClient(ctx, p2mapi.ClientBody{ClientId: clientID})
-	if err != nil && !errors.Is(err, apperror.ErrClientHasIDExists) {
-		return 0, err
+	parts := strings.Split(folder, "/")
+	if exceptionClientID[clientID] {
+		// Exception path:
+		// /volume3/FILES STATION/CLIENTS/COR/UPLOAD/01-07-2024/1513 Paddington
+		// /volume3/BRH/UPLOAD/2024/November/1/11-1 Melinda Brad 137
+		if len(parts) < 8 {
+			return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+		}
+	} else {
+		// Normal path:
+		// /volume3/FILES STATION/CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
+		if len(parts) < 10 {
+			return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+		}
 	}
-	return client.Id, nil
+
+	// ClientID, Title, InternalLink
+	return clientID, parts[len(parts)-1], folder[indexOfRoot+len(root):], nil
 }
 
 // Check if a ticket already exists for the given title and client ID

@@ -9,12 +9,14 @@ from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 # Configuration
-# TODO: Update env to each NAS device
-FOLDER_TO_WATCH = "/volume5/FOR DEVELOPER/CLIENTS"
-WEBHOOK_URL = "http://localhost:38081/api/v1/tickets/add_auto"
-LAST_RUN_FILE = "/volume5/FOR DEVELOPER/scripts/last_run.txt"
+FOLDERS_TO_WATCH = [
+    "/volume3/FILES STATION/CLIENTS",
+    "/volume3/BRH"
+]
+WEBHOOK_URL = "https://api.sharpstudio.id.vn/api/v1/tickets/add_auto"
+LAST_RUN_FILE = "/volume3/FILES STATION/scripts/last_run.txt"
 NAS_ID = 1
-LOG_FILE = "/volume5/FOR DEVELOPER/scripts/watch_folders.log"
+LOG_FILE = "/volume3/FILES STATION/scripts/watch_folders.log"
 
 # Set the request headers
 headers = {
@@ -24,7 +26,7 @@ headers = {
 
 log_handler = RotatingFileHandler(
     filename=str(LOG_FILE),
-    maxBytes=5*1024*1024,  # 5 MB per log file
+    maxBytes=10*1024*1024,  # 5 MB per log file
     backupCount=5,          # Keep up to 5 backup files
     encoding='utf-8'
 )
@@ -55,21 +57,28 @@ def save_current_time(timestamp):
     except Exception as e:
         logging.error(f"Failed to write to {LAST_RUN_FILE}: {e}")
 
-
-def find_new_folders(folder, last_run):
+def find_new_folders(folders, last_run):
     new_folders = set()
-    logging.info("Scanning for new folders...")
-    for root, directories, _ in os.walk(folder):
-        for directory_name in directories:
-            directory_path = os.path.join(root, directory_name)
-            try:
-                if os.path.getmtime(directory_path) > last_run:
-                    new_folders.add(directory_path)
-                    logging.debug(f"New folder detected: {directory_path}")
-            except FileNotFoundError:
-                logging.warning(f"Directory {directory_path} was not found.")
-            except Exception as e:
-                logging.error(f"Error accessing {directory_path}: {e}")
+    for folder in folders:
+        logging.info(f"Scanning for new folders in {folder}...")
+        try:
+            for root, directories, _ in os.walk(folder):
+                for directory_name in directories:
+                    directory_path = os.path.join(root, directory_name)
+
+                    if 'DAV' in directory_path or 'DONE' in directory_path or 'UPLOAD' not in directory_path:
+                        continue
+
+                    try:
+                        if os.path.getmtime(directory_path) > last_run:
+                            new_folders.add(directory_path)
+                            logging.debug(f"New folder detected: {directory_path}")
+                    except FileNotFoundError:
+                        logging.warning(f"Directory {directory_path} was not found.")
+                    except Exception as e:
+                        logging.error(f"Error accessing {directory_path}: {e}")
+        except Exception as e:
+            logging.error(f"Error scanning folder {folder}: {e}")               
     return list(new_folders)
 
 def send_webhook(new_folders):
@@ -106,7 +115,10 @@ def send_telegram_topic_message(curl_command, error):
         'text': f"{curl_command}\n{error}",
         'message_thread_id': message_thread_id
     }
-    requests.post(url, data=payload, timeout=10)
+    try:
+        requests.post(url, data=payload, timeout=10)
+    except Exception as e:
+        logging.error(f"Failed to send Telegram message: {e}")
 
 def main():
     logging.info("Script execution started.")
@@ -116,7 +128,7 @@ def main():
     # To prevent send a lot of existing dir in the first run
     is_first_run = last_run == 0 or (current_time - last_run) > 1200
 
-    new_folders = find_new_folders(FOLDER_TO_WATCH, last_run)
+    new_folders = find_new_folders(FOLDERS_TO_WATCH, last_run)
 
     if new_folders and not is_first_run:
         logging.info(f"Detected {len(new_folders)} new folder(s). Sending webhook.")
