@@ -18,11 +18,11 @@ func NewDashboardManagement() *DashboardManagement {
 	return &DashboardManagement{}
 }
 
-func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to time.Time) ([]*p2m_api.DashboardResponse, error) {
+func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to time.Time, usePaging bool, page, pageSize int) ([]p2m_api.DashboardResponse, int64, error) {
 	// Get payload to check if user is admin
 	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
 	if payload == nil {
-		return nil, apperror.ErrUserNotExists
+		return nil, 0, apperror.ErrUserNotExists
 	}
 
 	ti := dal.Q.Ticket
@@ -49,25 +49,47 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 		Where(ti.IsActive.Is(true), ti.CreatedAt.Between(from, to)).
 		Order(ci.ClientID.Asc(), ti.CreatedAt.Asc(), ti.Priority.Desc())
 
-	var ticketDashboard []*model.TicketDashboard
 	var err error
+
+	// Separate query to count the total records that match the filter
+	var countQuery int64
+	if payload.IsAdmin {
+		countQuery, err = ticketQuery.Count()
+		if err != nil {
+			return nil, 0, err
+		}
+	} else {
+		countQuery, err = ticketQuery.Where(tic.Where(ti.EditorID.Eq(payload.UserID)).Or(ti.QcID.Eq(payload.UserID))).Count()
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+
+	// Apply pagination if usePaging is true
+	if usePaging {
+		offset := (page - 1) * pageSize
+		ticketQuery = ticketQuery.Offset(offset).Limit(pageSize)
+	}
+
+	var ticketDashboard []*model.TicketDashboard
+
 	if payload.IsAdmin {
 		// Get all tickets
 		err = ticketQuery.Scan(&ticketDashboard)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	} else {
 		// Only get ticket relate to current user
 		err = ticketQuery.Where(tic.Where(ti.EditorID.Eq(payload.UserID)).Or(ti.QcID.Eq(payload.UserID))).Scan(&ticketDashboard)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	}
 
-	var res []*p2m_api.DashboardResponse
+	var res []p2m_api.DashboardResponse
 	for _, td := range ticketDashboard {
 		res = append(res, td.FromTicket())
 	}
-	return res, nil
+	return res, countQuery, nil
 }

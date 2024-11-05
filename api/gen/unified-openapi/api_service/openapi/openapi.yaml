@@ -1272,20 +1272,45 @@ paths:
       - description: date
         explode: true
         in: query
-        name: date
+        name: start_time
         required: true
         schema:
-          format: date
+          format: date-time
           type: string
+        style: form
+      - description: date
+        explode: true
+        in: query
+        name: end_time
+        required: true
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: The page number to retrieve
+        explode: true
+        in: query
+        name: page
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+        style: form
+      - description: The number of items per page
+        explode: true
+        in: query
+        name: pageSize
+        required: true
+        schema:
+          minimum: 1
+          type: integer
         style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/DashboardResponse'
-                type: array
+                $ref: '#/components/schemas/inline_response_200'
           description: Successful operation
         "401":
           content:
@@ -2238,6 +2263,45 @@ components:
       - access_token
       - access_token_expired_at
       title: RefreshTokenResponse
+      type: object
+    inline_response_200:
+      example:
+        data:
+        - date: 2024-09-18T17:23:52Z
+          editor_name: editor_name
+          num_of_multiple_image: 1
+          qc_name: qc_name
+          num_of_single_image: 1
+          qc_contract_type: FULLTIME
+          editor_contract_type: FULLTIME
+          ticket_id: 1
+          title: title
+          editing_style: Brighten
+          client_id: GMT
+        - date: 2024-09-18T17:23:52Z
+          editor_name: editor_name
+          num_of_multiple_image: 1
+          qc_name: qc_name
+          num_of_single_image: 1
+          qc_contract_type: FULLTIME
+          editor_contract_type: FULLTIME
+          ticket_id: 1
+          title: title
+          editing_style: Brighten
+          client_id: GMT
+        totalCount: 0
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/DashboardResponse'
+          type: array
+        totalCount:
+          description: Total number of records matching the criteria
+          format: int64
+          type: integer
+      required:
+      - data
+      - totalCount
       type: object
   securitySchemes:
     BearerAuth:

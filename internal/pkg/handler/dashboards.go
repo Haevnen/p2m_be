@@ -15,7 +15,6 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
-	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 type dashboardHandler struct {
@@ -30,24 +29,31 @@ func newDashboardHandler(registry *registry.Registry) dashboardHandler {
 
 // InternalGetDailyDashboard (GET /dashboards/daily)
 func (h dashboardHandler) InternalGetDailyDashboard(c *gin.Context, params p2mapi.InternalGetDailyDashboardParams) {
-	dailyDashboard, err := h.dashboardInteractor.GetDailyDashboard(c, util.Begin(params.Date.Time), util.End(params.Date.Time))
+	if h.isInvalidTimeRange(c, params.StartTime, params.EndTime) {
+		return
+	}
+
+	dailyDashboard, count, err := h.dashboardInteractor.GetDailyDashboard(c, params.StartTime, params.EndTime, true, params.Page, params.PageSize)
 	if err != nil {
 		SendError(c, "get daily dashboard error", err)
 		return
 	}
 
-	c.JSON(http.StatusOK, dailyDashboard)
+	response := p2mapi.InlineResponse200{
+		Data:       dailyDashboard,
+		TotalCount: count,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // InternalExportDashboard (GET /dashboards/export)
 func (h dashboardHandler) InternalExportDashboard(c *gin.Context, params p2mapi.InternalExportDashboardParams) {
-	difference := params.EndTime.Sub(params.StartTime)
-	if int64(difference.Hours()/24) > model.MaxExportRangeInDay {
-		SendError(c, "export select time over range", apperror.ErrExportTimeOverRange)
+	if h.isInvalidTimeRange(c, params.StartTime, params.EndTime) {
 		return
 	}
 
-	data, err := h.dashboardInteractor.GetDailyDashboard(c, params.StartTime, params.EndTime)
+	data, _, err := h.dashboardInteractor.GetDailyDashboard(c, params.StartTime, params.EndTime, false, 0, 0)
 	if err != nil {
 		SendError(c, "export error", err)
 		return
@@ -55,7 +61,7 @@ func (h dashboardHandler) InternalExportDashboard(c *gin.Context, params p2mapi.
 
 	dataConvert := make([]*model.TicketExport, len(data))
 	for i, v := range data {
-		d := (model.DashboardResponse)(*v)
+		d := (model.DashboardResponse)(v)
 		dataConvert[i] = d.FromDashboardResponse()
 	}
 
@@ -87,6 +93,15 @@ func (h dashboardHandler) InternalExportDashboard(c *gin.Context, params p2mapi.
 			return
 		}
 	}
+}
+
+func (h dashboardHandler) isInvalidTimeRange(c *gin.Context, startTime, endTime time.Time) bool {
+	difference := endTime.Sub(startTime)
+	if int64(difference.Hours()/24) > model.MaxExportRangeInDay {
+		SendError(c, "export select time over range", apperror.ErrExportTimeOverRange)
+		return true
+	}
+	return false
 }
 
 // getCSVHeader returns the CSV header based on the `csv` tags in the struct

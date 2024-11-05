@@ -36,8 +36,8 @@ type TicketDashboard struct {
 	QcContractType     string `gorm:"column:qc_contract_type"`
 }
 
-func (t *TicketDashboard) FromTicket() *p2m_api.DashboardResponse {
-	return &p2m_api.DashboardResponse{
+func (t *TicketDashboard) FromTicket() p2m_api.DashboardResponse {
+	return p2m_api.DashboardResponse{
 		ClientId:           t.ClientIdStr,
 		EditingStyle:       t.EditingStyle,
 		NumOfMultipleImage: t.NumOfMultipleImage,
@@ -60,10 +60,10 @@ type TicketExport struct {
 	EditingStyle       string `csv:"Editing style"`
 	NumOfSingleImage   int32  `csv:"Quantity single"`
 	NumOfMultipleImage int32  `csv:"Quantity multiple"`
-	QcName             string `csv:"QC"`
-	QcContractType     string `csv:"QC contract type"`
 	EditorName         string `csv:"Editor"`
 	EditorContractType string `csv:"Editor contract type"`
+	QcName             string `csv:"QC"`
+	QcContractType     string `csv:"QC contract type"`
 }
 
 type DashboardResponse p2m_api.DashboardResponse
