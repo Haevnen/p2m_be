@@ -771,21 +771,52 @@ paths:
         - BearerAuth: []
       parameters:
         - in: query
-          name: date
+          name: start_time
           schema:
             type: string
-            format: date
+            format: date-time
           required: true
           description: date
+        - in: query
+          name: end_time
+          schema:
+            type: string
+            format: date-time
+          required: true
+          description: date
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          required: true
+          description: The page number to retrieve
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+          required: true
+          description: The number of items per page
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/DashboardResponse"
+                type: object
+                required:
+                  - data
+                  - totalCount
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DashboardResponse"
+                  totalCount:
+                    type: integer
+                    format: int64
+                    description: "Total number of records matching the criteria"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '400':

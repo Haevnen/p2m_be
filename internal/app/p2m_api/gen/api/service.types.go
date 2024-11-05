@@ -5,8 +5,6 @@ package p2m_api
 
 import (
 	"time"
-
-	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 const (
@@ -304,6 +302,14 @@ type UserWithoutPass struct {
 	NickName     string       `json:"nick_name"`
 }
 
+// InlineResponse200 defines model for inline_response_200.
+type InlineResponse200 struct {
+	Data []DashboardResponse `json:"data"`
+
+	// TotalCount Total number of records matching the criteria
+	TotalCount int64 `json:"totalCount"`
+}
+
 // InternalGetAllClientsParams defines parameters for InternalGetAllClients.
 type InternalGetAllClientsParams struct {
 	IncludingDeactivates *bool `form:"including_deactivates,omitempty" json:"including_deactivates,omitempty"`
@@ -341,8 +347,17 @@ type InternalRemoveCommentParams struct {
 
 // InternalGetDailyDashboardParams defines parameters for InternalGetDailyDashboard.
 type InternalGetDailyDashboardParams struct {
-	// Date date
-	Date openapi_types.Date `form:"date" json:"date"`
+	// StartTime date
+	StartTime time.Time `form:"start_time" json:"start_time"`
+
+	// EndTime date
+	EndTime time.Time `form:"end_time" json:"end_time"`
+
+	// Page The page number to retrieve
+	Page int `form:"page" json:"page"`
+
+	// PageSize The number of items per page
+	PageSize int `form:"pageSize" json:"pageSize"`
 }
 
 // InternalExportDashboardParams defines parameters for InternalExportDashboard.
