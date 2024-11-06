@@ -536,14 +536,11 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 }
 
 // Check if a ticket already exists for the given title and client ID
-func ticketExists(ctx context.Context, title string, ID int32) (bool, error) {
-	ti := dal.Q.Ticket
+func ticketExists(ctx context.Context, expectedInternalLink string, _ int32) (bool, error) {
+	l := dal.Q.Link
 
-	ticket, err := ti.WithContext(ctx).Where(ti.Title.Eq(title)).Where(ti.ClientID.Eq(ID)).Where(ti.IsActive.Is(true)).First()
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, err
-	}
-	return ticket != nil, nil
+	count, err := l.WithContext(ctx).Where(l.Link.Eq(expectedInternalLink)).Count()
+	return count > 0, err
 }
 
 func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.CreateTicketAutoBody) error {
@@ -591,10 +588,12 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 			continue
 		}
 
-		exists, err := ticketExists(ctx, title, client.Id)
+		// Check if ticket already exists
+		expectedInternalLink := `\\` + nasServer.InternalPath + strings.ReplaceAll(internalLink, "/", `\`)
+		exists, err := ticketExists(ctx, expectedInternalLink, client.Id)
 		if err != nil {
 			logger.Errorf("Failed to check if ticket exists: %s", title)
-			return err // Handle error checking for existing tickets
+			return err
 		}
 
 		if exists {
