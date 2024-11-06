@@ -597,7 +597,7 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 		}
 
 		if exists {
-			logger.Infof("Ticket already exists: %s", title)
+			logger.Infof("Ticket already exists: %s", expectedInternalLink)
 			continue // Skip if ticket already exists
 		}
 
