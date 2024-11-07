@@ -1,0 +1,1 @@
+ALTER TABLE links MODIFY COLUMN client_id INT;
