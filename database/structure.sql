@@ -85,6 +85,7 @@ DROP TABLE IF EXISTS `links`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `links` (
   `id` bigint NOT NULL AUTO_INCREMENT,
+  `client_id` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
   `ticket_id` bigint NOT NULL,
   `link` varchar(2083) COLLATE utf8mb4_bin NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT (now()),
