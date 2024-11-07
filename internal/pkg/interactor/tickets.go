@@ -110,6 +110,7 @@ func (t *TicketManagement) AddTicketManual(ctx context.Context, body p2mapi.Crea
 				links = append(links, &model.Link{
 					TicketID: newTicket.ID,
 					Link:     link,
+					ClientID: newTicket.ClientID,
 				})
 			}
 
@@ -536,10 +537,10 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 }
 
 // Check if a ticket already exists for the given title and client ID
-func ticketExists(ctx context.Context, expectedInternalLink string, _ int32) (bool, error) {
+func ticketExists(ctx context.Context, expectedInternalLink string, client int32) (bool, error) {
 	l := dal.Q.Link
 
-	count, err := l.WithContext(ctx).Where(l.Link.Eq(expectedInternalLink)).Count()
+	count, err := l.WithContext(ctx).Where(l.ClientID.Eq(client)).Where(l.Link.Eq(expectedInternalLink)).Count()
 	return count > 0, err
 }
 
@@ -651,6 +652,7 @@ func (t *TicketManagement) AddTicketAutoHelper(ctx context.Context, body p2mapi.
 				err = tx.Link.WithContext(childCtx).Create(&model.Link{
 					TicketID: ticket.ID,
 					Link:     `\\` + nasServer.InternalPath + strings.ReplaceAll(ticket.InternalLink, "/", `\`),
+					ClientID: ticket.ClientID,
 				})
 				if err != nil {
 					return err

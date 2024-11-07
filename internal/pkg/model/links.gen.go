@@ -13,6 +13,7 @@ const TableNameLink = "links"
 // Link mapped from table <links>
 type Link struct {
 	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	ClientID  int32     `gorm:"column:client_id" json:"client_id"`
 	TicketID  int64     `gorm:"column:ticket_id;not null" json:"ticket_id"`
 	Link      string    `gorm:"column:link;not null" json:"link"`
 	CreatedAt time.Time `gorm:"column:created_at;not null;default:now()" json:"created_at"`

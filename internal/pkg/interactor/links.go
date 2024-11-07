@@ -22,9 +22,22 @@ func (li *LinkManagement) CreateLink(ctx context.Context, link p2mapi.LinkBody) 
 	var linkModel model.Link
 	linkModel.ToLink(link)
 
+	ti := dal.Q.Ticket
+	ticket, err := ti.WithContext(ctx).Where(ti.ID.Eq(link.TicketId)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperror.ErrTicketNotFound
+		}
+		return nil, err
+	}
+	if ticket == nil {
+		return nil, apperror.ErrTicketNotFound
+	}
+	linkModel.ClientID = ticket.ClientID
+
 	l := dal.Q.Link
 	// gorm will automatically fetch the the value of PK and populate to linkModel.ID
-	err := l.WithContext(ctx).Create(&linkModel)
+	err = l.WithContext(ctx).Create(&linkModel)
 	if err != nil {
 		return nil, err
 	}

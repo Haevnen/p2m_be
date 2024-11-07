@@ -28,6 +28,7 @@ func newLink(db *gorm.DB, opts ...gen.DOOption) link {
 	tableName := _link.linkDo.TableName()
 	_link.ALL = field.NewAsterisk(tableName)
 	_link.ID = field.NewInt64(tableName, "id")
+	_link.ClientID = field.NewInt32(tableName, "client_id")
 	_link.TicketID = field.NewInt64(tableName, "ticket_id")
 	_link.Link = field.NewString(tableName, "link")
 	_link.CreatedAt = field.NewTime(tableName, "created_at")
@@ -42,6 +43,7 @@ type link struct {
 
 	ALL       field.Asterisk
 	ID        field.Int64
+	ClientID  field.Int32
 	TicketID  field.Int64
 	Link      field.String
 	CreatedAt field.Time
@@ -62,6 +64,7 @@ func (l link) As(alias string) *link {
 func (l *link) updateTableName(table string) *link {
 	l.ALL = field.NewAsterisk(table)
 	l.ID = field.NewInt64(table, "id")
+	l.ClientID = field.NewInt32(table, "client_id")
 	l.TicketID = field.NewInt64(table, "ticket_id")
 	l.Link = field.NewString(table, "link")
 	l.CreatedAt = field.NewTime(table, "created_at")
@@ -89,8 +92,9 @@ func (l *link) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (l *link) fillFieldMap() {
-	l.fieldMap = make(map[string]field.Expr, 4)
+	l.fieldMap = make(map[string]field.Expr, 5)
 	l.fieldMap["id"] = l.ID
+	l.fieldMap["client_id"] = l.ClientID
 	l.fieldMap["ticket_id"] = l.TicketID
 	l.fieldMap["link"] = l.Link
 	l.fieldMap["created_at"] = l.CreatedAt
