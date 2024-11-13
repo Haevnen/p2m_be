@@ -534,13 +534,13 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 		// Exception path:
 		// /volume3/FILES STATION/CLIENTS/COR/UPLOAD/01-07-2024/1513 Paddington
 		// /volume3/BRH/UPLOAD/2024/November/1/11-1 Melinda Brad 137
-		if len(parts) < 8 {
+		if len(parts) != 8 {
 			return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 		}
 	} else {
 		// Normal path:
 		// /volume3/FILES STATION/CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
-		if len(parts) < 10 {
+		if len(parts) != 10 {
 			return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
 		}
 	}
