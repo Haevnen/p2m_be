@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -349,6 +350,18 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 
 	// convert to api model
 	if len(ticketsDb) > 0 {
+		// Try to order by date instead of date-time
+		sort.Slice(ticketsDb, func(i, j int) bool {
+			// Compare year, month, and day only
+			if ticketsDb[i].CreatedAt.Year() != ticketsDb[j].CreatedAt.Year() {
+				return ticketsDb[i].CreatedAt.Year() < ticketsDb[j].CreatedAt.Year()
+			}
+			if ticketsDb[i].CreatedAt.Month() != ticketsDb[j].CreatedAt.Month() {
+				return ticketsDb[i].CreatedAt.Month() < ticketsDb[j].CreatedAt.Month()
+			}
+			return ticketsDb[i].CreatedAt.Day() < ticketsDb[j].CreatedAt.Day()
+		})
+
 		// Get all users
 		users, err := t.userManagement.GetAllUser(ctx, swag.Bool(true))
 		if err != nil {
@@ -378,7 +391,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 				Title:      ticket.Title,
 				UpdatedAt:  ticket.UpdatedAt.Format(constants.DateTimeFormat),
 				ClientId:   clientIdMapping[ticket.ClientID].ClientId,
-				CreatedAt:  ticket.CreatedAt.Format(constants.DateTimeFormat),
+				CreatedAt:  ticket.CreatedAt.Format(constants.DateFormat),
 			}
 
 			switch ticket.Status {
