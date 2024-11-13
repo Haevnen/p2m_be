@@ -326,7 +326,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 			// Or List all ticket in status DONE (for current day)
 			Or(tid.Where(ti.UpdatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2mapi.DONE)))))
 	// List by priority and updated_at asc
-	ticketQuery.Order(ti.CreatedAt.Asc()).Order(ci.ClientID).Order(ti.Priority.Desc())
+	ticketQuery.Order(ti.CreatedAt.Asc()).Order(ci.ClientID)
 
 	// if contract type is FREELANCE, return only ticket from themselves
 	if user.ContractType == string(p2mapi.FREELANCE) {
