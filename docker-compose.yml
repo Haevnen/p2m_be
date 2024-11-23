@@ -18,13 +18,14 @@ services:
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
       - ./docker/mysql/conf.d:/etc/mysql/conf.d/
     environment:
+      - TZ=Asia/Ho_Chi_Minh
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - MYSQL_USER
       - MYSQL_PASSWORD
     restart: always
     container_name: ${PROJECT_NAME}-db
-  
+
   app-api-internal_api:
     image: ${PROJECT_NAME}:go-delve-${DOCKER_BUILD_TAG_VERSION}
     build: ./docker/delve

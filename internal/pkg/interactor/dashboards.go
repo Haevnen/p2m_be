@@ -9,6 +9,7 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/dal"
 	"github.com/Haevnen/p2m_be/internal/pkg/model"
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
+	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 type DashboardManagement struct {
@@ -19,6 +20,24 @@ func NewDashboardManagement() *DashboardManagement {
 }
 
 func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to time.Time, usePaging bool, page, pageSize int) ([]p2m_api.DashboardResponse, int64, error) {
+	// If check from, to are UTC
+	// we will convert automatically to ICT
+	if util.IsUTC(from) {
+		if fromServerTime, err := util.ConvertToServerTimeZone(from); err != nil {
+			return nil, 0, err
+		} else {
+			from = *fromServerTime
+		}
+	}
+
+	if util.IsUTC(to) {
+		if toServerTime, err := util.ConvertToServerTimeZone(from); err != nil {
+			return nil, 0, err
+		} else {
+			to = *toServerTime
+		}
+	}
+
 	// Get payload to check if user is admin
 	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
 	if payload == nil {
