@@ -43,7 +43,7 @@ func (t *TicketDashboard) FromTicket() p2m_api.DashboardResponse {
 		NumOfMultipleImage: t.NumOfMultipleImage,
 		NumOfSingleImage:   t.NumOfSingleImage,
 		Title:              t.Title,
-		Date:               t.CreatedAt.Format(constants.DateTimeFormat),
+		Date:               t.CreatedAt.Format(constants.DateFormat),
 		TicketId:           t.ID,
 		QcName:             t.QcName,
 		QcContractType:     p2m_api.ContractType(t.QcContractType),
