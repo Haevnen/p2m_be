@@ -31,7 +31,7 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 	}
 
 	if util.IsUTC(to) {
-		if toServerTime, err := util.ConvertToServerTimeZone(from); err != nil {
+		if toServerTime, err := util.ConvertToServerTimeZone(to); err != nil {
 			return nil, 0, err
 		} else {
 			to = *toServerTime
