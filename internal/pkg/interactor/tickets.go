@@ -350,21 +350,6 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 
 	// convert to api model
 	if len(ticketsDb) > 0 {
-		// Try to order by date instead of date-time
-		sort.Slice(ticketsDb, func(i, j int) bool {
-			// Compare year, month, and day only
-			if ticketsDb[i].CreatedAt.Year() != ticketsDb[j].CreatedAt.Year() {
-				return ticketsDb[i].CreatedAt.Year() < ticketsDb[j].CreatedAt.Year()
-			}
-			if ticketsDb[i].CreatedAt.Month() != ticketsDb[j].CreatedAt.Month() {
-				return ticketsDb[i].CreatedAt.Month() < ticketsDb[j].CreatedAt.Month()
-			}
-			if ticketsDb[i].CreatedAt.Day() != ticketsDb[j].CreatedAt.Day() {
-				return ticketsDb[i].CreatedAt.Day() < ticketsDb[j].CreatedAt.Day()
-			}
-			return ticketsDb[i].ClientID < ticketsDb[j].ClientID
-		})
-
 		// Get all users
 		users, err := t.userManagement.GetAllUser(ctx, swag.Bool(true))
 		if err != nil {
@@ -384,6 +369,21 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		for _, client := range clients {
 			clientIdMapping[client.Id] = client
 		}
+
+		// Try to order by date instead of date-time
+		sort.Slice(ticketsDb, func(i, j int) bool {
+			// Compare year, month, and day only
+			if ticketsDb[i].CreatedAt.Year() != ticketsDb[j].CreatedAt.Year() {
+				return ticketsDb[i].CreatedAt.Year() < ticketsDb[j].CreatedAt.Year()
+			}
+			if ticketsDb[i].CreatedAt.Month() != ticketsDb[j].CreatedAt.Month() {
+				return ticketsDb[i].CreatedAt.Month() < ticketsDb[j].CreatedAt.Month()
+			}
+			if ticketsDb[i].CreatedAt.Day() != ticketsDb[j].CreatedAt.Day() {
+
+			}
+			return clientIdMapping[ticketsDb[i].ClientID].ClientId < clientIdMapping[ticketsDb[j].ClientID].ClientId
+		})
 
 		for _, ticket := range ticketsDb {
 			ticketItem := p2mapi.ListTicket{
