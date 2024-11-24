@@ -119,7 +119,7 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 		if ticketDashboard[i].CreatedAt.Day() != ticketDashboard[j].CreatedAt.Day() {
 			return ticketDashboard[i].CreatedAt.Day() < ticketDashboard[j].CreatedAt.Day()
 		}
-		return ticketDashboard[i].ClientID < ticketDashboard[j].ClientID
+		return ticketDashboard[i].ClientIdStr < ticketDashboard[j].ClientIdStr
 	})
 
 	var res []p2m_api.DashboardResponse
