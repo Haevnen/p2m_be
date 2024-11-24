@@ -67,7 +67,7 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 		Join(ue, ti.EditorID.EqCol(ue.UserID)).
 		Join(uc, ti.QcID.EqCol(uc.UserID)).
 		Where(ti.IsActive.Is(true), ti.CreatedAt.Between(from, to)).
-		Order(ci.ClientID.Asc(), ti.CreatedAt.Asc(), ti.Priority.Desc())
+		Order(ti.CreatedAt.Asc(), ci.ClientID)
 
 	var err error
 
@@ -116,7 +116,10 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 		if ticketDashboard[i].CreatedAt.Month() != ticketDashboard[j].CreatedAt.Month() {
 			return ticketDashboard[i].CreatedAt.Month() < ticketDashboard[j].CreatedAt.Month()
 		}
-		return ticketDashboard[i].CreatedAt.Day() < ticketDashboard[j].CreatedAt.Day()
+		if ticketDashboard[i].CreatedAt.Day() != ticketDashboard[j].CreatedAt.Day() {
+			return ticketDashboard[i].CreatedAt.Day() < ticketDashboard[j].CreatedAt.Day()
+		}
+		return ticketDashboard[i].ClientID < ticketDashboard[j].ClientID
 	})
 
 	var res []p2m_api.DashboardResponse

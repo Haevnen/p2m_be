@@ -359,7 +359,10 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 			if ticketsDb[i].CreatedAt.Month() != ticketsDb[j].CreatedAt.Month() {
 				return ticketsDb[i].CreatedAt.Month() < ticketsDb[j].CreatedAt.Month()
 			}
-			return ticketsDb[i].CreatedAt.Day() < ticketsDb[j].CreatedAt.Day()
+			if ticketsDb[i].CreatedAt.Day() != ticketsDb[j].CreatedAt.Day() {
+				return ticketsDb[i].CreatedAt.Day() < ticketsDb[j].CreatedAt.Day()
+			}
+			return ticketsDb[i].ClientID < ticketsDb[j].ClientID
 		})
 
 		// Get all users
