@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"context"
+	"sort"
 	"time"
 
 	p2m_api "github.com/Haevnen/p2m_be/internal/app/p2m_api/gen/api"
@@ -105,6 +106,18 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 			return nil, 0, err
 		}
 	}
+
+	// Try to order by date instead of date-time
+	sort.Slice(ticketDashboard, func(i, j int) bool {
+		// Compare year, month, and day only
+		if ticketDashboard[i].CreatedAt.Year() != ticketDashboard[j].CreatedAt.Year() {
+			return ticketDashboard[i].CreatedAt.Year() < ticketDashboard[j].CreatedAt.Year()
+		}
+		if ticketDashboard[i].CreatedAt.Month() != ticketDashboard[j].CreatedAt.Month() {
+			return ticketDashboard[i].CreatedAt.Month() < ticketDashboard[j].CreatedAt.Month()
+		}
+		return ticketDashboard[i].CreatedAt.Day() < ticketDashboard[j].CreatedAt.Day()
+	})
 
 	var res []p2m_api.DashboardResponse
 	for _, td := range ticketDashboard {
