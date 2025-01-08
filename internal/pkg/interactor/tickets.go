@@ -282,8 +282,9 @@ func (t *TicketManagement) UpdateTicket(ctx context.Context, ticketID int64, bod
 				return err
 			}
 		}
-
-		_, err = tx.Ticket.WithContext(childCtx).Where(tx.Ticket.ID.Eq(ticketID)).Where(tx.Ticket.IsActive.Is(true)).Omit(tx.Ticket.UpdatedAt).Updates(&ticket)
+		ti := dal.Q.Ticket
+		_, err = tx.Ticket.WithContext(childCtx).Select(ti.ID, ti.Title, ti.Status, ti.QcID, ti.EditorID, ti.Priority, ti.ClientID, ti.Description, ti.CreatedBy, ti.NumOfMultipleImage, ti.NumOfSingleImage, ti.IsActive, ti.CreatedAt).
+			Where(tx.Ticket.ID.Eq(ticketID)).Where(tx.Ticket.IsActive.Is(true)).Omit(tx.Ticket.UpdatedAt).Updates(&ticket)
 		return err
 	})
 }
