@@ -1,0 +1,7 @@
+
+CREATE TRIGGER set_created_at
+    BEFORE INSERT ON tickets
+    FOR EACH ROW
+BEGIN
+    SET NEW.created_at = CURRENT_TIMESTAMP;
+END;

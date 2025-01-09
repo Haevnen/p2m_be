@@ -30,6 +30,7 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 			from = *fromServerTime
 		}
 	}
+	from = util.ChangeToUTC(from)
 
 	if util.IsUTC(to) {
 		if toServerTime, err := util.ConvertToServerTimeZone(to); err != nil {
@@ -38,6 +39,7 @@ func (d *DashboardManagement) GetDailyDashboard(ctx context.Context, from, to ti
 			to = *toServerTime
 		}
 	}
+	to = util.ChangeToUTC(to)
 
 	// Get payload to check if user is admin
 	payload := ctx.Value(model.AuthorizationPayloadKey).(*interactorinterface.Payload)
