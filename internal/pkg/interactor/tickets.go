@@ -381,9 +381,17 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 				return ticketsDb[i].CreatedAt.Month() < ticketsDb[j].CreatedAt.Month()
 			}
 			if ticketsDb[i].CreatedAt.Day() != ticketsDb[j].CreatedAt.Day() {
-
+				return ticketsDb[i].CreatedAt.Day() < ticketsDb[j].CreatedAt.Day()
 			}
-			return clientIdMapping[ticketsDb[i].ClientID].ClientId < clientIdMapping[ticketsDb[j].ClientID].ClientId
+
+			// If year, month, and day are the same, compare by client
+			if ticketsDb[i].ClientID != ticketsDb[j].ClientID {
+				return clientIdMapping[ticketsDb[i].ClientID].ClientId < clientIdMapping[ticketsDb[j].ClientID].ClientId
+			}
+
+			// If year, month, day, and client are the same, compare by ticket
+			// name
+			return ticketsDb[i].Title < ticketsDb[j].Title
 		})
 
 		for _, ticket := range ticketsDb {
@@ -517,7 +525,7 @@ func (t *TicketManagement) getUnassignedUser(ctx context.Context) (*model.User, 
 func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder string) (string, string, string, error) {
 	indexOfRoot := strings.Index(folder, root)
 	if indexOfRoot == -1 {
-		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+		return "", "", "", fmt.Errorf("invalid folder path: %s - does not start with root path", folder)
 	}
 
 	// This regex looks for any characters between / and /UPLOAD/
@@ -530,7 +538,7 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 	}
 
 	if clientID == "" {
-		return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+		return "", "", "", fmt.Errorf("invalid folder path: %s - no client ID found", folder)
 	}
 
 	parts := strings.Split(folder, "/")
@@ -539,13 +547,13 @@ func (t *TicketManagement) parseFolderPathToGetTicketMetadata(root, folder strin
 		// /volume3/FILES STATION/CLIENTS/COR/UPLOAD/01-07-2024/1513 Paddington
 		// /volume3/BRH/UPLOAD/2024/November/1/11-1 Melinda Brad 137
 		if len(parts) != 8 {
-			return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+			return "", "", "", fmt.Errorf("invalid folder path: %s - wrong number of parts", folder)
 		}
 	} else {
 		// Normal path:
 		// /volume3/FILES STATION/CLIENTS/SAW/UPLOAD/2024/9/14/TestAuto
 		if len(parts) != 10 {
-			return "", "", "", fmt.Errorf("invalid folder path: %s", folder)
+			return "", "", "", fmt.Errorf("invalid folder path: %s - wrong number of parts", folder)
 		}
 	}
 

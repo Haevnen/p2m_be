@@ -75,10 +75,10 @@ func (ci *ClientManagement) GetAllClient(ctx context.Context, includeDeActive *b
 	var clients []*model.Client
 	var err error
 
-	if includeDeActive == nil || *includeDeActive == false {
-		clients, err = c.WithContext(ctx).Where(c.IsActive).Find()
+	if includeDeActive == nil || !*includeDeActive {
+		clients, err = c.WithContext(ctx).Where(c.IsActive).Order(c.ClientID).Find()
 	} else {
-		clients, err = c.WithContext(ctx).Find()
+		clients, err = c.WithContext(ctx).Order(c.ClientID).Find()
 	}
 
 	if err != nil {
