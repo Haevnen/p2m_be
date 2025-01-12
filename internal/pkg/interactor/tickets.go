@@ -316,6 +316,12 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 
 	var ticketsDb []*model.Ticket
 	now := time.Now()
+	from := util.Begin(now)
+	to := util.End(now)
+	if now.Hour() < 6 {
+		yesterday := now.AddDate(0, 0, -1)
+		from = util.Begin(yesterday)
+	}
 	// general query
 	// Only return needed fields (title, ticket-number, status, priority)
 	ticketQuery := tid.Join(ci, ti.ClientID.EqCol(ci.ID)).
@@ -325,7 +331,7 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 		// List all ticket not completed (for all day)
 		Where(tid.Where(ti.Status.Neq(string(p2mapi.DONE))).
 			// Or List all ticket in status DONE (for current day)
-			Or(tid.Where(ti.UpdatedAt.Between(util.Begin(now), util.End(now))).Where(ti.Status.Eq(string(p2mapi.DONE)))))
+			Or(tid.Where(ti.UpdatedAt.Between(from, to)).Where(ti.Status.Eq(string(p2mapi.DONE)))))
 	// List by priority and updated_at asc
 	ticketQuery.Order(ti.CreatedAt.Asc()).Order(ci.ClientID)
 
