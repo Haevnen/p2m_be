@@ -19,7 +19,6 @@ import (
 	"github.com/Haevnen/p2m_be/internal/pkg/registry/interactorinterface"
 	"github.com/Haevnen/p2m_be/pkg/constants"
 	"github.com/Haevnen/p2m_be/pkg/logger"
-	"github.com/Haevnen/p2m_be/pkg/util"
 )
 
 const (
@@ -316,11 +315,19 @@ func (t *TicketManagement) GetAllTicketsByContractType(ctx context.Context) ([]*
 
 	var ticketsDb []*model.Ticket
 	now := time.Now()
-	from := util.Begin(now)
-	to := util.End(now)
-	if now.Hour() < 6 {
-		yesterday := now.AddDate(0, 0, -1)
-		from = util.Begin(yesterday)
+	previousDate := now.AddDate(0, 0, -1)
+
+	// About DONE column
+	// 1. from 0h -> 4h59: show all DONE tickets from 5h of previous date to
+	// 4h59 of current date
+	// 2. from 5h -> 23h59: show all ticket that move to DONE from 5h -> 23h59
+	var from, to time.Time
+	if now.Hour() < 5 {
+		from = time.Date(previousDate.Year(), previousDate.Month(), previousDate.Day(), 5, 0, 0, 0, time.Local)
+		to = time.Date(now.Year(), now.Month(), now.Day(), 4, 59, 59, 0, time.Local)
+	} else {
+		from = time.Date(now.Year(), now.Month(), now.Day(), 5, 0, 0, 0, time.Local)
+		to = time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, time.Local)
 	}
 	// general query
 	// Only return needed fields (title, ticket-number, status, priority)
