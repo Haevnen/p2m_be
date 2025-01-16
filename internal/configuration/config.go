@@ -50,6 +50,7 @@ func (e *Config) GetGORMConfig() *gormdb.Config {
 		DBUser:            e.MySQLUser,
 		DBPass:            e.MySQLPassword,
 		DBName:            e.MySQLDatabase,
+		DBLocation:        "Asia/Ho_Chi_Minh",
 		LogSQL:            true,
 		MaxOpenConn:       10,
 		MaxLifetimeSecond: 300,
