@@ -45,7 +45,7 @@ var (
 	}
 )
 
-func (d definedErrorDetail) detailsJA(params ...any) []string {
+func (d definedErrorDetail) detailsEN(params ...any) []string {
 	return []string{fmt.Sprintf(d.msg, params...)}
 }
 

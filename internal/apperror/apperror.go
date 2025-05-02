@@ -18,8 +18,7 @@ type Error struct {
 	httpStatus int
 	resType    string
 	errCode    string
-	details    []string       // Use slice in case several messages are returned in the response
-	debug      map[string]any // Send Rollbar for debug purpose. Not for response, not put personal information.
+	details    []string // Use slice in case several messages are returned in the response
 }
 
 // Define application layer errors
@@ -50,14 +49,12 @@ var (
 	ErrExportTimeOverRange              = errors.New("ERR_EXPORT_TIME_OVER_RANGE")
 )
 
-// New constructor
-// TODO: Support adding stack trace. It doesn't show enough stack trace when the error occurs in deep layer.
 func New(_ context.Context, err error, params ...any) *Error {
 	if err == nil {
 		return nil
 	}
 
-	e := &Error{debug: map[string]any{}}
+	e := &Error{}
 	if errors.As(err, &e) {
 		return e
 	}
@@ -70,8 +67,7 @@ func New(_ context.Context, err error, params ...any) *Error {
 		}
 		e.httpStatus = defined.httpStatus
 		e.resType = defined.resType
-		// When we support i18n, get lang parameter from the context to switch detailsXX
-		e.details = defined.detailsJA(params...)
+		e.details = defined.detailsEN(params...)
 	} else {
 		if errors.Is(err, context.Canceled) {
 			e.errCode = errMessageMap[context.Canceled].errCode
@@ -89,21 +85,10 @@ func New(_ context.Context, err error, params ...any) *Error {
 	return e
 }
 
-// WithDebug add debug parameters
-func (e *Error) WithDebug(key string, value any) *Error {
-	e.debug[key] = value
-	return e
-}
-
 // Error satisfies error interface.
 func (e *Error) Error() string {
 	// Please not use this method for returning error to the client
 	return e.err.Error()
-}
-
-// Unwrap for errors.Unwrap
-func (e *Error) Unwrap() error {
-	return e.err
 }
 
 // HTTPStatus http status code
@@ -124,9 +109,4 @@ func (e *Error) ResType() string {
 // Detail error message for response
 func (e *Error) Detail() string {
 	return strings.Join(e.details, ",")
-}
-
-// DebugParams for error tracing
-func (e *Error) DebugParams() map[string]any {
-	return e.debug
 }

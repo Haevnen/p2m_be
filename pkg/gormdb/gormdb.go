@@ -90,7 +90,6 @@ func BuildMySQLConnectionString(c *Config) (string, error) {
 	if c.DBPort != 0 {
 		port = c.DBPort
 	}
-	// Hostにport番号を含めた場合は portの設定を無視する
 	if strings.Contains(c.DBHost, ":") {
 		cfg.Addr = c.DBHost
 	} else {
@@ -102,7 +101,7 @@ func BuildMySQLConnectionString(c *Config) (string, error) {
 	}
 	cfg.DBName = c.DBName
 
-	cfg.ParseTime = true // goの場合は基本的にtrue必須
+	cfg.ParseTime = true
 	cfg.InterpolateParams = c.DBInterpolateParams
 	if c.DBCollation != "" {
 		cfg.Collation = c.DBCollation
