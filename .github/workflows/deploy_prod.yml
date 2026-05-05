@@ -3,7 +3,7 @@ name: Deployment in Production
 on:
   push:
     branches:
-      - release
+      - master
 
 jobs:
   deploy-db:
